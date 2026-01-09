@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import { cn } from "@/lib/utils";
 
 const navigation = [
@@ -55,6 +56,7 @@ export function Header() {
 
           {/* CTA Button */}
           <div className="hidden lg:flex items-center gap-4">
+            <ThemeSwitcher />
             <Button variant="gold" size="lg" asChild>
               <Link to="/contact">Schedule a Call</Link>
             </Button>
