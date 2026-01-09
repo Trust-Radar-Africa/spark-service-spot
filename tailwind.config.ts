@@ -72,6 +72,15 @@ export default {
         },
         cream: "hsl(var(--cream))",
         slate: "hsl(var(--slate))",
+        qx: {
+          blue: "hsl(var(--qx-blue))",
+          "blue-dark": "hsl(var(--qx-blue-dark))",
+          orange: "hsl(var(--qx-orange))",
+          "orange-dark": "hsl(var(--qx-orange-dark))",
+          gray: "hsl(var(--qx-gray))",
+          "light-gray": "hsl(var(--qx-light-gray))",
+          "light-blue": "hsl(var(--qx-light-blue))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
