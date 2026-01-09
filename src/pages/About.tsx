@@ -57,7 +57,7 @@ export default function About() {
             <p className="text-xl text-primary-foreground/80 leading-relaxed">
               A firm of Certified Public Accountants handling exclusively
               outsourced assignments from firms of accountants in the USA,
-              Canada, and Europe.
+              Canada, Europe and Australia.
             </p>
           </div>
         </div>
@@ -82,7 +82,8 @@ export default function About() {
                 Federation of Accountants. Being a reputable licensed
                 professional firm of accountants, we guarantee that your affairs
                 will be handled in accordance with best international ethical
-                and professional standards.
+                and professional standards. Based on your needs, we shall identify the most suitable 
+                candidate for the role in hand.
               </p>
 
               <div className="flex items-center gap-4 p-4 rounded-lg bg-muted border border-border">
@@ -180,9 +181,11 @@ export default function About() {
           <h2 className="text-3xl md:text-4xl font-serif font-bold text-primary-foreground mb-4">
             Take the Next Step
           </h2>
-          <p className="text-primary-foreground/70 max-w-2xl mx-auto mb-10">
-            Schedule a call to discuss further how we can contribute to the
-            mission of your firm.
+          <p className="text-primary-foreground/70 max-w-2xl mx-auto mb-6">
+            We strongly recommend that you schedule a call to discuss further how we can contribute to the mission of your firm.
+          </p>
+          <p className="text-primary-foreground/60 max-w-2xl mx-auto mb-10 text-sm">
+            If you would like us to refer a candidate meeting certain specifications, send us your request.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button variant="hero" size="xl" asChild>

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Mail, Calendar, Send, CheckCircle2, Phone, MessageSquare } from "lucide-react";
+import { Mail, Calendar, Send, CheckCircle2, Phone, MapPin } from "lucide-react";
 import { toast } from "sonner";
 
 export default function ContactModern() {
@@ -86,6 +86,23 @@ export default function ContactModern() {
               </p>
 
               <div className="space-y-4">
+                {/* Phone */}
+                <div className="flex items-start gap-4 p-5 rounded-xl bg-qx-light-gray border border-gray-100">
+                  <div className="w-10 h-10 rounded-lg bg-qx-orange flex items-center justify-center flex-shrink-0">
+                    <Phone className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-qx-blue mb-1">Call Us</h3>
+                    <a
+                      href="tel:+18885566382"
+                      className="text-qx-orange hover:underline text-sm"
+                    >
+                      +1 888 556 6382
+                    </a>
+                  </div>
+                </div>
+
+                {/* Email */}
                 <div className="flex items-start gap-4 p-5 rounded-xl bg-qx-light-gray border border-gray-100">
                   <div className="w-10 h-10 rounded-lg bg-qx-orange flex items-center justify-center flex-shrink-0">
                     <Mail className="w-5 h-5 text-white" />
@@ -98,12 +115,24 @@ export default function ContactModern() {
                     >
                       info@multiversecpa.com
                     </a>
-                    <p className="text-xs text-qx-gray mt-1">
-                      We respond within 24 hours
+                  </div>
+                </div>
+
+                {/* Address */}
+                <div className="flex items-start gap-4 p-5 rounded-xl bg-qx-light-gray border border-gray-100">
+                  <div className="w-10 h-10 rounded-lg bg-qx-orange flex items-center justify-center flex-shrink-0">
+                    <MapPin className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-qx-blue mb-1">Our Address</h3>
+                    <p className="text-sm text-qx-gray">
+                      500 Westover Dr #31297<br />
+                      Sanford, NC 27330
                     </p>
                   </div>
                 </div>
 
+                {/* Schedule Meeting */}
                 <div className="flex items-start gap-4 p-5 rounded-xl bg-qx-light-gray border border-gray-100">
                   <div className="w-10 h-10 rounded-lg bg-qx-orange flex items-center justify-center flex-shrink-0">
                     <Calendar className="w-5 h-5 text-white" />
@@ -112,18 +141,6 @@ export default function ContactModern() {
                     <h3 className="font-bold text-qx-blue mb-1">Book a Meeting</h3>
                     <p className="text-sm text-qx-gray">
                       Schedule a time to discuss your outsourcing needs.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4 p-5 rounded-xl bg-qx-light-gray border border-gray-100">
-                  <div className="w-10 h-10 rounded-lg bg-qx-orange flex items-center justify-center flex-shrink-0">
-                    <MessageSquare className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-qx-blue mb-1">Live Chat</h3>
-                    <p className="text-sm text-qx-gray">
-                      Chat with our team for quick answers.
                     </p>
                   </div>
                 </div>

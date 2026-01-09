@@ -75,7 +75,7 @@ export default function AboutModern() {
               <span className="text-qx-orange">Accounting Excellence</span>
             </h1>
             <p className="text-lg text-white/80 leading-relaxed">
-              A firm of Certified Public Accountants handling exclusively outsourced assignments from firms of accountants in the USA, Canada, and Europe.
+              A firm of Certified Public Accountants handling exclusively outsourced assignments from firms of accountants in the USA, Canada, Europe and Australia.
             </p>
           </div>
         </div>

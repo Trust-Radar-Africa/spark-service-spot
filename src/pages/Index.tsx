@@ -10,19 +10,13 @@ import bookkeepingImg from "@/assets/bookkeeping-service.jpg";
 import consultingImg from "@/assets/consulting-service.jpg";
 
 const taglines = [
-  "SETTING THE STANDARD IN REMOTE ACCOUNTING OUTSOURCING",
-  "A PARADIGM SHIFT IN REMOTE BOOKKEEPING OUTSOURCING",
-  "GLOBAL REMOTE AUDIT SUPPORT OUTSOURCING",
-  "LEADERS IN REMOTE OUTSOURCED CONSULTING SERVICES",
+  "EXCEPTIONAL OUTSOURCED OFFSHORE ACCOUNTING SOLUTIONS",
+  "BLENDING NEW TECHNIQUES WITH TRADITIONAL VALUES",
+  "GLOBAL ASSIGNMENTS FROM US, CANADA, AUSTRALIA & EUROPE",
+  "YOUR ONE-STOP SHOP FOR FINANCIAL NEEDS",
 ];
 
 const services = [
-  {
-    title: "Outsourced Audit",
-    description: "Expert audit services under US GAAP, IFRS, and FRS frameworks with experienced professionals.",
-    image: auditImg,
-    href: "/services#audit",
-  },
   {
     title: "Bookkeeping",
     description: "Professional bookkeeping using Xero, QuickBooks, Sage, and more to boost your firm's productivity.",
@@ -30,10 +24,16 @@ const services = [
     href: "/services#bookkeeping",
   },
   {
-    title: "Consulting",
-    description: "Financial analysis, budget planning, and strategic consulting with superior expertise.",
+    title: "Tax Preparation",
+    description: "Expert tax preparation services ensuring compliance and optimization.",
+    image: auditImg,
+    href: "/services#tax",
+  },
+  {
+    title: "Audit & Review",
+    description: "Audit, review and compilation of financial statements under multiple frameworks.",
     image: consultingImg,
-    href: "/services#consulting",
+    href: "/services#audit",
   },
 ];
 
@@ -111,9 +111,8 @@ export default function Index() {
             </div>
 
             <p className="text-base md:text-lg text-primary-foreground/70 max-w-2xl mx-auto mb-10 leading-relaxed">
-              Your premier destination for exceptional outsourced accounting
-              solutions. We blend innovative techniques with traditional values
-              to deliver the best accounting experience.
+              Your premier destination for exceptional outsourced offshore accounting solutions. 
+              We blend new techniques with traditional values to provide the best accounting experience possible.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -203,7 +202,7 @@ export default function Index() {
               Our <span className="text-accent">Services</span>
             </h2>
             <p className="text-muted-foreground">
-              We act as a one-stop shop for your company's financial needs.
+              We act as a one-stop shop for your company's financial needs, reducing the need to communicate with multiple accounting outsourcing companies.
             </p>
           </div>
 
@@ -267,9 +266,9 @@ export default function Index() {
               <p className="text-muted-foreground mb-6 leading-relaxed">
                 Multiverse CPA is a firm of Certified Public Accountants
                 handling exclusively outsourced assignments from firms of
-                accountants in the USA, Canada, and Europe. Our team comprises
+                accountants in the USA, Canada, Europe and Australia. Our team comprises
                 CPAs and Chartered Accountants from diverse nationalities and
-                backgrounds.
+                backgrounds who have been vetted, tried and tested.
               </p>
 
               <ul className="space-y-4 mb-8">
