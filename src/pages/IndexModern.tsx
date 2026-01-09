@@ -50,25 +50,25 @@ const whyChoose = [
 
 const services = [
   {
-    title: "Outsourced Audit Support",
-    description: "Expert audit and assurance services under US GAAP, IFRS, and FRS frameworks.",
-    icon: FileSearch,
-    image: auditImg,
-    href: "/services#audit",
-  },
-  {
-    title: "Outsourced Bookkeeping",
+    title: "Bookkeeping",
     description: "Professional bookkeeping using Xero, QuickBooks, Sage, and more.",
     icon: Calculator,
     image: bookkeepingImg,
     href: "/services#bookkeeping",
   },
   {
-    title: "Consulting Services",
-    description: "Financial analysis, budget planning, and strategic consulting.",
+    title: "Tax Preparation",
+    description: "Expert tax preparation ensuring compliance and optimization.",
+    icon: FileSearch,
+    image: auditImg,
+    href: "/services#tax",
+  },
+  {
+    title: "Audit & Review",
+    description: "Audit, review and compilation of financial statements.",
     icon: BarChart3,
     image: consultingImg,
-    href: "/services#consulting",
+    href: "/services#audit",
   },
 ];
 
@@ -93,11 +93,12 @@ export default function IndexModern() {
               </div>
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
-                Global Leaders in{" "}
-                <span className="text-qx-orange">Accounting Outsourcing</span>
+                Exceptional{" "}
+                <span className="text-qx-orange">Offshore Accounting</span> Solutions
               </h1>
 
               <p className="text-lg text-white/80 mb-8 max-w-xl leading-relaxed">
+                Your premier destination for outsourced offshore accounting solutions. Our team has handled diverse assignments from the US, Canada, Australia, and Europe.
                 Helping accountants grow their firm's capacity and profitability with outsourcing solutions that follow a three-pronged approach: <strong className="text-qx-orange">People, Process & Platforms</strong>.
               </p>
 

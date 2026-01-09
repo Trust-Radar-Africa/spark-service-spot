@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Mail, Calendar, Send, CheckCircle2 } from "lucide-react";
+import { Mail, Calendar, Send, CheckCircle2, Phone, MapPin } from "lucide-react";
 import { toast } from "sonner";
 
 export default function Contact() {
@@ -84,6 +84,24 @@ export default function Contact() {
               </p>
 
               <div className="space-y-6">
+                {/* Phone */}
+                <div className="flex items-start gap-4 p-6 rounded-xl bg-muted border border-border">
+                  <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                    <Phone className="w-6 h-6 text-accent" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-foreground mb-1">
+                      Call Us
+                    </h3>
+                    <a
+                      href="tel:+18885566382"
+                      className="text-accent hover:underline"
+                    >
+                      +1 888 556 6382
+                    </a>
+                  </div>
+                </div>
+
                 {/* Email */}
                 <div className="flex items-start gap-4 p-6 rounded-xl bg-muted border border-border">
                   <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
@@ -99,8 +117,21 @@ export default function Contact() {
                     >
                       info@multiversecpa.com
                     </a>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      We respond within 24 hours
+                  </div>
+                </div>
+
+                {/* Address */}
+                <div className="flex items-start gap-4 p-6 rounded-xl bg-muted border border-border">
+                  <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                    <MapPin className="w-6 h-6 text-accent" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-foreground mb-1">
+                      Our Address
+                    </h3>
+                    <p className="text-muted-foreground text-sm">
+                      500 Westover Dr #31297<br />
+                      Sanford, NC 27330
                     </p>
                   </div>
                 </div>
@@ -115,8 +146,7 @@ export default function Contact() {
                       Schedule a Meeting
                     </h3>
                     <p className="text-muted-foreground text-sm">
-                      Book a time that works for you to discuss your needs with
-                      our team.
+                      Book a time that works for you to discuss your needs.
                     </p>
                   </div>
                 </div>
