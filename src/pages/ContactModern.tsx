@@ -61,7 +61,7 @@ export default function ContactModern() {
                 Contact Us
               </span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            <h1 className="text-4xl md:text-5xl font-montserrat font-bold text-white mb-6">
               Book a{" "}
               <span className="text-qx-orange">Free Consultation</span>
             </h1>
@@ -78,7 +78,7 @@ export default function ContactModern() {
           <div className="grid lg:grid-cols-2 gap-16">
             {/* Contact Info */}
             <div>
-              <h2 className="text-3xl font-bold text-qx-blue mb-6">
+              <h2 className="text-3xl font-montserrat font-bold text-qx-blue mb-6">
                 Get in Touch
               </h2>
               <p className="text-qx-gray mb-10 leading-relaxed">

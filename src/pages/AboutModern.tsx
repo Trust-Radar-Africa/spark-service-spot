@@ -70,7 +70,7 @@ export default function AboutModern() {
                 About Us
               </span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            <h1 className="text-4xl md:text-5xl font-montserrat font-bold text-white mb-6">
               Your Partner in{" "}
               <span className="text-qx-orange">Accounting Excellence</span>
             </h1>
@@ -91,7 +91,7 @@ export default function AboutModern() {
                   <item.icon className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-qx-blue mb-1">{item.title}</h3>
+                  <h3 className="text-lg font-montserrat font-bold text-qx-blue mb-1">{item.title}</h3>
                   <p className="text-sm text-qx-gray">{item.description}</p>
                 </div>
               </div>
@@ -105,7 +105,7 @@ export default function AboutModern() {
         <div className="container mx-auto px-4 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-qx-blue mb-6">
+              <h2 className="text-3xl md:text-4xl font-montserrat font-bold text-qx-blue mb-6">
                 Who We Are
               </h2>
               <p className="text-qx-gray mb-6 leading-relaxed">
@@ -147,7 +147,7 @@ export default function AboutModern() {
       <section className="py-20 bg-qx-light-gray">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-14">
-            <h2 className="text-3xl md:text-4xl font-bold text-qx-blue mb-4">
+            <h2 className="text-3xl md:text-4xl font-montserrat font-bold text-qx-blue mb-4">
               Why Outsource to Multiverse CPA?
             </h2>
             <p className="text-qx-gray">
@@ -173,7 +173,7 @@ export default function AboutModern() {
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-14">
-            <h2 className="text-3xl md:text-4xl font-bold text-qx-blue mb-4">
+            <h2 className="text-3xl md:text-4xl font-montserrat font-bold text-qx-blue mb-4">
               Our Core Values
             </h2>
             <p className="text-qx-gray">
@@ -190,7 +190,7 @@ export default function AboutModern() {
                 <div className="w-14 h-14 rounded-full bg-qx-orange/10 flex items-center justify-center mx-auto mb-5">
                   <value.icon className="w-7 h-7 text-qx-orange" />
                 </div>
-                <h3 className="text-lg font-bold text-qx-blue mb-2">
+                <h3 className="text-lg font-montserrat font-bold text-qx-blue mb-2">
                   {value.title}
                 </h3>
                 <p className="text-sm text-qx-gray">

@@ -92,7 +92,7 @@ export default function IndexModern() {
                 </span>
               </div>
 
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-montserrat font-bold text-white mb-6 leading-tight">
                 Exceptional{" "}
                 <span className="text-qx-orange">Offshore Accounting</span> Solutions
               </h1>
@@ -151,7 +151,7 @@ export default function IndexModern() {
       <section className="py-16 bg-white border-b">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-2xl md:text-3xl font-bold text-qx-blue mb-4">
+            <h2 className="text-2xl md:text-3xl font-montserrat font-bold text-qx-blue mb-4">
               Market Leaders in Accounting Outsourcing
             </h2>
             <p className="text-qx-gray max-w-2xl mx-auto">
@@ -181,7 +181,7 @@ export default function IndexModern() {
       <section className="py-20 bg-qx-light-gray">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-bold text-qx-blue mb-4">
+            <h2 className="text-3xl md:text-4xl font-montserrat font-bold text-qx-blue mb-4">
               Why Choose Multiverse CPA
             </h2>
             <p className="text-qx-gray max-w-2xl mx-auto">
@@ -198,7 +198,7 @@ export default function IndexModern() {
                 <div className="w-12 h-12 rounded-lg bg-qx-orange/10 flex items-center justify-center mb-4 group-hover:bg-qx-orange group-hover:text-white transition-colors">
                   <item.icon className="w-6 h-6 text-qx-orange group-hover:text-white" />
                 </div>
-                <h3 className="text-lg font-bold text-qx-blue mb-2">
+                <h3 className="text-lg font-montserrat font-bold text-qx-blue mb-2">
                   {item.title}
                 </h3>
                 <p className="text-sm text-qx-gray leading-relaxed">
@@ -214,7 +214,7 @@ export default function IndexModern() {
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-bold text-qx-blue mb-4">
+            <h2 className="text-3xl md:text-4xl font-montserrat font-bold text-qx-blue mb-4">
               Our Outsourcing Services
             </h2>
             <p className="text-qx-gray max-w-2xl mx-auto">
@@ -241,7 +241,7 @@ export default function IndexModern() {
                     <div className="w-10 h-10 rounded-lg bg-qx-orange/10 flex items-center justify-center">
                       <service.icon className="w-5 h-5 text-qx-orange" />
                     </div>
-                    <h3 className="text-lg font-bold text-qx-blue group-hover:text-qx-orange transition-colors">
+                    <h3 className="text-lg font-montserrat font-bold text-qx-blue group-hover:text-qx-orange transition-colors">
                       {service.title}
                     </h3>
                   </div>
@@ -262,7 +262,7 @@ export default function IndexModern() {
       {/* CTA Section */}
       <section className="py-20 bg-qx-blue">
         <div className="container mx-auto px-4 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          <h2 className="text-3xl md:text-4xl font-montserrat font-bold text-white mb-4">
             Ready to Scale Your Accounting Firm?
           </h2>
           <p className="text-white/70 max-w-2xl mx-auto mb-10">

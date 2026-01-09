@@ -71,7 +71,7 @@ export default function ServicesModern() {
                 Our Services
               </span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            <h1 className="text-4xl md:text-5xl font-montserrat font-bold text-white mb-6">
               Outsourcing Services for{" "}
               <span className="text-qx-orange">Accounting Firms</span>
             </h1>
