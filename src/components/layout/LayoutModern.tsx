@@ -8,7 +8,7 @@ interface LayoutModernProps {
 
 export function LayoutModern({ children }: LayoutModernProps) {
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-white font-poppins">
       <HeaderModern />
       <main className="flex-1 pt-16">{children}</main>
       <FooterModern />

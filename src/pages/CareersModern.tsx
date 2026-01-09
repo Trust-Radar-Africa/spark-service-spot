@@ -75,7 +75,7 @@ export default function CareersModern() {
                 Careers
               </span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            <h1 className="text-4xl md:text-5xl font-montserrat font-bold text-white mb-6">
               Join Our{" "}
               <span className="text-qx-orange">Global Team</span>
             </h1>
@@ -91,7 +91,7 @@ export default function CareersModern() {
         <div className="container mx-auto px-4 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-qx-blue mb-6">
+              <h2 className="text-3xl md:text-4xl font-montserrat font-bold text-qx-blue mb-6">
                 Why Work With Us?
               </h2>
               <p className="text-qx-gray mb-8 leading-relaxed">
