@@ -2,9 +2,23 @@ import { Link } from "react-router-dom";
 import { LayoutModern } from "@/components/layout/LayoutModern";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Calendar, User, Clock } from "lucide-react";
-import { featuredPost, posts, categories } from "@/data/blogData";
+import { BlogSearch } from "@/components/BlogSearch";
+import { useBlogSearch } from "@/hooks/useBlogSearch";
+import { featuredPost, categories } from "@/data/blogData";
 
 export default function BlogModern() {
+  const { 
+    setSearchQuery, 
+    filteredPosts, 
+    isLoading, 
+    selectedCategory, 
+    setSelectedCategory 
+  } = useBlogSearch();
+
+  // Separate featured from other posts in filtered results
+  const isFeaturedInResults = filteredPosts.some(p => p.slug === featuredPost.slug);
+  const displayPosts = filteredPosts.filter(p => p.slug !== featuredPost.slug);
+
   return (
     <LayoutModern>
       {/* Hero Section */}
@@ -13,9 +27,10 @@ export default function BlogModern() {
           <h1 className="text-4xl md:text-5xl font-montserrat font-bold text-white mb-4">
             Insights & <span className="text-qx-orange">Resources</span>
           </h1>
-          <p className="text-white/70 max-w-2xl mx-auto text-lg">
+          <p className="text-white/70 max-w-2xl mx-auto text-lg mb-8">
             Expert perspectives on accounting, outsourcing best practices, and industry trends.
           </p>
+          <BlogSearch onSearch={setSearchQuery} isLoading={isLoading} variant="modern" />
         </div>
       </section>
 
@@ -26,8 +41,9 @@ export default function BlogModern() {
             {categories.map((category) => (
               <button
                 key={category}
+                onClick={() => setSelectedCategory(category)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                  category === "All"
+                  category === selectedCategory
                     ? "bg-qx-orange text-white"
                     : "bg-qx-light-gray text-qx-gray hover:bg-qx-blue/10 hover:text-qx-blue"
                 }`}
@@ -39,103 +55,114 @@ export default function BlogModern() {
         </div>
       </section>
 
-      {/* Featured Post */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-8 items-center">
-            <div className="aspect-[16/10] rounded-2xl overflow-hidden shadow-xl">
-              <img
-                src={featuredPost.image}
-                alt={featuredPost.title}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div>
-              <span className="inline-block px-3 py-1 bg-qx-orange/10 text-qx-orange text-sm font-medium rounded-full mb-4">
-                {featuredPost.category}
-              </span>
-              <h2 className="text-3xl md:text-4xl font-montserrat font-bold text-qx-blue mb-4">
-                {featuredPost.title}
-              </h2>
-              <p className="text-qx-gray mb-6 leading-relaxed">
-                {featuredPost.excerpt}
-              </p>
-              <div className="flex flex-wrap items-center gap-4 text-sm text-qx-gray mb-6">
-                <span className="flex items-center gap-1">
-                  <User className="w-4 h-4" />
-                  {featuredPost.author.name}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Calendar className="w-4 h-4" />
-                  {featuredPost.date}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Clock className="w-4 h-4" />
-                  {featuredPost.readTime}
-                </span>
+      {/* Featured Post - only show if in results */}
+      {isFeaturedInResults && (
+        <section className="py-16 bg-white">
+          <div className="container mx-auto px-4 lg:px-8">
+            <div className="grid lg:grid-cols-2 gap-8 items-center">
+              <div className="aspect-[16/10] rounded-2xl overflow-hidden shadow-xl">
+                <img
+                  src={featuredPost.image}
+                  alt={featuredPost.title}
+                  className="w-full h-full object-cover"
+                />
               </div>
-              <Button className="bg-qx-orange hover:bg-qx-orange-dark text-white rounded-full px-8" asChild>
-                <Link to={`/blog/${featuredPost.slug}`}>
-                  Read Article
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
+              <div>
+                <span className="inline-block px-3 py-1 bg-qx-orange/10 text-qx-orange text-sm font-medium rounded-full mb-4">
+                  {featuredPost.category}
+                </span>
+                <h2 className="text-3xl md:text-4xl font-montserrat font-bold text-qx-blue mb-4">
+                  {featuredPost.title}
+                </h2>
+                <p className="text-qx-gray mb-6 leading-relaxed">
+                  {featuredPost.excerpt}
+                </p>
+                <div className="flex flex-wrap items-center gap-4 text-sm text-qx-gray mb-6">
+                  <span className="flex items-center gap-1">
+                    <User className="w-4 h-4" />
+                    {featuredPost.author.name}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Calendar className="w-4 h-4" />
+                    {featuredPost.date}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    {featuredPost.readTime}
+                  </span>
+                </div>
+                <Button className="bg-qx-orange hover:bg-qx-orange-dark text-white rounded-full px-8" asChild>
+                  <Link to={`/blog/${featuredPost.slug}`}>
+                    Read Article
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Posts Grid */}
       <section className="py-16 bg-qx-light-gray">
         <div className="container mx-auto px-4 lg:px-8">
           <h3 className="text-2xl font-montserrat font-bold text-qx-blue mb-8">
-            Latest Articles
+            {filteredPosts.length === 0 ? "No articles found" : "Latest Articles"}
           </h3>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {posts.map((post) => (
-              <Link
-                key={post.slug}
-                to={`/blog/${post.slug}`}
-                className="bg-white rounded-xl overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300 group"
-              >
-                <div className="aspect-[16/10] overflow-hidden">
-                  <img
-                    src={post.image}
-                    alt={post.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="p-6">
-                  <span className="inline-block px-2 py-1 bg-qx-orange/10 text-qx-orange text-xs font-medium rounded mb-3">
-                    {post.category}
-                  </span>
-                  <h4 className="font-montserrat text-lg font-bold text-qx-blue mb-2 group-hover:text-qx-orange transition-colors line-clamp-2">
-                    {post.title}
-                  </h4>
-                  <p className="text-qx-gray text-sm mb-4 line-clamp-2">
-                    {post.excerpt}
-                  </p>
-                  <div className="flex items-center justify-between text-xs text-qx-gray">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-3 h-3" />
-                      {post.date}
-                    </span>
-                    <span>{post.readTime}</span>
+          
+          {displayPosts.length > 0 ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {displayPosts.map((post) => (
+                <Link
+                  key={post.slug}
+                  to={`/blog/${post.slug}`}
+                  className="bg-white rounded-xl overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300 group"
+                >
+                  <div className="aspect-[16/10] overflow-hidden">
+                    <img
+                      src={post.image}
+                      alt={post.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
                   </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+                  <div className="p-6">
+                    <span className="inline-block px-2 py-1 bg-qx-orange/10 text-qx-orange text-xs font-medium rounded mb-3">
+                      {post.category}
+                    </span>
+                    <h4 className="font-montserrat text-lg font-bold text-qx-blue mb-2 group-hover:text-qx-orange transition-colors line-clamp-2">
+                      {post.title}
+                    </h4>
+                    <p className="text-qx-gray text-sm mb-4 line-clamp-2">
+                      {post.excerpt}
+                    </p>
+                    <div className="flex items-center justify-between text-xs text-qx-gray">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        {post.date}
+                      </span>
+                      <span>{post.readTime}</span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : !isFeaturedInResults && (
+            <p className="text-center text-qx-gray py-12">
+              No articles match your search criteria. Try a different search term or category.
+            </p>
+          )}
 
-          <div className="text-center mt-12">
-            <Button 
-              variant="outline" 
-              className="border-qx-blue text-qx-blue hover:bg-qx-blue hover:text-white rounded-full px-8"
-            >
-              Load More Articles
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
+          {displayPosts.length > 0 && (
+            <div className="text-center mt-12">
+              <Button 
+                variant="outline" 
+                className="border-qx-blue text-qx-blue hover:bg-qx-blue hover:text-white rounded-full px-8"
+              >
+                Load More Articles
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          )}
         </div>
       </section>
 
