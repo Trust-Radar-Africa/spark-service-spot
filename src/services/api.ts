@@ -243,6 +243,31 @@ class ApiService {
       body: JSON.stringify({ is_active: isActive }),
     });
   }
+
+  // Employer Requests endpoints
+  async getEmployerRequests(filters?: {
+    country?: string;
+    experience?: string;
+    search?: string;
+    page?: number;
+  }) {
+    const params = new URLSearchParams();
+    if (filters?.country) params.append('country', filters.country);
+    if (filters?.experience) params.append('experience', filters.experience);
+    if (filters?.search) params.append('search', filters.search);
+    if (filters?.page) params.append('page', filters.page.toString());
+
+    return this.request<{
+      data: any[];
+      meta: { current_page: number; last_page: number; total: number };
+    }>(`/api/admin/employer-requests?${params.toString()}`);
+  }
+
+  async deleteEmployerRequest(id: number) {
+    return this.request(`/api/admin/employer-requests/${id}`, {
+      method: 'DELETE',
+    });
+  }
 }
 
 export const api = new ApiService();

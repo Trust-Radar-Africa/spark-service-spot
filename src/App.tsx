@@ -26,6 +26,10 @@ import CareersModern from "./pages/CareersModern";
 import ApplyModern from "./pages/ApplyModern";
 import ContactModern from "./pages/ContactModern";
 
+// Employer pages
+import Employers from "./pages/Employers";
+import EmployersModern from "./pages/EmployersModern";
+
 // Admin pages
 import AdminLogin from "./pages/admin/AdminLogin";
 import CandidatesPage from "./pages/admin/CandidatesPage";
@@ -51,6 +55,7 @@ function ThemedRoutes() {
         <Route path="/blog/:slug" element={<BlogPostModern />} />
         <Route path="/careers" element={<CareersModern />} />
         <Route path="/apply" element={<ApplyModern />} />
+        <Route path="/employers" element={<EmployersModern />} />
         <Route path="/contact" element={<ContactModern />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
@@ -66,6 +71,7 @@ function ThemedRoutes() {
       <Route path="/blog/:slug" element={<BlogPost />} />
       <Route path="/careers" element={<Careers />} />
       <Route path="/apply" element={<Apply />} />
+      <Route path="/employers" element={<Employers />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="*" element={<NotFound />} />
     </Routes>

@@ -204,6 +204,91 @@ Toggle the active status of a job posting.
 
 ---
 
+## Employer Requests
+
+### POST /api/employer-requests
+Public endpoint for employers to submit recruitment requests.
+
+**Request:**
+```json
+{
+  "firm_name": "ABC Accounting Firm",
+  "email": "hr@company.com",
+  "country": "United Arab Emirates",
+  "position_title": "Senior Accountant",
+  "preferred_location": "Dubai, UAE",
+  "preferred_nationality": "Arab",
+  "years_experience": "7-10",
+  "other_qualifications": "CPA/CA certified, Big 4 experience preferred"
+}
+```
+
+**Response (Success):**
+```json
+{
+  "message": "Request submitted successfully"
+}
+```
+
+### GET /api/admin/employer-requests
+List all employer requests with filtering and pagination. Requires authentication.
+
+**Query Parameters:**
+- `country` (optional): Filter by country
+- `experience` (optional): Filter by experience level (0-3, 3-7, 7-10, 10+)
+- `search` (optional): Search by firm name, email, or position title
+- `page` (optional): Page number for pagination
+
+**Response:**
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "firm_name": "ABC Accounting Firm",
+      "email": "hr@company.com",
+      "country": "United Arab Emirates",
+      "position_title": "Senior Accountant",
+      "preferred_location": "Dubai, UAE",
+      "preferred_nationality": "Arab",
+      "years_experience": "7-10",
+      "other_qualifications": "CPA/CA certified, Big 4 experience preferred",
+      "created_at": "2024-01-15T10:30:00Z",
+      "updated_at": "2024-01-15T10:30:00Z"
+    }
+  ],
+  "meta": {
+    "current_page": 1,
+    "last_page": 3,
+    "total": 25
+  }
+}
+```
+
+### DELETE /api/admin/employer-requests/{id}
+Delete an employer request. Requires authentication.
+
+---
+
+## Employer Requests Migration
+
+```php
+Schema::create('employer_requests', function (Blueprint $table) {
+    $table->id();
+    $table->string('firm_name');
+    $table->string('email');
+    $table->string('country');
+    $table->string('position_title')->nullable();
+    $table->string('preferred_location');
+    $table->string('preferred_nationality');
+    $table->enum('years_experience', ['0-3', '3-7', '7-10', '10+']);
+    $table->text('other_qualifications')->nullable();
+    $table->timestamps();
+});
+```
+
+---
+
 ## Job Postings Migration
 
 ```php
