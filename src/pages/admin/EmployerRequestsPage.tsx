@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Select,
   SelectContent,
@@ -67,6 +68,9 @@ import { SortableTableHead, useSorting } from '@/components/admin/SortableTableH
 import { exportToCSV } from '@/utils/csvExport';
 import ItemsPerPageSelect from '@/components/admin/ItemsPerPageSelect';
 import { ItemsPerPageOption } from '@/hooks/useItemsPerPage';
+import { SearchableSelect, SearchableSelectOption } from '@/components/ui/searchable-select';
+import { BulkActionsBar } from '@/components/admin/BulkActionsBar';
+import { useBulkSelection } from '@/hooks/useBulkSelection';
 
 const experienceLabels: Record<ExperienceLevel, string> = {
   '0-3': '0-3 years',
