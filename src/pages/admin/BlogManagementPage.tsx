@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import BlogPostEditor from '@/components/admin/BlogPostEditor';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Select,
   SelectContent,
@@ -61,6 +62,9 @@ import { SortableTableHead, useSorting } from '@/components/admin/SortableTableH
 import { exportToCSV } from '@/utils/csvExport';
 import ItemsPerPageSelect from '@/components/admin/ItemsPerPageSelect';
 import { ItemsPerPageOption } from '@/hooks/useItemsPerPage';
+import { SearchableSelect, SearchableSelectOption } from '@/components/ui/searchable-select';
+import { BulkActionsBar } from '@/components/admin/BulkActionsBar';
+import { useBulkSelection } from '@/hooks/useBulkSelection';
 
 const getStoredItemsPerPage = (): ItemsPerPageOption => {
   if (typeof window !== 'undefined') {
@@ -80,12 +84,14 @@ export default function BlogManagementPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [authorFilter, setAuthorFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPageOption>(getStoredItemsPerPage);
   const [isEditing, setIsEditing] = useState(false);
   const [editingPost, setEditingPost] = useState<BlogPostData | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [postToDelete, setPostToDelete] = useState<BlogPostData | null>(null);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   const handleItemsPerPageChange = (value: ItemsPerPageOption) => {
@@ -97,7 +103,7 @@ export default function BlogManagementPage() {
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, statusFilter, categoryFilter]);
+  }, [searchTerm, statusFilter, categoryFilter, authorFilter]);
 
   // Handle CSV export
   const handleExportCSV = () => {
@@ -117,25 +123,45 @@ export default function BlogManagementPage() {
   // Get unique categories
   const categories = [...new Set(posts.map((p) => p.category))].sort();
 
+  // Get unique authors for filter
+  const authorOptions: SearchableSelectOption[] = useMemo(() => {
+    const uniqueAuthors = [...new Set(posts.map((p) => p.author))].sort();
+    return uniqueAuthors.map((a) => ({ value: a, label: a }));
+  }, [posts]);
+
   // Filter and sort posts
-  const filteredPosts = posts.filter((post) => {
-    const matchesSearch =
-      searchTerm === '' ||
-      post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.author.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredPosts = useMemo(() => {
+    return posts.filter((post) => {
+      const matchesSearch =
+        searchTerm === '' ||
+        post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        post.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        post.author.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesStatus =
-      statusFilter === 'all' ||
-      (statusFilter === 'published' && post.is_published) ||
-      (statusFilter === 'draft' && !post.is_published);
+      const matchesStatus =
+        statusFilter === 'all' ||
+        (statusFilter === 'published' && post.is_published) ||
+        (statusFilter === 'draft' && !post.is_published);
 
-    const matchesCategory = categoryFilter === 'all' || post.category === categoryFilter;
+      const matchesCategory = categoryFilter === 'all' || post.category === categoryFilter;
+      const matchesAuthor = !authorFilter || post.author === authorFilter;
 
-    return matchesSearch && matchesStatus && matchesCategory;
-  });
+      return matchesSearch && matchesStatus && matchesCategory && matchesAuthor;
+    });
+  }, [posts, searchTerm, statusFilter, categoryFilter, authorFilter]);
 
   const sortedPosts = sortData(filteredPosts);
+
+  // Bulk selection
+  const {
+    selectedItems,
+    selectedCount,
+    toggleItem,
+    selectAll,
+    clearSelection,
+    isSelected,
+    allSelected,
+  } = useBulkSelection(sortedPosts);
 
   // Pagination
   const totalPages = Math.max(1, Math.ceil(sortedPosts.length / itemsPerPage));
@@ -210,6 +236,32 @@ export default function BlogManagementPage() {
       setDeleteDialogOpen(false);
       setPostToDelete(null);
     }
+  };
+
+  const handleBulkDelete = () => {
+    for (const item of selectedItems) {
+      deletePost(item.id);
+    }
+    toast({
+      title: 'Posts deleted',
+      description: `Deleted ${selectedCount} blog posts.`,
+    });
+    clearSelection();
+    setBulkDeleteOpen(false);
+  };
+
+  const handleBulkExport = () => {
+    exportToCSV(selectedItems, 'blog_posts_selected', [
+      { key: 'title', header: 'Title' },
+      { key: 'author', header: 'Author' },
+      { key: 'category', header: 'Category' },
+      { key: 'is_published', header: 'Published' },
+      { key: 'created_at', header: 'Created Date' },
+    ]);
+    toast({
+      title: 'Export successful',
+      description: `Exported ${selectedCount} posts to CSV.`,
+    });
   };
 
   const handleTogglePublish = (post: BlogPostData) => {
@@ -308,22 +360,40 @@ export default function BlogManagementPage() {
           </div>
         </div>
 
+        {/* Bulk Actions */}
+        <BulkActionsBar
+          selectedCount={selectedCount}
+          totalCount={filteredPosts.length}
+          onSelectAll={selectAll}
+          allSelected={allSelected}
+          onDelete={() => setBulkDeleteOpen(true)}
+          onExport={handleBulkExport}
+          onClearSelection={clearSelection}
+        />
+
         {/* Filters */}
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 p-4 bg-card rounded-lg border">
-          <div className="relative sm:col-span-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 p-4 bg-card rounded-lg border">
+          <div className="relative lg:col-span-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search posts by title, excerpt, or author..."
+              placeholder="Search posts..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-9"
             />
           </div>
+          <SearchableSelect
+            options={authorOptions}
+            value={authorFilter}
+            onValueChange={setAuthorFilter}
+            placeholder="All Authors"
+            searchPlaceholder="Search author..."
+          />
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger>
               <SelectValue placeholder="Status" />
             </SelectTrigger>
-            <SelectContent className="bg-background border shadow-lg z-50">
+            <SelectContent className="bg-popover border shadow-lg z-50">
               <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="published">Published</SelectItem>
               <SelectItem value="draft">Drafts</SelectItem>
@@ -333,7 +403,7 @@ export default function BlogManagementPage() {
             <SelectTrigger>
               <SelectValue placeholder="Category" />
             </SelectTrigger>
-            <SelectContent className="bg-background border shadow-lg z-50">
+            <SelectContent className="bg-popover border shadow-lg z-50">
               <SelectItem value="all">All Categories</SelectItem>
               {categories.map((cat) => (
                 <SelectItem key={cat} value={cat}>
@@ -342,6 +412,18 @@ export default function BlogManagementPage() {
               ))}
             </SelectContent>
           </Select>
+          <Button
+            variant="ghost"
+            onClick={() => {
+              setSearchTerm('');
+              setAuthorFilter('');
+              setStatusFilter('all');
+              setCategoryFilter('all');
+            }}
+            className="text-muted-foreground"
+          >
+            Clear Filters
+          </Button>
         </div>
 
         {/* Posts Table */}
@@ -350,12 +432,19 @@ export default function BlogManagementPage() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-[40px]">
+                    <Checkbox
+                      checked={allSelected}
+                      onCheckedChange={selectAll}
+                      aria-label="Select all"
+                    />
+                  </TableHead>
                   <SortableTableHead
                     sortKey="title"
                     currentSortKey={sortKey}
                     currentSortDirection={sortDirection}
                     onSort={handleSort}
-                    className="w-[40%]"
+                    className="w-[35%]"
                   >
                     Post
                   </SortableTableHead>
@@ -397,7 +486,7 @@ export default function BlogManagementPage() {
               <TableBody>
                 {paginatedPosts.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8">
+                    <TableCell colSpan={7} className="text-center py-8">
                       <div className="flex flex-col items-center gap-2">
                         <FileText className="w-8 h-8 text-muted-foreground" />
                         <p className="text-muted-foreground">No posts found</p>
@@ -409,7 +498,14 @@ export default function BlogManagementPage() {
                   </TableRow>
                 ) : (
                   paginatedPosts.map((post) => (
-                    <TableRow key={post.id}>
+                    <TableRow key={post.id} className={isSelected(post.id) ? 'bg-muted/50' : ''}>
+                      <TableCell>
+                        <Checkbox
+                          checked={isSelected(post.id)}
+                          onCheckedChange={() => toggleItem(post.id)}
+                          aria-label={`Select ${post.title}`}
+                        />
+                      </TableCell>
                       <TableCell>
                         <div>
                           <p className="font-medium line-clamp-1">{post.title}</p>

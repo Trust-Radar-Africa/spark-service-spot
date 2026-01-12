@@ -41,6 +41,9 @@ import {
   Globe,
   ExternalLink,
 } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { BulkActionsBar } from '@/components/admin/BulkActionsBar';
+import { useBulkSelection } from '@/hooks/useBulkSelection';
 import { Link } from 'react-router-dom';
 import {
   Pagination,
@@ -103,6 +106,7 @@ export default function CandidatesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPageOption>(getStoredItemsPerPage);
   const [candidateToDelete, setCandidateToDelete] = useState<CandidateApplication | null>(null);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
   const { sortKey, sortDirection, handleSort, sortData } = useSorting<CandidateApplication>();
@@ -158,6 +162,18 @@ export default function CandidatesPage() {
 
   // Sort and paginate
   const sortedCandidates = sortData(filteredCandidates);
+
+  // Bulk selection
+  const {
+    selectedItems,
+    selectedCount,
+    toggleItem,
+    selectAll,
+    clearSelection,
+    isSelected,
+    allSelected,
+  } = useBulkSelection(sortedCandidates);
+
   const totalPages = Math.max(1, Math.ceil(sortedCandidates.length / itemsPerPage));
   const validCurrentPage = currentPage > totalPages ? 1 : currentPage;
   const startIndex = (validCurrentPage - 1) * itemsPerPage;
@@ -215,6 +231,33 @@ export default function CandidatesPage() {
       setIsDeleting(false);
       setCandidateToDelete(null);
     }
+  };
+
+  const handleBulkDelete = () => {
+    for (const item of selectedItems) {
+      deleteCandidate(item.id);
+    }
+    toast({
+      title: 'Candidates deleted',
+      description: `Deleted ${selectedCount} candidates.`,
+    });
+    clearSelection();
+    setBulkDeleteOpen(false);
+  };
+
+  const handleBulkExport = () => {
+    exportToCSV(selectedItems, 'candidates_selected', [
+      { key: 'first_name', header: 'First Name' },
+      { key: 'last_name', header: 'Last Name' },
+      { key: 'email', header: 'Email' },
+      { key: 'nationality', header: 'Nationality' },
+      { key: 'experience', header: 'Experience' },
+      { key: 'created_at', header: 'Applied Date' },
+    ]);
+    toast({
+      title: 'Export successful',
+      description: `Exported ${selectedCount} candidates to CSV.`,
+    });
   };
 
   const getExperienceBadgeVariant = (experience: ExperienceLevel) => {
@@ -380,6 +423,17 @@ export default function CandidatesPage() {
           </Button>
         </div>
 
+        {/* Bulk Actions */}
+        <BulkActionsBar
+          selectedCount={selectedCount}
+          totalCount={filteredCandidates.length}
+          onSelectAll={selectAll}
+          allSelected={allSelected}
+          onDelete={() => setBulkDeleteOpen(true)}
+          onExport={handleBulkExport}
+          onClearSelection={clearSelection}
+        />
+
         {/* Table */}
         <div className="bg-card rounded-lg border overflow-hidden">
           {isLoading ? (
@@ -399,6 +453,13 @@ export default function CandidatesPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="w-[40px]">
+                      <Checkbox
+                        checked={allSelected}
+                        onCheckedChange={selectAll}
+                        aria-label="Select all"
+                      />
+                    </TableHead>
                     <SortableTableHead
                       sortKey="first_name"
                       currentSortKey={sortKey}
@@ -444,7 +505,14 @@ export default function CandidatesPage() {
                 </TableHeader>
                 <TableBody>
                   {paginatedCandidates.map((candidate) => (
-                    <TableRow key={candidate.id}>
+                    <TableRow key={candidate.id} className={isSelected(candidate.id) ? 'bg-muted/50' : ''}>
+                      <TableCell>
+                        <Checkbox
+                          checked={isSelected(candidate.id)}
+                          onCheckedChange={() => toggleItem(candidate.id)}
+                          aria-label={`Select ${candidate.first_name} ${candidate.last_name}`}
+                        />
+                      </TableCell>
                       <TableCell className="font-medium">
                         {candidate.first_name} {candidate.last_name}
                       </TableCell>
@@ -567,6 +635,27 @@ export default function CandidatesPage() {
               ) : (
                 'Delete'
               )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Delete Confirmation Dialog */}
+      <Dialog open={bulkDeleteOpen} onOpenChange={setBulkDeleteOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Selected Candidates</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete {selectedCount} selected candidates?
+              This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBulkDeleteOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleBulkDelete}>
+              Delete {selectedCount} Candidates
             </Button>
           </DialogFooter>
         </DialogContent>
