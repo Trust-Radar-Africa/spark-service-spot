@@ -95,13 +95,15 @@ export default function EmployerRequestsPage() {
   const { sortKey, sortDirection, handleSort, sortData } = useSorting<EmployerRequest>();
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [countryFilter, setCountryFilter] = useState<string>('all');
+  const [countryFilter, setCountryFilter] = useState('');
+  const [positionFilter, setPositionFilter] = useState('');
   const [experienceFilter, setExperienceFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPageOption>(getStoredItemsPerPage);
   const [selectedRequest, setSelectedRequest] = useState<EmployerRequest | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [requestToDelete, setRequestToDelete] = useState<EmployerRequest | null>(null);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
 
   const handleItemsPerPageChange = (value: ItemsPerPageOption) => {
     setItemsPerPage(value);
@@ -131,7 +133,16 @@ export default function EmployerRequestsPage() {
   }, [fetchRequests]);
 
   // Get unique countries for filter
-  const countries = [...new Set(requests.map((r) => r.country))].sort();
+  const countryOptions: SearchableSelectOption[] = useMemo(() => {
+    const uniqueCountries = [...new Set(requests.map((r) => r.country))].sort();
+    return uniqueCountries.map((c) => ({ value: c, label: c }));
+  }, [requests]);
+
+  // Get unique positions for filter
+  const positionOptions: SearchableSelectOption[] = useMemo(() => {
+    const uniquePositions = [...new Set(requests.map((r) => r.position_title).filter(Boolean))].sort();
+    return uniquePositions.map((p) => ({ value: p!, label: p! }));
+  }, [requests]);
 
   // Filter requests
   const filteredRequests = useMemo(() => {
@@ -142,13 +153,25 @@ export default function EmployerRequestsPage() {
         request.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
         request.position_title?.toLowerCase().includes(searchTerm.toLowerCase());
 
-      const matchesCountry = countryFilter === 'all' || request.country === countryFilter;
+      const matchesCountry = !countryFilter || request.country === countryFilter;
+      const matchesPosition = !positionFilter || request.position_title === positionFilter;
       const matchesExperience =
         experienceFilter === 'all' || request.years_experience === experienceFilter;
 
-      return matchesSearch && matchesCountry && matchesExperience;
+      return matchesSearch && matchesCountry && matchesPosition && matchesExperience;
     });
-  }, [requests, searchTerm, countryFilter, experienceFilter]);
+  }, [requests, searchTerm, countryFilter, positionFilter, experienceFilter]);
+
+  // Bulk selection
+  const {
+    selectedItems,
+    selectedCount,
+    toggleItem,
+    selectAll,
+    clearSelection,
+    isSelected,
+    allSelected,
+  } = useBulkSelection(filteredRequests);
 
   // Sort and paginate
   const sortedRequests = sortData(filteredRequests);
@@ -166,7 +189,7 @@ export default function EmployerRequestsPage() {
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, countryFilter, experienceFilter]);
+  }, [searchTerm, countryFilter, positionFilter, experienceFilter]);
 
   // Generate page numbers for pagination
   const getPageNumbers = () => {
@@ -195,6 +218,34 @@ export default function EmployerRequestsPage() {
       setDeleteDialogOpen(false);
       setRequestToDelete(null);
     }
+  };
+
+  const handleBulkDelete = () => {
+    for (const item of selectedItems) {
+      deleteRequest(item.id);
+    }
+    toast({
+      title: 'Requests deleted',
+      description: `Deleted ${selectedCount} employer requests.`,
+    });
+    clearSelection();
+    setBulkDeleteOpen(false);
+  };
+
+  const handleBulkExport = () => {
+    exportToCSV(selectedItems, 'employer_requests_selected', [
+      { key: 'firm_name', header: 'Company' },
+      { key: 'email', header: 'Email' },
+      { key: 'country', header: 'Country' },
+      { key: 'position_title', header: 'Position' },
+      { key: 'preferred_location', header: 'Location' },
+      { key: 'years_experience', header: 'Experience Required' },
+      { key: 'created_at', header: 'Request Date' },
+    ]);
+    toast({
+      title: 'Export successful',
+      description: `Exported ${selectedCount} requests to CSV.`,
+    });
   };
 
   const stats = {
@@ -276,35 +327,47 @@ export default function EmployerRequestsPage() {
           </div>
         </div>
 
+        {/* Bulk Actions */}
+        <BulkActionsBar
+          selectedCount={selectedCount}
+          totalCount={filteredRequests.length}
+          onSelectAll={selectAll}
+          allSelected={allSelected}
+          onDelete={() => setBulkDeleteOpen(true)}
+          onExport={handleBulkExport}
+          onClearSelection={clearSelection}
+        />
+
         {/* Filters */}
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 p-4 bg-card rounded-lg border">
-          <div className="relative sm:col-span-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 p-4 bg-card rounded-lg border">
+          <div className="relative sm:col-span-2 lg:col-span-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search by firm, email, or position..."
+              placeholder="Search by firm, email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-9"
             />
           </div>
-          <Select value={countryFilter} onValueChange={setCountryFilter}>
-            <SelectTrigger>
-              <SelectValue placeholder="Country" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Countries</SelectItem>
-              {countries.map((country) => (
-                <SelectItem key={country} value={country}>
-                  {country}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <SearchableSelect
+            options={positionOptions}
+            value={positionFilter}
+            onValueChange={setPositionFilter}
+            placeholder="All Positions"
+            searchPlaceholder="Search position..."
+          />
+          <SearchableSelect
+            options={countryOptions}
+            value={countryFilter}
+            onValueChange={setCountryFilter}
+            placeholder="All Countries"
+            searchPlaceholder="Search country..."
+          />
           <Select value={experienceFilter} onValueChange={setExperienceFilter}>
             <SelectTrigger>
               <SelectValue placeholder="Experience" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-popover border shadow-lg z-50">
               <SelectItem value="all">All Levels</SelectItem>
               <SelectItem value="0-3">0-3 years</SelectItem>
               <SelectItem value="3-7">3-7 years</SelectItem>
@@ -312,6 +375,18 @@ export default function EmployerRequestsPage() {
               <SelectItem value="10+">10+ years</SelectItem>
             </SelectContent>
           </Select>
+          <Button
+            variant="ghost"
+            onClick={() => {
+              setSearchTerm('');
+              setPositionFilter('');
+              setCountryFilter('');
+              setExperienceFilter('all');
+            }}
+            className="text-muted-foreground"
+          >
+            Clear Filters
+          </Button>
         </div>
 
         {/* Requests Table */}
@@ -319,6 +394,13 @@ export default function EmployerRequestsPage() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-[40px]">
+                  <Checkbox
+                    checked={allSelected}
+                    onCheckedChange={selectAll}
+                    aria-label="Select all"
+                  />
+                </TableHead>
                 <SortableTableHead
                   sortKey="firm_name"
                   currentSortKey={sortKey}
@@ -365,13 +447,13 @@ export default function EmployerRequestsPage() {
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8">
+                  <TableCell colSpan={7} className="text-center py-8">
                     Loading requests...
                   </TableCell>
                 </TableRow>
               ) : paginatedRequests.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8">
+                  <TableCell colSpan={7} className="text-center py-8">
                     <div className="flex flex-col items-center gap-2">
                       <Building2 className="w-8 h-8 text-muted-foreground" />
                       <p className="text-muted-foreground">No requests found</p>
@@ -380,7 +462,14 @@ export default function EmployerRequestsPage() {
                 </TableRow>
               ) : (
                 paginatedRequests.map((request) => (
-                  <TableRow key={request.id}>
+                  <TableRow key={request.id} className={isSelected(request.id) ? 'bg-muted/50' : ''}>
+                    <TableCell>
+                      <Checkbox
+                        checked={isSelected(request.id)}
+                        onCheckedChange={() => toggleItem(request.id)}
+                        aria-label={`Select ${request.firm_name}`}
+                      />
+                    </TableCell>
                     <TableCell>
                       <div>
                         <p className="font-medium">{request.firm_name}</p>
@@ -605,6 +694,27 @@ export default function EmployerRequestsPage() {
               </Button>
               <Button variant="destructive" onClick={handleDelete}>
                 Delete
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Bulk Delete Confirmation Dialog */}
+        <Dialog open={bulkDeleteOpen} onOpenChange={setBulkDeleteOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Delete Selected Requests</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete {selectedCount} selected requests?
+                This action cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setBulkDeleteOpen(false)}>
+                Cancel
+              </Button>
+              <Button variant="destructive" onClick={handleBulkDelete}>
+                Delete {selectedCount} Requests
               </Button>
             </DialogFooter>
           </DialogContent>
