@@ -251,13 +251,29 @@ export const useSettingsStore = create<SettingsState>()(
           notifications: { ...state.notifications, ...prefs },
         })),
 
-      // Admin Users
+      // Admin Users - includes test users for different roles
       adminUsers: [
         {
           id: '1',
           email: 'admin@demo.com',
           name: 'Demo Admin',
           role: 'super_admin',
+          createdAt: '2024-01-01T00:00:00Z',
+          lastLogin: new Date().toISOString(),
+        },
+        {
+          id: '2',
+          email: 'editor@demo.com',
+          name: 'Test Editor',
+          role: 'editor',
+          createdAt: '2024-01-01T00:00:00Z',
+          lastLogin: new Date().toISOString(),
+        },
+        {
+          id: '3',
+          email: 'viewer@demo.com',
+          name: 'Test Viewer',
+          role: 'viewer',
           createdAt: '2024-01-01T00:00:00Z',
           lastLogin: new Date().toISOString(),
         },

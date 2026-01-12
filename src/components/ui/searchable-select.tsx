@@ -95,7 +95,7 @@ export function SearchableSelect({
             className="h-10 border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
           />
         </div>
-        <ScrollArea className="max-h-[200px]">
+        <ScrollArea className="h-[250px] overflow-auto">
           {filteredOptions.length === 0 ? (
             <div className="py-6 text-center text-sm text-muted-foreground">
               {emptyMessage}
@@ -113,7 +113,7 @@ export function SearchableSelect({
                 >
                   <Check
                     className={cn(
-                      'mr-2 h-4 w-4',
+                      'mr-2 h-4 w-4 shrink-0',
                       value === option.value ? 'opacity-100' : 'opacity-0'
                     )}
                   />

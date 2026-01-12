@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { JobPosting, JobPostingFormData, ExperienceLevel } from '@/types/admin';
+import { JobPosting, JobPostingFormData, ExperienceLevel, WorkType } from '@/types/admin';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -26,6 +26,7 @@ import { SearchableSelect } from '@/components/ui/searchable-select';
 import { Loader2 } from 'lucide-react';
 import { AVAILABLE_CURRENCIES, getCurrencyFromLocation } from '@/utils/currencyUtils';
 import { getCountryOptions } from '@/data/countries';
+import { WORK_TYPE_OPTIONS } from '@/stores/jobPostingsStore';
 
 const experienceLevels: { value: ExperienceLevel; label: string }[] = [
   { value: '0-3', label: '0-3 years' },
@@ -41,6 +42,7 @@ const jobPostingSchema = z.object({
   description: z.string().min(20, 'Description must be at least 20 characters').max(5000),
   country: z.string().min(2, 'Country is required'),
   location: z.string().min(2, 'Specific location is required').max(100),
+  work_type: z.enum(['remote', 'hybrid', 'on-site', 'flexible'] as const),
   experience_required: z.enum(['0-3', '3-7', '7-10', '10+'] as const),
   requirements: z.string().max(2000).optional(),
   benefits: z.string().max(2000).optional(),
@@ -62,13 +64,14 @@ export default function JobPostingForm({
   onCancel,
   isLoading,
 }: JobPostingFormProps) {
-  const form = useForm<JobPostingFormData & { country: string }>({
+  const form = useForm<JobPostingFormData>({
     resolver: zodResolver(jobPostingSchema),
     defaultValues: {
       title: initialData?.title || '',
       description: initialData?.description || '',
-      country: initialData?.location?.split(',').pop()?.trim() || '',
-      location: initialData?.location?.split(',').slice(0, -1).join(',').trim() || '',
+      country: initialData?.country || '',
+      location: initialData?.location || '',
+      work_type: initialData?.work_type || 'remote',
       experience_required: initialData?.experience_required || '0-3',
       requirements: initialData?.requirements || '',
       benefits: initialData?.benefits || '',
@@ -79,21 +82,16 @@ export default function JobPostingForm({
   });
 
   const watchedCountry = form.watch('country');
-  const watchedLocation = form.watch('location');
-  const fullLocation = watchedLocation && watchedCountry ? `${watchedLocation}, ${watchedCountry}` : watchedCountry || '';
-  const detectedCurrency = fullLocation ? getCurrencyFromLocation(fullLocation) : 'USD';
+  const detectedCurrency = watchedCountry ? getCurrencyFromLocation(watchedCountry) : 'USD';
 
-  const handleSubmit = async (data: JobPostingFormData & { country: string }) => {
-    const formData: JobPostingFormData = {
-      ...data,
-      location: `${data.location}, ${data.country}`,
-    };
-    await onSubmit(formData);
+  const handleSubmit = async (data: JobPostingFormData) => {
+    await onSubmit(data);
   };
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+        {/* Row 1: Title and Work Type */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -109,6 +107,34 @@ export default function JobPostingForm({
             )}
           />
 
+          <FormField
+            control={form.control}
+            name="work_type"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Work Type *</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select work type" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent className="bg-popover border shadow-lg z-50">
+                    {WORK_TYPE_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {/* Row 2: Country and Location */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
             name="country"
@@ -134,7 +160,7 @@ export default function JobPostingForm({
             name="location"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Specific Location *</FormLabel>
+                <FormLabel>City/Region *</FormLabel>
                 <FormControl>
                   <Input placeholder="e.g., London, Dublin, Atlanta" {...field} />
                 </FormControl>
@@ -145,6 +171,7 @@ export default function JobPostingForm({
           />
         </div>
 
+        {/* Row 3: Experience and Salary */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -158,7 +185,7 @@ export default function JobPostingForm({
                       <SelectValue placeholder="Select experience level" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
+                  <SelectContent className="bg-popover border shadow-lg z-50">
                     {experienceLevels.map((level) => (
                       <SelectItem key={level.value} value={level.value}>
                         {level.label}
@@ -189,6 +216,7 @@ export default function JobPostingForm({
           />
         </div>
 
+        {/* Row 4: Currency Override */}
         <FormField
           control={form.control}
           name="currency_override"
@@ -204,7 +232,7 @@ export default function JobPostingForm({
                     <SelectValue placeholder="Auto-detect from location" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent className="max-h-60">
+                <SelectContent className="bg-popover border shadow-lg z-50 max-h-60">
                   <SelectItem value="auto">
                     Auto-detect ({detectedCurrency})
                   </SelectItem>
@@ -216,13 +244,14 @@ export default function JobPostingForm({
                 </SelectContent>
               </Select>
               <FormDescription>
-                Currency is auto-detected from location. Override if detection is wrong.
+                Currency is auto-detected from country. Override if detection is wrong.
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
 
+        {/* Description */}
         <FormField
           control={form.control}
           name="description"
@@ -241,44 +270,46 @@ export default function JobPostingForm({
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="requirements"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Requirements</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="List the skills, qualifications, and experience required..."
-                  className="min-h-[100px]"
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription>Optional: List key requirements for candidates</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/* Requirements and Benefits side by side */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="requirements"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Requirements</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="List the skills, qualifications, and experience required..."
+                    className="min-h-[100px]"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="benefits"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Benefits</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="List the benefits and perks offered..."
-                  className="min-h-[100px]"
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription>Optional: Highlight company benefits</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="benefits"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Benefits</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="List the benefits and perks offered..."
+                    className="min-h-[100px]"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
+        {/* Active Status */}
         <FormField
           control={form.control}
           name="is_active"
@@ -297,6 +328,7 @@ export default function JobPostingForm({
           )}
         />
 
+        {/* Actions */}
         <div className="flex justify-end gap-3 pt-4 border-t">
           <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
             Cancel

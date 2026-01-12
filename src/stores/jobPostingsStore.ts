@@ -1,15 +1,17 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { JobPosting, JobPostingFormData, ExperienceLevel } from '@/types/admin';
+import { JobPosting, JobPostingFormData, ExperienceLevel, WorkType } from '@/types/admin';
 import { useApiConfigStore } from './apiConfigStore';
 
-// Initial mock data - these would come from Laravel API in production
+// Initial mock data
 const initialJobs: JobPosting[] = [
   {
     id: 1,
     title: 'Audit Seniors',
     description: 'Join an accountancy firm based in Dublin, Ireland to work exclusively remotely in their assurance team.',
-    location: 'Dublin, Ireland (100% Remote)',
+    country: 'Ireland',
+    location: 'Dublin',
+    work_type: 'remote',
     experience_required: '3-7',
     requirements: `• Fully Qualified ACA, CA, CPA or equivalent
 • Strong External Audit experience
@@ -20,7 +22,8 @@ const initialJobs: JobPosting[] = [
 • 100% Remote work
 • International exposure
 • Career development opportunities`,
-    salary_range: '€55,000 - €75,000',
+    salary_range: '55000 - 75000',
+    currency_override: 'EUR',
     is_active: true,
     created_at: '2024-01-10T09:00:00Z',
     updated_at: '2024-01-10T09:00:00Z',
@@ -29,7 +32,9 @@ const initialJobs: JobPosting[] = [
     id: 2,
     title: 'Audit Seniors',
     description: 'Join an accountancy firm based in Atlanta, Georgia to work exclusively remotely in their assurance team.',
-    location: 'Atlanta, Georgia (100% Remote)',
+    country: 'United States',
+    location: 'Atlanta, Georgia',
+    work_type: 'remote',
     experience_required: '3-7',
     requirements: `• Fully Qualified ACA, ACCA, CA, CPA or equivalent
 • Strong External Audit experience
@@ -39,7 +44,7 @@ const initialJobs: JobPosting[] = [
 • 100% Remote work
 • Work with US GAAP clients
 • Professional development`,
-    salary_range: '$65,000 - $85,000',
+    salary_range: '65000 - 85000',
     is_active: true,
     created_at: '2024-01-12T14:30:00Z',
     updated_at: '2024-01-12T14:30:00Z',
@@ -48,7 +53,9 @@ const initialJobs: JobPosting[] = [
     id: 3,
     title: 'Senior Accountant',
     description: 'We are looking for an experienced Senior Accountant to join our team. The ideal candidate will have strong analytical skills and experience with financial reporting.',
-    location: 'London, UK (Hybrid)',
+    country: 'United Kingdom',
+    location: 'London',
+    work_type: 'hybrid',
     experience_required: '7-10',
     requirements: `• CPA or ACCA qualified
 • 7+ years experience in accounting
@@ -58,7 +65,7 @@ const initialJobs: JobPosting[] = [
 • Health insurance
 • Pension scheme
 • Flexible working`,
-    salary_range: '£55,000 - £70,000',
+    salary_range: '55000 - 70000',
     is_active: true,
     created_at: '2024-01-08T11:00:00Z',
     updated_at: '2024-01-15T16:00:00Z',
@@ -67,7 +74,9 @@ const initialJobs: JobPosting[] = [
     id: 4,
     title: 'Junior Bookkeeper',
     description: 'Entry-level position for a motivated individual looking to start their career in accounting. Full training provided.',
-    location: 'Manchester, UK (Remote)',
+    country: 'United Kingdom',
+    location: 'Manchester',
+    work_type: 'remote',
     experience_required: '0-3',
     requirements: `• Basic accounting knowledge
 • Attention to detail
@@ -77,7 +86,7 @@ const initialJobs: JobPosting[] = [
 • Career progression
 • Friendly team environment
 • Flexible hours`,
-    salary_range: '£25,000 - £30,000',
+    salary_range: '25000 - 30000',
     is_active: true,
     created_at: '2024-01-05T08:00:00Z',
     updated_at: '2024-01-05T08:00:00Z',
@@ -86,7 +95,9 @@ const initialJobs: JobPosting[] = [
     id: 5,
     title: 'Tax Consultant',
     description: 'Experienced Tax Consultant needed for our growing advisory practice. Handle complex tax matters for corporate clients.',
-    location: 'Birmingham, UK (Hybrid)',
+    country: 'United Kingdom',
+    location: 'Birmingham',
+    work_type: 'hybrid',
     experience_required: '3-7',
     requirements: `• CTA qualified
 • Experience with corporate tax
@@ -96,7 +107,7 @@ const initialJobs: JobPosting[] = [
 • Professional development budget
 • Remote working options
 • Health insurance`,
-    salary_range: '£45,000 - £55,000',
+    salary_range: '45000 - 55000',
     is_active: true,
     created_at: '2024-01-03T10:00:00Z',
     updated_at: '2024-01-03T10:00:00Z',
@@ -105,7 +116,9 @@ const initialJobs: JobPosting[] = [
     id: 6,
     title: 'Finance Director',
     description: 'Strategic leadership role overseeing all financial operations. Report directly to the CEO and board of directors.',
-    location: 'London, UK (On-site)',
+    country: 'United Kingdom',
+    location: 'London',
+    work_type: 'on-site',
     experience_required: '10+',
     requirements: `• ACA/ACCA/CIMA qualified
 • 10+ years experience including leadership roles
@@ -115,10 +128,32 @@ const initialJobs: JobPosting[] = [
 • Car allowance
 • Private healthcare
 • Equity participation`,
-    salary_range: '£120,000 - £150,000',
+    salary_range: '120000 - 150000',
     is_active: true,
     created_at: '2024-01-01T09:00:00Z',
     updated_at: '2024-01-01T09:00:00Z',
+  },
+  {
+    id: 7,
+    title: 'Remote Audit Manager',
+    description: 'Lead audit engagements for international clients from anywhere in the world.',
+    country: 'United Arab Emirates',
+    location: 'Dubai',
+    work_type: 'flexible',
+    experience_required: '7-10',
+    requirements: `• CPA/ACA qualified
+• Experience managing audit teams
+• Strong communication skills
+• Ability to work across time zones`,
+    benefits: `• Tax-free salary
+• Flexible working hours
+• International exposure
+• Performance bonuses`,
+    salary_range: '180000 - 250000',
+    currency_override: 'AED',
+    is_active: true,
+    created_at: '2024-01-02T09:00:00Z',
+    updated_at: '2024-01-02T09:00:00Z',
   },
 ];
 
@@ -132,6 +167,7 @@ interface JobPostingsState {
   updateJob: (id: number, data: JobPostingFormData) => void;
   deleteJob: (id: number) => void;
   toggleJobStatus: (id: number) => void;
+  archiveJob: (id: number) => void;
   
   // Getters
   getActiveJobs: () => JobPosting[];
@@ -213,6 +249,16 @@ export const useJobPostingsStore = create<JobPostingsState>()(
         }));
       },
       
+      archiveJob: (id: number) => {
+        set(state => ({
+          jobs: state.jobs.map(job =>
+            job.id === id
+              ? { ...job, is_active: false, updated_at: new Date().toISOString() }
+              : job
+          ),
+        }));
+      },
+      
       getActiveJobs: () => {
         return get().jobs.filter(job => job.is_active);
       },
@@ -227,6 +273,20 @@ export const useJobPostingsStore = create<JobPostingsState>()(
   )
 );
 
+// Work type labels
+export const WORK_TYPE_LABELS: Record<WorkType, string> = {
+  'remote': '100% Remote',
+  'hybrid': 'Hybrid',
+  'on-site': 'On-site',
+  'flexible': 'Flexible',
+};
+
+// Work type options for dropdown
+export const WORK_TYPE_OPTIONS = Object.entries(WORK_TYPE_LABELS).map(([value, label]) => ({
+  value: value as WorkType,
+  label,
+}));
+
 // Helper function to get experience label
 export const getExperienceLabel = (exp: ExperienceLevel): string => {
   const labels: Record<ExperienceLevel, string> = {
@@ -240,10 +300,12 @@ export const getExperienceLabel = (exp: ExperienceLevel): string => {
 
 // Locations for filtering (derived from jobs)
 export const getUniqueLocations = (jobs: JobPosting[]): string[] => {
-  const locations = new Set(jobs.map(job => {
-    // Extract main location (before parentheses)
-    const match = job.location.match(/^([^(]+)/);
-    return match ? match[1].trim() : job.location;
-  }));
+  const locations = new Set(jobs.map(job => job.location));
   return Array.from(locations).sort();
+};
+
+// Countries for filtering
+export const getUniqueCountries = (jobs: JobPosting[]): string[] => {
+  const countries = new Set(jobs.map(job => job.country));
+  return Array.from(countries).sort();
 };
