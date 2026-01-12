@@ -27,9 +27,23 @@ export interface JobPosting {
   description: string;
   location: string;
   experience_required: ExperienceLevel;
+  requirements?: string;
+  benefits?: string;
+  salary_range?: string;
   is_active: boolean;
   created_at: string;
   updated_at: string;
+}
+
+export interface JobPostingFormData {
+  title: string;
+  description: string;
+  location: string;
+  experience_required: ExperienceLevel;
+  requirements?: string;
+  benefits?: string;
+  salary_range?: string;
+  is_active: boolean;
 }
 
 // Employer Request Types
