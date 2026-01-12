@@ -364,18 +364,20 @@ export default function CandidatesPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold">Candidate Applications</h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold">Candidate Applications</h1>
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/apply" target="_blank">
+                  <ExternalLink className="h-4 w-4 mr-1" />
+                  View Page
+                </Link>
+              </Button>
+            </div>
             <p className="text-muted-foreground">
               Manage and filter candidate resumes
             </p>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" asChild>
-              <Link to="/apply" target="_blank">
-                View Apply Page
-                <ExternalLink className="ml-2 h-3 w-3" />
-              </Link>
-            </Button>
             <Button onClick={handleExportCSV} variant="outline" disabled={filteredCandidates.length === 0}>
               <Download className="h-4 w-4 mr-2" />
               Export CSV
