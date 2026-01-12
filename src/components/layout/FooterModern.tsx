@@ -1,6 +1,24 @@
 import { Link } from "react-router-dom";
-import { Mail, Globe, Building2, ArrowRight, Linkedin, Twitter } from "lucide-react";
+import { Mail, Globe, Building2, ArrowRight, Linkedin, Twitter, Facebook, Instagram, Youtube, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useSettingsStore } from "@/stores/settingsStore";
+
+const getSocialIcon = (iconName: string) => {
+  switch (iconName.toLowerCase()) {
+    case 'linkedin':
+      return Linkedin;
+    case 'twitter':
+      return Twitter;
+    case 'facebook':
+      return Facebook;
+    case 'instagram':
+      return Instagram;
+    case 'youtube':
+      return Youtube;
+    default:
+      return ExternalLink;
+  }
+};
 
 const services = [
   { name: "Outsourced Audit", href: "/services#audit" },
@@ -16,6 +34,9 @@ const company = [
 ];
 
 export function FooterModern() {
+  const { socialLinks, branding } = useSettingsStore();
+  const enabledLinks = socialLinks.filter((link) => link.enabled);
+
   return (
     <footer className="bg-qx-blue text-white">
       {/* CTA Strip */}
@@ -140,26 +161,25 @@ export function FooterModern() {
           </p>
           <div className="flex items-center gap-6">
             {/* Social Links */}
-            <div className="flex items-center gap-3">
-              <a
-                href="https://linkedin.com/company/multiversecpa"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/60 hover:bg-qx-orange hover:text-white transition-colors"
-                aria-label="LinkedIn"
-              >
-                <Linkedin className="w-4 h-4" />
-              </a>
-              <a
-                href="https://twitter.com/multiversecpa"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/60 hover:bg-qx-orange hover:text-white transition-colors"
-                aria-label="Twitter"
-              >
-                <Twitter className="w-4 h-4" />
-              </a>
-            </div>
+            {enabledLinks.length > 0 && (
+              <div className="flex items-center gap-3">
+                {enabledLinks.map((link) => {
+                  const Icon = getSocialIcon(link.icon);
+                  return (
+                    <a
+                      key={link.id}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/60 hover:bg-qx-orange hover:text-white transition-colors"
+                      aria-label={link.platform}
+                    >
+                      <Icon className="w-4 h-4" />
+                    </a>
+                  );
+                })}
+              </div>
+            )}
             <span className="text-white/40 text-xs">
               People • Process • Platforms
             </span>
