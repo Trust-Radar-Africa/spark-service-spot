@@ -13,6 +13,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { BlogPostData } from '@/stores/blogPostsStore';
+import ImageUpload from './ImageUpload';
 import {
   Bold,
   Italic,
@@ -233,13 +234,10 @@ export default function BlogPostEditor({
         </div>
 
         <div className="md:col-span-2">
-          <Label htmlFor="image">Featured Image URL</Label>
-          <Input
-            id="image"
+          <ImageUpload
             value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-            placeholder="https://example.com/image.jpg"
-            className="mt-1"
+            onChange={setImageUrl}
+            label="Featured Image"
           />
         </div>
       </div>
