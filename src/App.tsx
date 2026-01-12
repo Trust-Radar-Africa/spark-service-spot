@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import About from "./pages/About";
 import Services from "./pages/Services";
 import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import Careers from "./pages/Careers";
 import Contact from "./pages/Contact";
 
@@ -18,6 +19,7 @@ import IndexModern from "./pages/IndexModern";
 import AboutModern from "./pages/AboutModern";
 import ServicesModern from "./pages/ServicesModern";
 import BlogModern from "./pages/BlogModern";
+import BlogPostModern from "./pages/BlogPostModern";
 import CareersModern from "./pages/CareersModern";
 import ContactModern from "./pages/ContactModern";
 
@@ -35,6 +37,7 @@ function ThemedRoutes() {
         <Route path="/about" element={<AboutModern />} />
         <Route path="/services" element={<ServicesModern />} />
         <Route path="/blog" element={<BlogModern />} />
+        <Route path="/blog/:slug" element={<BlogPostModern />} />
         <Route path="/careers" element={<CareersModern />} />
         <Route path="/contact" element={<ContactModern />} />
         <Route path="*" element={<NotFound />} />
@@ -48,6 +51,7 @@ function ThemedRoutes() {
       <Route path="/about" element={<About />} />
       <Route path="/services" element={<Services />} />
       <Route path="/blog" element={<Blog />} />
+      <Route path="/blog/:slug" element={<BlogPost />} />
       <Route path="/careers" element={<Careers />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="*" element={<NotFound />} />

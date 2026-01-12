@@ -2,95 +2,7 @@ import { Link } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Calendar, User, Clock } from "lucide-react";
-import auditImg from "@/assets/audit-service.jpg";
-import bookkeepingImg from "@/assets/bookkeeping-service.jpg";
-import consultingImg from "@/assets/consulting-service.jpg";
-import teamImg from "@/assets/team.jpg";
-
-const featuredPost = {
-  title: "The Future of Offshore Accounting: Trends to Watch in 2024",
-  excerpt: "Discover how technological advancements and changing business landscapes are reshaping the offshore accounting industry and what it means for your firm.",
-  image: teamImg,
-  author: "Sarah Mitchell",
-  date: "January 10, 2024",
-  readTime: "8 min read",
-  category: "Industry Insights",
-  slug: "future-offshore-accounting-2024",
-};
-
-const posts = [
-  {
-    title: "5 Ways Outsourcing Bookkeeping Can Transform Your Practice",
-    excerpt: "Learn how delegating bookkeeping tasks can free up your time for higher-value advisory services.",
-    image: bookkeepingImg,
-    author: "James Crawford",
-    date: "January 5, 2024",
-    readTime: "5 min read",
-    category: "Best Practices",
-    slug: "outsourcing-bookkeeping-benefits",
-  },
-  {
-    title: "Understanding US GAAP vs IFRS: A Comprehensive Guide",
-    excerpt: "A detailed comparison of the two major accounting frameworks and when to apply each.",
-    image: auditImg,
-    author: "Emma Richardson",
-    date: "December 28, 2023",
-    readTime: "10 min read",
-    category: "Technical",
-    slug: "us-gaap-vs-ifrs-guide",
-  },
-  {
-    title: "Building a Successful Remote Accounting Team",
-    excerpt: "Best practices for managing and collaborating with offshore accounting professionals.",
-    image: consultingImg,
-    author: "Michael Zhang",
-    date: "December 20, 2023",
-    readTime: "6 min read",
-    category: "Management",
-    slug: "remote-accounting-team-success",
-  },
-  {
-    title: "Tax Season Preparation: A Checklist for CPA Firms",
-    excerpt: "Essential steps to ensure your firm is ready for the upcoming tax season.",
-    image: auditImg,
-    author: "David Foster",
-    date: "December 15, 2023",
-    readTime: "7 min read",
-    category: "Tax",
-    slug: "tax-season-preparation-checklist",
-  },
-  {
-    title: "The Role of Technology in Modern Accounting Practices",
-    excerpt: "How cloud-based solutions and automation are revolutionizing the accounting industry.",
-    image: bookkeepingImg,
-    author: "Sarah Mitchell",
-    date: "December 10, 2023",
-    readTime: "6 min read",
-    category: "Technology",
-    slug: "technology-modern-accounting",
-  },
-  {
-    title: "Ensuring Data Security in Offshore Accounting",
-    excerpt: "Best practices and certifications that protect your client data when outsourcing.",
-    image: consultingImg,
-    author: "James Crawford",
-    date: "December 5, 2023",
-    readTime: "8 min read",
-    category: "Security",
-    slug: "data-security-offshore-accounting",
-  },
-];
-
-const categories = [
-  "All",
-  "Industry Insights",
-  "Best Practices",
-  "Technical",
-  "Management",
-  "Tax",
-  "Technology",
-  "Security",
-];
+import { featuredPost, posts, categories } from "@/data/blogData";
 
 export default function Blog() {
   return (
@@ -151,7 +63,7 @@ export default function Blog() {
               <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-6">
                 <span className="flex items-center gap-1">
                   <User className="w-4 h-4" />
-                  {featuredPost.author}
+                  {featuredPost.author.name}
                 </span>
                 <span className="flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
@@ -162,9 +74,11 @@ export default function Blog() {
                   {featuredPost.readTime}
                 </span>
               </div>
-              <Button variant="gold" size="lg">
-                Read Article
-                <ArrowRight className="ml-2 h-4 w-4" />
+              <Button variant="gold" size="lg" asChild>
+                <Link to={`/blog/${featuredPost.slug}`}>
+                  Read Article
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
               </Button>
             </div>
           </div>
@@ -179,8 +93,9 @@ export default function Blog() {
           </h3>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {posts.map((post) => (
-              <article
+              <Link
                 key={post.slug}
+                to={`/blog/${post.slug}`}
                 className="bg-card rounded-xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 group"
               >
                 <div className="aspect-[16/10] overflow-hidden">
@@ -208,7 +123,7 @@ export default function Blog() {
                     <span>{post.readTime}</span>
                   </div>
                 </div>
-              </article>
+              </Link>
             ))}
           </div>
 
