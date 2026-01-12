@@ -14,6 +14,7 @@ import {
   X,
 } from 'lucide-react';
 import { useState } from 'react';
+import NotificationsDropdown from './NotificationsDropdown';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -40,15 +41,22 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Mobile menu button */}
-      <div className="lg:hidden fixed top-4 left-4 z-50">
+      {/* Top bar for mobile with notifications */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-card border-b px-4 py-3 flex items-center justify-between">
         <Button
-          variant="outline"
+          variant="ghost"
           size="icon"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
           {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </Button>
+        <span className="text-sm font-medium">Admin Panel</span>
+        <NotificationsDropdown />
+      </div>
+
+      {/* Desktop notification bar */}
+      <div className="hidden lg:flex fixed top-0 left-64 right-0 z-30 bg-card border-b px-6 py-3 items-center justify-end">
+        <NotificationsDropdown />
       </div>
 
       {/* Sidebar */}
@@ -125,7 +133,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       )}
 
       {/* Main content */}
-      <main className="lg:pl-64">
+      <main className="lg:pl-64 pt-14 lg:pt-14">
         <div className="p-6 lg:p-8">{children}</div>
       </main>
     </div>

@@ -1,21 +1,25 @@
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
   Users,
   Briefcase,
   Building2,
   FileText,
+  Calendar as CalendarIcon,
   TrendingUp,
-  TrendingDown,
-  ArrowRight,
-  CheckCircle,
-  Clock,
-  Globe,
-  Calendar,
 } from 'lucide-react';
 import {
   AreaChart,
@@ -32,13 +36,15 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
-import { format, subDays, startOfDay, isAfter } from 'date-fns';
+import { format, subDays, startOfDay, isAfter, isBefore, isWithinInterval, startOfWeek, startOfMonth, startOfQuarter, startOfYear, eachDayOfInterval, eachWeekOfInterval } from 'date-fns';
 import { useJobPostingsStore } from '@/stores/jobPostingsStore';
 import { useBlogPostsStore } from '@/stores/blogPostsStore';
 import { useEmployerRequestsStore } from '@/stores/employerRequestsStore';
 import { CandidateApplication, ExperienceLevel } from '@/types/admin';
+import { cn } from '@/lib/utils';
+import { DateRange } from 'react-day-picker';
 
-// Mock candidates data (same as in CandidatesPage)
+// Mock candidates data
 const mockCandidates: CandidateApplication[] = [
   { id: 1, first_name: 'John', last_name: 'Smith', email: 'john.smith@example.com', nationality: 'British', experience: '3-7', cv_url: '/uploads/cv-1.docx', cover_letter_url: '/uploads/cl-1.docx', created_at: '2024-01-15T10:30:00Z', updated_at: '2024-01-15T10:30:00Z' },
   { id: 2, first_name: 'Sarah', last_name: 'Johnson', email: 'sarah.j@example.com', nationality: 'American', experience: '7-10', cv_url: '/uploads/cv-2.docx', cover_letter_url: '/uploads/cl-2.docx', created_at: '2024-01-14T14:20:00Z', updated_at: '2024-01-14T14:20:00Z' },
@@ -51,20 +57,68 @@ const mockCandidates: CandidateApplication[] = [
 
 const COLORS = ['hsl(var(--primary))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))'];
 
+type DatePreset = '7d' | '30d' | '90d' | 'ytd' | 'custom';
+
+const datePresets: { value: DatePreset; label: string }[] = [
+  { value: '7d', label: 'Last 7 days' },
+  { value: '30d', label: 'Last 30 days' },
+  { value: '90d', label: 'Last quarter' },
+  { value: 'ytd', label: 'Year to date' },
+  { value: 'custom', label: 'Custom range' },
+];
+
 export default function AdminDashboard() {
   const { jobs } = useJobPostingsStore();
   const { posts } = useBlogPostsStore();
   const { requests } = useEmployerRequestsStore();
   const candidates = mockCandidates;
 
-  // Calculate stats
-  const stats = useMemo(() => {
-    const weekAgo = subDays(new Date(), 7);
+  // Date range state
+  const [datePreset, setDatePreset] = useState<DatePreset>('30d');
+  const [customRange, setCustomRange] = useState<DateRange | undefined>();
+  const [calendarOpen, setCalendarOpen] = useState(false);
+
+  // Calculate date range based on preset
+  const dateRange = useMemo(() => {
+    const now = new Date();
+    const today = startOfDay(now);
     
+    switch (datePreset) {
+      case '7d':
+        return { from: subDays(today, 6), to: today };
+      case '30d':
+        return { from: subDays(today, 29), to: today };
+      case '90d':
+        return { from: startOfQuarter(today), to: today };
+      case 'ytd':
+        return { from: startOfYear(today), to: today };
+      case 'custom':
+        return customRange?.from && customRange?.to
+          ? { from: startOfDay(customRange.from), to: startOfDay(customRange.to) }
+          : { from: subDays(today, 29), to: today };
+      default:
+        return { from: subDays(today, 29), to: today };
+    }
+  }, [datePreset, customRange]);
+
+  // Filter data within date range
+  const filterByDateRange = <T extends { created_at: string }>(items: T[]) => {
+    if (!dateRange.from || !dateRange.to) return items;
+    return items.filter((item) => {
+      const created = new Date(item.created_at);
+      return isWithinInterval(created, { start: dateRange.from!, end: new Date(dateRange.to!.getTime() + 86400000) });
+    });
+  };
+
+  const filteredCandidates = filterByDateRange(candidates);
+  const filteredRequests = filterByDateRange(requests);
+
+  // Calculate stats for the selected period
+  const stats = useMemo(() => {
     return {
       candidates: {
         total: candidates.length,
-        thisWeek: candidates.filter((c) => isAfter(new Date(c.created_at), weekAgo)).length,
+        inPeriod: filteredCandidates.length,
       },
       jobs: {
         total: jobs.length,
@@ -72,41 +126,64 @@ export default function AdminDashboard() {
       },
       employers: {
         total: requests.length,
-        thisWeek: requests.filter((r) => isAfter(new Date(r.created_at), weekAgo)).length,
+        inPeriod: filteredRequests.length,
       },
       blog: {
         total: posts.length,
         published: posts.filter((p) => p.is_published).length,
       },
     };
-  }, [candidates, jobs, requests, posts]);
+  }, [candidates, jobs, requests, posts, filteredCandidates, filteredRequests]);
 
-  // Activity timeline data (last 7 days)
+  // Activity timeline data for selected period
   const activityData = useMemo(() => {
-    const days = Array.from({ length: 7 }, (_, i) => {
-      const date = subDays(new Date(), 6 - i);
+    if (!dateRange.from || !dateRange.to) return [];
+    
+    const daysDiff = Math.ceil((dateRange.to.getTime() - dateRange.from.getTime()) / 86400000);
+    
+    // Use weekly grouping for periods > 30 days
+    if (daysDiff > 30) {
+      const weeks = eachWeekOfInterval({ start: dateRange.from, end: dateRange.to });
+      return weeks.map((weekStart, index) => {
+        const weekEnd = weeks[index + 1] || new Date(dateRange.to!.getTime() + 86400000);
+        return {
+          date: format(weekStart, 'MMM d'),
+          candidates: filteredCandidates.filter((c) => {
+            const created = new Date(c.created_at);
+            return created >= weekStart && created < weekEnd;
+          }).length,
+          employers: filteredRequests.filter((r) => {
+            const created = new Date(r.created_at);
+            return created >= weekStart && created < weekEnd;
+          }).length,
+        };
+      });
+    }
+    
+    // Daily grouping for shorter periods
+    const days = eachDayOfInterval({ start: dateRange.from, end: dateRange.to });
+    return days.map((date) => {
       const dayStart = startOfDay(date);
-      const dayEnd = startOfDay(subDays(date, -1));
+      const dayEnd = new Date(dayStart.getTime() + 86400000);
       
       return {
-        date: format(date, 'MMM d'),
-        candidates: candidates.filter((c) => {
+        date: format(date, daysDiff <= 7 ? 'EEE' : 'MMM d'),
+        candidates: filteredCandidates.filter((c) => {
           const created = new Date(c.created_at);
           return created >= dayStart && created < dayEnd;
         }).length,
-        employers: requests.filter((r) => {
+        employers: filteredRequests.filter((r) => {
           const created = new Date(r.created_at);
           return created >= dayStart && created < dayEnd;
         }).length,
       };
     });
-    return days;
-  }, [candidates, requests]);
+  }, [dateRange, filteredCandidates, filteredRequests]);
 
-  // Experience distribution
+  // Experience distribution (from filtered candidates)
   const experienceData = useMemo(() => {
     const distribution: Record<ExperienceLevel, number> = { '0-3': 0, '3-7': 0, '7-10': 0, '10+': 0 };
-    candidates.forEach((c) => {
+    filteredCandidates.forEach((c) => {
       distribution[c.experience]++;
     });
     return [
@@ -115,7 +192,7 @@ export default function AdminDashboard() {
       { name: '7-10 years', value: distribution['7-10'] },
       { name: '10+ years', value: distribution['10+'] },
     ].filter((d) => d.value > 0);
-  }, [candidates]);
+  }, [filteredCandidates]);
 
   // Blog categories
   const categoryData = useMemo(() => {
@@ -137,8 +214,8 @@ export default function AdminDashboard() {
     {
       title: 'Candidates',
       value: stats.candidates.total,
-      change: stats.candidates.thisWeek,
-      changeLabel: 'this week',
+      change: stats.candidates.inPeriod,
+      changeLabel: 'in period',
       icon: Users,
       color: 'text-primary',
       bgColor: 'bg-primary/10',
@@ -157,8 +234,8 @@ export default function AdminDashboard() {
     {
       title: 'Employer Requests',
       value: stats.employers.total,
-      change: stats.employers.thisWeek,
-      changeLabel: 'this week',
+      change: stats.employers.inPeriod,
+      changeLabel: 'in period',
       icon: Building2,
       color: 'text-blue-500',
       bgColor: 'bg-blue-500/10',
@@ -203,16 +280,81 @@ export default function AdminDashboard() {
       .slice(0, 5);
   }, [candidates, requests]);
 
+  const handlePresetChange = (value: string) => {
+    setDatePreset(value as DatePreset);
+    if (value !== 'custom') {
+      setCalendarOpen(false);
+    }
+  };
+
   return (
     <AdminLayout>
       <div className="space-y-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground">
-            Overview of your recruitment platform activity
-          </p>
+        {/* Header with Date Filter */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold">Dashboard</h1>
+            <p className="text-muted-foreground">
+              Overview of your recruitment platform activity
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Select value={datePreset} onValueChange={handlePresetChange}>
+              <SelectTrigger className="w-[160px]">
+                <CalendarIcon className="h-4 w-4 mr-2" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {datePresets.map((preset) => (
+                  <SelectItem key={preset.value} value={preset.value}>
+                    {preset.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            {datePreset === 'custom' && (
+              <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="justify-start text-left font-normal">
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {customRange?.from ? (
+                      customRange.to ? (
+                        <>
+                          {format(customRange.from, 'LLL dd')} - {format(customRange.to, 'LLL dd')}
+                        </>
+                      ) : (
+                        format(customRange.from, 'LLL dd, y')
+                      )
+                    ) : (
+                      <span>Pick dates</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="end">
+                  <Calendar
+                    initialFocus
+                    mode="range"
+                    defaultMonth={customRange?.from}
+                    selected={customRange}
+                    onSelect={setCustomRange}
+                    numberOfMonths={2}
+                  />
+                </PopoverContent>
+              </Popover>
+            )}
+          </div>
         </div>
+
+        {/* Period indicator */}
+        {dateRange.from && dateRange.to && (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <TrendingUp className="h-4 w-4" />
+            <span>
+              Showing data from {format(dateRange.from, 'MMM d, yyyy')} to {format(dateRange.to, 'MMM d, yyyy')}
+            </span>
+          </div>
+        )}
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -245,8 +387,8 @@ export default function AdminDashboard() {
           {/* Activity Timeline */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Weekly Activity</CardTitle>
-              <CardDescription>Applications and employer requests over the past week</CardDescription>
+              <CardTitle className="text-lg">Activity Timeline</CardTitle>
+              <CardDescription>Applications and employer requests over the selected period</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="h-[250px]">
@@ -295,32 +437,38 @@ export default function AdminDashboard() {
             </CardHeader>
             <CardContent>
               <div className="h-[250px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={experienceData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={90}
-                      paddingAngle={2}
-                      dataKey="value"
-                      label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                      labelLine={false}
-                    >
-                      {experienceData.map((_, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: 'hsl(var(--card))',
-                        border: '1px solid hsl(var(--border))',
-                        borderRadius: '8px',
-                      }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
+                {experienceData.length === 0 ? (
+                  <div className="flex items-center justify-center h-full text-muted-foreground">
+                    No candidates in selected period
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={experienceData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={90}
+                        paddingAngle={2}
+                        dataKey="value"
+                        label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                        labelLine={false}
+                      >
+                        {experienceData.map((_, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: 'hsl(var(--card))',
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px',
+                        }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                )}
               </div>
             </CardContent>
           </Card>
