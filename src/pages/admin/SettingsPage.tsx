@@ -53,8 +53,8 @@ import {
   DateFormat,
   TimeFormat,
   CurrencyFormat,
-  ThemeMode,
 } from '@/stores/settingsStore';
+import { useApiConfigStore } from '@/stores/apiConfigStore';
 import {
   Settings,
   Palette,
@@ -75,14 +75,84 @@ import {
   ExternalLink,
   Link as LinkIcon,
   Cog,
-  Sun,
-  Moon,
-  Monitor,
   Calendar,
   Clock,
   DollarSign,
   Archive,
+  Server,
+  ToggleLeft,
 } from 'lucide-react';
+
+// Helper functions for color conversion
+function hslToHex(hslString: string): string {
+  try {
+    const parts = hslString.trim().split(/\s+/);
+    if (parts.length < 3) return '#000000';
+    
+    const h = parseFloat(parts[0]) / 360;
+    const s = parseFloat(parts[1].replace('%', '')) / 100;
+    const l = parseFloat(parts[2].replace('%', '')) / 100;
+    
+    const hue2rgb = (p: number, q: number, t: number) => {
+      if (t < 0) t += 1;
+      if (t > 1) t -= 1;
+      if (t < 1/6) return p + (q - p) * 6 * t;
+      if (t < 1/2) return q;
+      if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+      return p;
+    };
+
+    let r, g, b;
+    if (s === 0) {
+      r = g = b = l;
+    } else {
+      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      const p = 2 * l - q;
+      r = hue2rgb(p, q, h + 1/3);
+      g = hue2rgb(p, q, h);
+      b = hue2rgb(p, q, h - 1/3);
+    }
+
+    const toHex = (x: number) => {
+      const hex = Math.round(x * 255).toString(16);
+      return hex.length === 1 ? '0' + hex : hex;
+    };
+
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+  } catch {
+    return '#000000';
+  }
+}
+
+function hexToHsl(hex: string): string {
+  try {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    if (!result) return '0 0% 0%';
+    
+    const r = parseInt(result[1], 16) / 255;
+    const g = parseInt(result[2], 16) / 255;
+    const b = parseInt(result[3], 16) / 255;
+
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h = 0, s = 0;
+    const l = (max + min) / 2;
+
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+        case g: h = ((b - r) / d + 2) / 6; break;
+        case b: h = ((r - g) / d + 4) / 6; break;
+      }
+    }
+
+    return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
+  } catch {
+    return '0 0% 0%';
+  }
+}
 
 export default function SettingsPage() {
   const { toast } = useToast();
@@ -107,6 +177,8 @@ export default function SettingsPage() {
     setNotifications,
     adminUsers,
   } = useSettingsStore();
+
+  const { dataMode, apiBaseUrl, setDataMode, setApiBaseUrl } = useApiConfigStore();
 
   const [activeTab, setActiveTab] = useState('branding');
 
@@ -425,42 +497,54 @@ export default function SettingsPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="primary-color">Primary Color (HSL)</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="primary-color"
-                        value={branding.primaryColor}
-                        onChange={(e) => setBranding({ primaryColor: e.target.value })}
-                        placeholder="220 60% 20%"
+                <div className="grid gap-6 sm:grid-cols-2">
+                  <div className="space-y-3">
+                    <Label htmlFor="primary-color">Primary Color</Label>
+                    <div className="flex gap-3 items-center">
+                      <input
+                        type="color"
+                        id="primary-color-picker"
+                        className="w-12 h-12 rounded-lg border cursor-pointer"
+                        value={hslToHex(branding.primaryColor)}
+                        onChange={(e) => setBranding({ primaryColor: hexToHsl(e.target.value) })}
                       />
-                      <div
-                        className="w-10 h-10 rounded border shrink-0"
-                        style={{ backgroundColor: `hsl(${branding.primaryColor})` }}
-                      />
+                      <div className="flex-1 space-y-1">
+                        <Input
+                          id="primary-color"
+                          value={branding.primaryColor}
+                          onChange={(e) => setBranding({ primaryColor: e.target.value })}
+                          placeholder="220 60% 20%"
+                          className="text-sm"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          HSL format: H S% L%
+                        </p>
+                      </div>
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      Format: H S% L% (e.g., 220 60% 20%)
-                    </p>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="accent-color">Accent Color (HSL)</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="accent-color"
-                        value={branding.accentColor}
-                        onChange={(e) => setBranding({ accentColor: e.target.value })}
-                        placeholder="38 92% 50%"
+                  <div className="space-y-3">
+                    <Label htmlFor="accent-color">Accent Color</Label>
+                    <div className="flex gap-3 items-center">
+                      <input
+                        type="color"
+                        id="accent-color-picker"
+                        className="w-12 h-12 rounded-lg border cursor-pointer"
+                        value={hslToHex(branding.accentColor)}
+                        onChange={(e) => setBranding({ accentColor: hexToHsl(e.target.value) })}
                       />
-                      <div
-                        className="w-10 h-10 rounded border shrink-0"
-                        style={{ backgroundColor: `hsl(${branding.accentColor})` }}
-                      />
+                      <div className="flex-1 space-y-1">
+                        <Input
+                          id="accent-color"
+                          value={branding.accentColor}
+                          onChange={(e) => setBranding({ accentColor: e.target.value })}
+                          placeholder="38 92% 50%"
+                          className="text-sm"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          HSL format: H S% L%
+                        </p>
+                      </div>
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      Format: H S% L% (e.g., 38 92% 50%)
-                    </p>
                   </div>
                 </div>
                 <Button onClick={handleSaveBranding}>
@@ -473,40 +557,6 @@ export default function SettingsPage() {
 
           {/* General Tab */}
           <TabsContent value="general" className="space-y-6">
-            {/* Theme Settings */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Sun className="h-5 w-5" />
-                  Appearance
-                </CardTitle>
-                <CardDescription>
-                  Configure light/dark mode preference
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Theme Mode</Label>
-                  <div className="flex gap-2">
-                    {[
-                      { value: 'light', icon: Sun, label: 'Light' },
-                      { value: 'dark', icon: Moon, label: 'Dark' },
-                      { value: 'system', icon: Monitor, label: 'System' },
-                    ].map(({ value, icon: Icon, label }) => (
-                      <Button
-                        key={value}
-                        variant={general.themeMode === value ? 'default' : 'outline'}
-                        className="flex-1"
-                        onClick={() => setGeneral({ themeMode: value as ThemeMode })}
-                      >
-                        <Icon className="h-4 w-4 mr-2" />
-                        {label}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
 
             {/* Display Settings */}
             <Card>
@@ -648,9 +698,48 @@ export default function SettingsPage() {
                 </Button>
               </CardContent>
             </Card>
-          </TabsContent>
 
-          {/* Notifications Tab */}
+            {/* API Configuration */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Server className="h-5 w-5" />
+                  Data Source
+                </CardTitle>
+                <CardDescription>
+                  Switch between demo data and live backend
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Use Live Data</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Connect to your backend API instead of demo data
+                    </p>
+                  </div>
+                  <Switch
+                    checked={dataMode === 'live'}
+                    onCheckedChange={(checked) => setDataMode(checked ? 'live' : 'demo')}
+                  />
+                </div>
+                {dataMode === 'live' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="api-url">API Base URL</Label>
+                    <Input
+                      id="api-url"
+                      value={apiBaseUrl}
+                      onChange={(e) => setApiBaseUrl(e.target.value)}
+                      placeholder="https://your-api.com"
+                    />
+                  </div>
+                )}
+                <Badge variant={dataMode === 'demo' ? 'secondary' : 'default'}>
+                  {dataMode === 'demo' ? 'Using Demo Data' : 'Using Live Data'}
+                </Badge>
+              </CardContent>
+            </Card>
+          </TabsContent>
           <TabsContent value="notifications" className="space-y-6">
             <Card>
               <CardHeader>
@@ -835,9 +924,6 @@ export default function SettingsPage() {
                 </Button>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground mb-4">
-                  User management requires Laravel backend integration. Configure this in your Laravel admin panel.
-                </p>
                 <Table>
                   <TableHeader>
                     <TableRow>

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { EmployerRequest, ExperienceLevel } from '@/types/admin';
+import { EmployerRequest } from '@/types/admin';
+import { useApiConfigStore } from './apiConfigStore';
 
 interface EmployerRequestsState {
   requests: EmployerRequest[];
@@ -168,33 +169,40 @@ const mockRequests: EmployerRequest[] = [
   },
 ];
 
-export const useEmployerRequestsStore = create<EmployerRequestsState>((set) => ({
+export const useEmployerRequestsStore = create<EmployerRequestsState>((set, get) => ({
   requests: mockRequests,
   isLoading: false,
 
   fetchRequests: async () => {
+    const { dataMode, apiBaseUrl, isLiveMode } = useApiConfigStore.getState();
+    
     set({ isLoading: true });
+    
+    // If in demo mode, just reset to mock data with a small delay for UX
+    if (!isLiveMode()) {
+      await new Promise(resolve => setTimeout(resolve, 300));
+      set({ requests: [...mockRequests], isLoading: false });
+      return;
+    }
+    
     try {
-      const apiUrl = import.meta.env.VITE_LARAVEL_API_URL;
-      if (apiUrl) {
-        const token = localStorage.getItem('admin_token');
-        const response = await fetch(`${apiUrl}/api/admin/employer-requests`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: 'application/json',
-          },
-        });
-        if (response.ok) {
-          const data = await response.json();
-          set({ requests: data.data || data, isLoading: false });
-          return;
-        }
+      const token = localStorage.getItem('admin_token');
+      const response = await fetch(`${apiBaseUrl}/api/admin/employer-requests`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: 'application/json',
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        set({ requests: data.data || data, isLoading: false });
+        return;
       }
     } catch (error) {
       console.log('Using demo data for employer requests');
     }
     // Fall back to demo data
-    set({ requests: mockRequests, isLoading: false });
+    set({ requests: [...mockRequests], isLoading: false });
   },
 
   deleteRequest: (id: number) => {
