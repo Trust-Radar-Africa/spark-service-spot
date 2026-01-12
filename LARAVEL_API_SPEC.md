@@ -472,6 +472,64 @@ Toggle publish status of a blog post.
 
 ---
 
+## Blog Image Upload
+
+### POST /api/admin/upload-image
+Upload an image for blog posts. Requires authentication. Returns the URL of the uploaded image.
+
+**Request (multipart/form-data):**
+- `image`: file, required, mime: jpeg,png,gif,webp, max 5MB
+
+**Response (Success):**
+```json
+{
+  "url": "/storage/blog/images/image-1234567890.jpg",
+  "image_url": "/storage/blog/images/image-1234567890.jpg",
+  "filename": "image-1234567890.jpg"
+}
+```
+
+**Response (Error):**
+```json
+{
+  "message": "The image must be a file of type: jpeg, png, gif, webp.",
+  "errors": {
+    "image": ["The image must be a file of type: jpeg, png, gif, webp."]
+  }
+}
+```
+
+### Laravel Controller Example
+
+```php
+// In BlogController or a dedicated UploadController
+public function uploadImage(Request $request)
+{
+    $request->validate([
+        'image' => 'required|image|mimes:jpeg,png,gif,webp|max:5120',
+    ]);
+
+    $path = $request->file('image')->store('blog/images', 'public');
+    
+    return response()->json([
+        'url' => Storage::url($path),
+        'image_url' => Storage::url($path),
+        'filename' => basename($path),
+    ]);
+}
+```
+
+### Laravel Route Example
+
+```php
+// In routes/api.php
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/admin/upload-image', [BlogController::class, 'uploadImage']);
+});
+```
+
+---
+
 ## Blog Posts Migration
 
 ```php
