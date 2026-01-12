@@ -4,6 +4,7 @@ import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
+  LayoutDashboard,
   Users,
   Briefcase,
   Building2,
@@ -19,6 +20,7 @@ interface AdminLayoutProps {
 }
 
 const navigation = [
+  { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { name: 'Candidates', href: '/admin/candidates', icon: Users },
   { name: 'Job Postings', href: '/admin/jobs', icon: Briefcase },
   { name: 'Employer Requests', href: '/admin/employers', icon: Building2 },
@@ -68,7 +70,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           {/* Navigation */}
           <nav className="flex-1 p-4 space-y-1">
             {navigation.map((item) => {
-              const isActive = location.pathname === item.href;
+              const isActive = location.pathname === item.href || 
+                (item.href === '/admin' && location.pathname === '/admin/dashboard');
               return (
                 <Link
                   key={item.name}
