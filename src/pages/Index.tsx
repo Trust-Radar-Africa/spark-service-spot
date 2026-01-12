@@ -1,20 +1,12 @@
-import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle2, Globe, Users, Award, Shield } from "lucide-react";
-import heroBg from "@/assets/hero-bg.jpg";
 import teamImg from "@/assets/team.jpg";
 import auditImg from "@/assets/audit-service.jpg";
 import bookkeepingImg from "@/assets/bookkeeping-service.jpg";
 import consultingImg from "@/assets/consulting-service.jpg";
-
-const taglines = [
-  "EXCEPTIONAL OUTSOURCED OFFSHORE ACCOUNTING SOLUTIONS",
-  "BLENDING NEW TECHNIQUES WITH TRADITIONAL VALUES",
-  "GLOBAL ASSIGNMENTS FROM US, CANADA, AUSTRALIA & EUROPE",
-  "YOUR ONE-STOP SHOP FOR FINANCIAL NEEDS",
-];
+import { HeroCarousel } from "@/components/HeroCarousel";
 
 const services = [
   {
@@ -68,74 +60,10 @@ const features = [
 ];
 
 export default function Index() {
-  const [currentTagline, setCurrentTagline] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTagline((prev) => (prev + 1) % taglines.length);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <Layout>
-      {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${heroBg})` }}
-        >
-          <div className="absolute inset-0 bg-gradient-hero opacity-90" />
-        </div>
-
-        <div className="relative z-10 container mx-auto px-4 lg:px-8 text-center">
-          <div className="max-w-4xl mx-auto">
-            <div className="mb-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-foreground/10 border border-primary-foreground/20">
-              <span className="text-xs font-semibold text-gold tracking-widest uppercase">
-                IFAC Affiliate Member
-              </span>
-            </div>
-
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold text-primary-foreground mb-6 leading-tight">
-              Welcome to{" "}
-              <span className="text-gradient-gold">Multiverse CPA</span>
-            </h1>
-
-            <div className="h-20 md:h-16 flex items-center justify-center mb-8">
-              <p
-                key={currentTagline}
-                className="text-lg md:text-xl text-primary-foreground/80 font-medium tracking-wide animate-fade-in"
-              >
-                {taglines[currentTagline]}
-              </p>
-            </div>
-
-            <p className="text-base md:text-lg text-primary-foreground/70 max-w-2xl mx-auto mb-10 leading-relaxed">
-              Your premier destination for exceptional outsourced offshore accounting solutions. 
-              We blend new techniques with traditional values to provide the best accounting experience possible.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button variant="hero" size="xl" asChild>
-                <Link to="/contact">
-                  Schedule a Call
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-              <Button variant="heroOutline" size="xl" asChild>
-                <Link to="/services">Explore Services</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce">
-          <div className="w-6 h-10 rounded-full border-2 border-primary-foreground/30 flex items-start justify-center p-2">
-            <div className="w-1.5 h-3 rounded-full bg-gold" />
-          </div>
-        </div>
-      </section>
+      {/* Hero Carousel */}
+      <HeroCarousel variant="classic" />
 
       {/* Stats Section */}
       <section className="py-16 bg-secondary">
