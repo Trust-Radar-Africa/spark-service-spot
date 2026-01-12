@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Mail, Globe, Building2, ArrowRight } from "lucide-react";
+import { Mail, Globe, Building2, ArrowRight, Linkedin, Twitter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const services = [
@@ -138,7 +138,28 @@ export function FooterModern() {
           <p className="text-white/40 text-sm">
             © {new Date().getFullYear()} Multiverse CPA. All rights reserved.
           </p>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
+            {/* Social Links */}
+            <div className="flex items-center gap-3">
+              <a
+                href="https://linkedin.com/company/multiversecpa"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/60 hover:bg-qx-orange hover:text-white transition-colors"
+                aria-label="LinkedIn"
+              >
+                <Linkedin className="w-4 h-4" />
+              </a>
+              <a
+                href="https://twitter.com/multiversecpa"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/60 hover:bg-qx-orange hover:text-white transition-colors"
+                aria-label="Twitter"
+              >
+                <Twitter className="w-4 h-4" />
+              </a>
+            </div>
             <span className="text-white/40 text-xs">
               People • Process • Platforms
             </span>

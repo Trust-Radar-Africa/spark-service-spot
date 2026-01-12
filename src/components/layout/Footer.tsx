@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Mail, Globe, Building2 } from "lucide-react";
+import { Mail, Globe, Building2, Linkedin, Twitter } from "lucide-react";
 
 const services = [
   { name: "Outsourced Audit", href: "/services#audit" },
@@ -115,6 +115,27 @@ export function Footer() {
             © {new Date().getFullYear()} Multiverse CPA. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
+            {/* Social Links */}
+            <div className="flex items-center gap-4">
+              <a
+                href="https://linkedin.com/company/multiversecpa"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary-foreground/50 hover:text-gold transition-colors"
+                aria-label="LinkedIn"
+              >
+                <Linkedin className="w-5 h-5" />
+              </a>
+              <a
+                href="https://twitter.com/multiversecpa"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary-foreground/50 hover:text-gold transition-colors"
+                aria-label="Twitter"
+              >
+                <Twitter className="w-5 h-5" />
+              </a>
+            </div>
             <span className="text-primary-foreground/50 text-xs">
               Integrity • Competence • Dedication
             </span>
