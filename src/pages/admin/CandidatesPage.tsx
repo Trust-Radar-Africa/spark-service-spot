@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { SearchableSelect } from '@/components/ui/searchable-select';
 import {
   Table,
   TableBody,
@@ -61,6 +62,29 @@ const experienceLevels: { value: ExperienceLevel; label: string }[] = [
   { value: '3-7', label: '3-7 years' },
   { value: '7-10', label: '7-10 years' },
   { value: '10+', label: 'Over 10 years' },
+];
+
+const nationalityOptions = [
+  { value: 'United States', label: 'United States' },
+  { value: 'United Kingdom', label: 'United Kingdom' },
+  { value: 'Canada', label: 'Canada' },
+  { value: 'Australia', label: 'Australia' },
+  { value: 'Germany', label: 'Germany' },
+  { value: 'France', label: 'France' },
+  { value: 'India', label: 'India' },
+  { value: 'China', label: 'China' },
+  { value: 'Japan', label: 'Japan' },
+  { value: 'Brazil', label: 'Brazil' },
+  { value: 'South Africa', label: 'South Africa' },
+  { value: 'Nigeria', label: 'Nigeria' },
+  { value: 'Kenya', label: 'Kenya' },
+  { value: 'UAE', label: 'United Arab Emirates' },
+  { value: 'Saudi Arabia', label: 'Saudi Arabia' },
+  { value: 'Singapore', label: 'Singapore' },
+  { value: 'Malaysia', label: 'Malaysia' },
+  { value: 'Philippines', label: 'Philippines' },
+  { value: 'Pakistan', label: 'Pakistan' },
+  { value: 'Egypt', label: 'Egypt' },
 ];
 
 const getStoredItemsPerPage = (): ItemsPerPageOption => {
