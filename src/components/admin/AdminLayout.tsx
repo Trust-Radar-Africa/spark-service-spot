@@ -12,6 +12,7 @@ import {
   LogOut,
   Menu,
   X,
+  ExternalLink,
 } from 'lucide-react';
 import { useState } from 'react';
 import NotificationsDropdown from './NotificationsDropdown';
@@ -21,11 +22,11 @@ interface AdminLayoutProps {
 }
 
 const navigation = [
-  { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-  { name: 'Candidates', href: '/admin/candidates', icon: Users },
-  { name: 'Job Postings', href: '/admin/jobs', icon: Briefcase },
-  { name: 'Employer Requests', href: '/admin/employers', icon: Building2 },
-  { name: 'Blog Posts', href: '/admin/blog', icon: FileText },
+  { name: 'Dashboard', href: '/admin', icon: LayoutDashboard, viewHref: null },
+  { name: 'Candidates', href: '/admin/candidates', icon: Users, viewHref: '/apply' },
+  { name: 'Job Postings', href: '/admin/jobs', icon: Briefcase, viewHref: '/careers' },
+  { name: 'Employer Requests', href: '/admin/employers', icon: Building2, viewHref: '/employers' },
+  { name: 'Blog Posts', href: '/admin/blog', icon: FileText, viewHref: '/blog' },
 ];
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
@@ -69,9 +70,16 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="p-6 border-b">
-            <h1 className="text-xl font-bold text-primary">Admin Panel</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Global Outsourced Accounting
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                <span className="text-lg font-bold text-primary">GOA</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h1 className="text-lg font-bold text-primary truncate">Admin Panel</h1>
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground mt-3 leading-relaxed">
+              Global Out Sourced Offshore Accounting Solutions
             </p>
           </div>
 
@@ -81,20 +89,32 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               const isActive = location.pathname === item.href || 
                 (item.href === '/admin' && location.pathname === '/admin/dashboard');
               return (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={cn(
-                    'flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors',
-                    isActive
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                <div key={item.name} className="flex items-center gap-1">
+                  <Link
+                    to={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={cn(
+                      'flex-1 flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors',
+                      isActive
+                        ? 'bg-primary text-primary-foreground'
+                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                    )}
+                  >
+                    <item.icon className="h-5 w-5" />
+                    {item.name}
+                  </Link>
+                  {item.viewHref && (
+                    <Link
+                      to={item.viewHref}
+                      target="_blank"
+                      onClick={(e) => e.stopPropagation()}
+                      className="p-2 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                      title={`View ${item.name} page`}
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </Link>
                   )}
-                >
-                  <item.icon className="h-5 w-5" />
-                  {item.name}
-                </Link>
+                </div>
               );
             })}
           </nav>

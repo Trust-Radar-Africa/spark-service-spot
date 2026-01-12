@@ -54,6 +54,8 @@ import {
 } from '@/components/ui/pagination';
 import { SortableTableHead, useSorting } from '@/components/admin/SortableTableHead';
 import { exportToCSV } from '@/utils/csvExport';
+import ItemsPerPageSelect from '@/components/admin/ItemsPerPageSelect';
+import { ItemsPerPageOption } from '@/hooks/useItemsPerPage';
 
 const experienceLevels: { value: ExperienceLevel; label: string }[] = [
   { value: '0-3', label: '0-3 years' },
@@ -150,17 +152,32 @@ const mockCandidates: CandidateApplication[] = [
   },
 ];
 
-const ITEMS_PER_PAGE = 5;
+const getStoredItemsPerPage = (): ItemsPerPageOption => {
+  if (typeof window !== 'undefined') {
+    const stored = localStorage.getItem('admin-candidates-items-per-page');
+    if (stored && [5, 10, 25, 50].includes(Number(stored))) {
+      return Number(stored) as ItemsPerPageOption;
+    }
+  }
+  return 5;
+};
 
 export default function CandidatesPage() {
   const [candidates, setCandidates] = useState<CandidateApplication[]>(mockCandidates);
   const [filters, setFilters] = useState<CandidateFilters>({});
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPageOption>(getStoredItemsPerPage);
   const [deleteCandidate, setDeleteCandidate] = useState<CandidateApplication | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
   const { sortKey, sortDirection, handleSort, sortData } = useSorting<CandidateApplication>();
+
+  const handleItemsPerPageChange = (value: ItemsPerPageOption) => {
+    setItemsPerPage(value);
+    setCurrentPage(1);
+    localStorage.setItem('admin-candidates-items-per-page', String(value));
+  };
 
   // Handle CSV export
   const handleExportCSV = () => {
@@ -203,10 +220,10 @@ export default function CandidatesPage() {
 
   // Sort and paginate
   const sortedCandidates = sortData(filteredCandidates);
-  const totalPages = Math.max(1, Math.ceil(sortedCandidates.length / ITEMS_PER_PAGE));
+  const totalPages = Math.max(1, Math.ceil(sortedCandidates.length / itemsPerPage));
   const validCurrentPage = currentPage > totalPages ? 1 : currentPage;
-  const startIndex = (validCurrentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, sortedCandidates.length);
+  const startIndex = (validCurrentPage - 1) * itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage, sortedCandidates.length);
   const paginatedCandidates = sortedCandidates.slice(startIndex, endIndex);
 
   const goToPage = (page: number) => {
@@ -571,11 +588,14 @@ export default function CandidatesPage() {
           )}
 
           {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border-t">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border-t">
+            <div className="flex items-center gap-4">
               <p className="text-sm text-muted-foreground">
                 Showing {startIndex + 1}-{endIndex} of {filteredCandidates.length} candidates
               </p>
+              <ItemsPerPageSelect value={itemsPerPage} onChange={handleItemsPerPageChange} />
+            </div>
+            {totalPages > 1 && (
               <Pagination>
                 <PaginationContent>
                   <PaginationItem>
@@ -609,8 +629,8 @@ export default function CandidatesPage() {
                   </PaginationItem>
                 </PaginationContent>
               </Pagination>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 

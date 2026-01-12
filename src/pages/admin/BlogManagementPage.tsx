@@ -59,8 +59,18 @@ import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
 import { SortableTableHead, useSorting } from '@/components/admin/SortableTableHead';
 import { exportToCSV } from '@/utils/csvExport';
+import ItemsPerPageSelect from '@/components/admin/ItemsPerPageSelect';
+import { ItemsPerPageOption } from '@/hooks/useItemsPerPage';
 
-const ITEMS_PER_PAGE = 5;
+const getStoredItemsPerPage = (): ItemsPerPageOption => {
+  if (typeof window !== 'undefined') {
+    const stored = localStorage.getItem('admin-blog-items-per-page');
+    if (stored && [5, 10, 25, 50].includes(Number(stored))) {
+      return Number(stored) as ItemsPerPageOption;
+    }
+  }
+  return 5;
+};
 
 export default function BlogManagementPage() {
   const { posts, addPost, updatePost, deletePost, togglePublish } = useBlogPostsStore();
@@ -71,11 +81,18 @@ export default function BlogManagementPage() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPageOption>(getStoredItemsPerPage);
   const [isEditing, setIsEditing] = useState(false);
   const [editingPost, setEditingPost] = useState<BlogPostData | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [postToDelete, setPostToDelete] = useState<BlogPostData | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+
+  const handleItemsPerPageChange = (value: ItemsPerPageOption) => {
+    setItemsPerPage(value);
+    setCurrentPage(1);
+    localStorage.setItem('admin-blog-items-per-page', String(value));
+  };
 
   // Reset page when filters change
   useEffect(() => {
@@ -121,10 +138,10 @@ export default function BlogManagementPage() {
   const sortedPosts = sortData(filteredPosts);
 
   // Pagination
-  const totalPages = Math.max(1, Math.ceil(sortedPosts.length / ITEMS_PER_PAGE));
+  const totalPages = Math.max(1, Math.ceil(sortedPosts.length / itemsPerPage));
   const validCurrentPage = currentPage > totalPages ? 1 : currentPage;
-  const startIndex = (validCurrentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, sortedPosts.length);
+  const startIndex = (validCurrentPage - 1) * itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage, sortedPosts.length);
   const paginatedPosts = sortedPosts.slice(startIndex, endIndex);
 
   const goToPage = (page: number) => {
@@ -467,11 +484,14 @@ export default function BlogManagementPage() {
             </Table>
 
             {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border-t">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border-t">
+              <div className="flex items-center gap-4">
                 <p className="text-sm text-muted-foreground">
                   Showing {startIndex + 1}-{endIndex} of {sortedPosts.length} posts
                 </p>
+                <ItemsPerPageSelect value={itemsPerPage} onChange={handleItemsPerPageChange} />
+              </div>
+              {totalPages > 1 && (
                 <Pagination>
                   <PaginationContent>
                     <PaginationItem>
@@ -505,8 +525,8 @@ export default function BlogManagementPage() {
                     </PaginationItem>
                   </PaginationContent>
                 </Pagination>
-              </div>
-            )}
+              )}
+            </div>
           </CardContent>
         </Card>
 

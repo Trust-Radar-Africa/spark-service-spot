@@ -65,6 +65,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
 import { SortableTableHead, useSorting } from '@/components/admin/SortableTableHead';
 import { exportToCSV } from '@/utils/csvExport';
+import ItemsPerPageSelect from '@/components/admin/ItemsPerPageSelect';
+import { ItemsPerPageOption } from '@/hooks/useItemsPerPage';
 
 const experienceLabels: Record<ExperienceLevel, string> = {
   '0-3': '0-3 years',
@@ -73,7 +75,15 @@ const experienceLabels: Record<ExperienceLevel, string> = {
   '10+': '10+ years',
 };
 
-const ITEMS_PER_PAGE = 5;
+const getStoredItemsPerPage = (): ItemsPerPageOption => {
+  if (typeof window !== 'undefined') {
+    const stored = localStorage.getItem('admin-employer-requests-items-per-page');
+    if (stored && [5, 10, 25, 50].includes(Number(stored))) {
+      return Number(stored) as ItemsPerPageOption;
+    }
+  }
+  return 5;
+};
 
 export default function EmployerRequestsPage() {
   const { requests, isLoading, fetchRequests, deleteRequest } = useEmployerRequestsStore();
@@ -84,9 +94,16 @@ export default function EmployerRequestsPage() {
   const [countryFilter, setCountryFilter] = useState<string>('all');
   const [experienceFilter, setExperienceFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPageOption>(getStoredItemsPerPage);
   const [selectedRequest, setSelectedRequest] = useState<EmployerRequest | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [requestToDelete, setRequestToDelete] = useState<EmployerRequest | null>(null);
+
+  const handleItemsPerPageChange = (value: ItemsPerPageOption) => {
+    setItemsPerPage(value);
+    setCurrentPage(1);
+    localStorage.setItem('admin-employer-requests-items-per-page', String(value));
+  };
 
   // Handle CSV export
   const handleExportCSV = () => {
@@ -131,10 +148,10 @@ export default function EmployerRequestsPage() {
 
   // Sort and paginate
   const sortedRequests = sortData(filteredRequests);
-  const totalPages = Math.max(1, Math.ceil(sortedRequests.length / ITEMS_PER_PAGE));
+  const totalPages = Math.max(1, Math.ceil(sortedRequests.length / itemsPerPage));
   const validCurrentPage = currentPage > totalPages ? 1 : currentPage;
-  const startIndex = (validCurrentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, sortedRequests.length);
+  const startIndex = (validCurrentPage - 1) * itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage, sortedRequests.length);
   const paginatedRequests = sortedRequests.slice(startIndex, endIndex);
 
   const goToPage = (page: number) => {
@@ -413,11 +430,14 @@ export default function EmployerRequestsPage() {
           </Table>
 
           {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border-t">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border-t">
+            <div className="flex items-center gap-4">
               <p className="text-sm text-muted-foreground">
                 Showing {startIndex + 1}-{endIndex} of {filteredRequests.length} requests
               </p>
+              <ItemsPerPageSelect value={itemsPerPage} onChange={handleItemsPerPageChange} />
+            </div>
+            {totalPages > 1 && (
               <Pagination>
                 <PaginationContent>
                   <PaginationItem>
@@ -451,8 +471,8 @@ export default function EmployerRequestsPage() {
                   </PaginationItem>
                 </PaginationContent>
               </Pagination>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         {/* View Details Sheet */}
