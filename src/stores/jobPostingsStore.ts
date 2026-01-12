@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { JobPosting, JobPostingFormData, ExperienceLevel } from '@/types/admin';
+import { useApiConfigStore } from './apiConfigStore';
 
 // Initial mock data - these would come from Laravel API in production
 const initialJobs: JobPosting[] = [
@@ -123,8 +124,10 @@ const initialJobs: JobPosting[] = [
 
 interface JobPostingsState {
   jobs: JobPosting[];
+  isLoading: boolean;
   
   // Actions
+  fetchJobs: () => Promise<void>;
   addJob: (data: JobPostingFormData) => JobPosting;
   updateJob: (id: number, data: JobPostingFormData) => void;
   deleteJob: (id: number) => void;
@@ -139,6 +142,39 @@ export const useJobPostingsStore = create<JobPostingsState>()(
   persist(
     (set, get) => ({
       jobs: initialJobs,
+      isLoading: false,
+      
+      fetchJobs: async () => {
+        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+        
+        set({ isLoading: true });
+        
+        // If in demo mode, reset to initial data with a small delay for UX
+        if (!isLiveMode()) {
+          await new Promise(resolve => setTimeout(resolve, 300));
+          set({ jobs: [...initialJobs], isLoading: false });
+          return;
+        }
+        
+        try {
+          const token = localStorage.getItem('admin_token');
+          const response = await fetch(`${apiBaseUrl}/api/admin/job-postings`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Accept: 'application/json',
+            },
+          });
+          if (response.ok) {
+            const data = await response.json();
+            set({ jobs: data.data || data, isLoading: false });
+            return;
+          }
+        } catch (error) {
+          console.log('Using demo data for job postings');
+        }
+        // Fall back to demo data
+        set({ jobs: [...initialJobs], isLoading: false });
+      },
       
       addJob: (data: JobPostingFormData) => {
         const newJob: JobPosting = {
