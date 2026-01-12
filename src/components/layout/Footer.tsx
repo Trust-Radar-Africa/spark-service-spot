@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { Mail, Globe, Building2, Linkedin, Twitter } from "lucide-react";
+import { Mail, Globe, Building2, Linkedin, Twitter, Facebook, Instagram, Youtube, ExternalLink } from "lucide-react";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 const services = [
   { name: "Outsourced Audit", href: "/services#audit" },
@@ -14,7 +15,27 @@ const company = [
   { name: "Contact", href: "/contact" },
 ];
 
+const getSocialIcon = (iconName: string) => {
+  switch (iconName.toLowerCase()) {
+    case 'linkedin':
+      return Linkedin;
+    case 'twitter':
+      return Twitter;
+    case 'facebook':
+      return Facebook;
+    case 'instagram':
+      return Instagram;
+    case 'youtube':
+      return Youtube;
+    default:
+      return ExternalLink;
+  }
+};
+
 export function Footer() {
+  const { socialLinks, branding } = useSettingsStore();
+  const enabledLinks = socialLinks.filter((link) => link.enabled);
+
   return (
     <footer className="bg-gradient-navy text-primary-foreground">
       <div className="container mx-auto px-4 lg:px-8 py-16">
@@ -116,26 +137,25 @@ export function Footer() {
           </p>
           <div className="flex items-center gap-6">
             {/* Social Links */}
-            <div className="flex items-center gap-4">
-              <a
-                href="https://linkedin.com/company/multiversecpa"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary-foreground/50 hover:text-gold transition-colors"
-                aria-label="LinkedIn"
-              >
-                <Linkedin className="w-5 h-5" />
-              </a>
-              <a
-                href="https://twitter.com/multiversecpa"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary-foreground/50 hover:text-gold transition-colors"
-                aria-label="Twitter"
-              >
-                <Twitter className="w-5 h-5" />
-              </a>
-            </div>
+            {enabledLinks.length > 0 && (
+              <div className="flex items-center gap-4">
+                {enabledLinks.map((link) => {
+                  const Icon = getSocialIcon(link.icon);
+                  return (
+                    <a
+                      key={link.id}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary-foreground/50 hover:text-gold transition-colors"
+                      aria-label={link.platform}
+                    >
+                      <Icon className="w-5 h-5" />
+                    </a>
+                  );
+                })}
+              </div>
+            )}
             <span className="text-primary-foreground/50 text-xs">
               Integrity • Competence • Dedication
             </span>

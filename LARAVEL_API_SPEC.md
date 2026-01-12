@@ -792,6 +792,26 @@ Schema::create('settings', function (Blueprint $table) {
     $table->timestamps();
 });
 
+// Example settings keys:
+// - branding.company_name
+// - branding.tagline
+// - branding.logo_url
+// - branding.primary_color
+// - branding.accent_color
+// - general.theme_mode
+// - general.items_per_page
+// - general.date_format
+// - general.time_format
+// - general.currency_format
+// - general.auto_archive_days
+// - general.auto_archive_enabled
+// - notifications.email_new_candidates
+// - notifications.email_new_employer_requests
+// - notifications.email_digest_frequency
+// - notifications.candidate_threshold
+// - notifications.employer_threshold
+// - notifications.threshold_alert_enabled
+
 Schema::create('social_links', function (Blueprint $table) {
     $table->id();
     $table->string('platform');

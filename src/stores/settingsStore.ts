@@ -38,6 +38,23 @@ export interface BrandingSettings {
   logoUrl: string | null;
   companyName: string;
   tagline: string;
+  primaryColor: string;
+  accentColor: string;
+}
+
+export type ThemeMode = 'light' | 'dark' | 'system';
+export type DateFormat = 'MM/DD/YYYY' | 'DD/MM/YYYY' | 'YYYY-MM-DD';
+export type TimeFormat = '12h' | '24h';
+export type CurrencyFormat = 'USD' | 'EUR' | 'GBP' | 'AUD' | 'CAD';
+
+export interface GeneralSettings {
+  themeMode: ThemeMode;
+  itemsPerPage: number;
+  dateFormat: DateFormat;
+  timeFormat: TimeFormat;
+  currencyFormat: CurrencyFormat;
+  autoArchiveDays: number;
+  autoArchiveEnabled: boolean;
 }
 
 export type AdminRole = 'super_admin' | 'editor' | 'viewer';
@@ -77,6 +94,10 @@ interface SettingsState {
   // Branding
   branding: BrandingSettings;
   setBranding: (branding: Partial<BrandingSettings>) => void;
+
+  // General Settings
+  general: GeneralSettings;
+  setGeneral: (settings: Partial<GeneralSettings>) => void;
 
   // Social Links
   socialLinks: SocialLink[];
@@ -135,10 +156,27 @@ export const useSettingsStore = create<SettingsState>()(
         logoUrl: null,
         companyName: 'Global Outsourced Accounting',
         tagline: 'Global Out Sourced Offshore Accounting Solutions',
+        primaryColor: '220 60% 20%',
+        accentColor: '38 92% 50%',
       },
       setBranding: (branding) =>
         set((state) => ({
           branding: { ...state.branding, ...branding },
+        })),
+
+      // General Settings
+      general: {
+        themeMode: 'system',
+        itemsPerPage: 10,
+        dateFormat: 'MM/DD/YYYY',
+        timeFormat: '12h',
+        currencyFormat: 'USD',
+        autoArchiveDays: 90,
+        autoArchiveEnabled: false,
+      },
+      setGeneral: (settings) =>
+        set((state) => ({
+          general: { ...state.general, ...settings },
         })),
 
       // Social Links

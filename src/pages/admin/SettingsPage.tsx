@@ -50,6 +50,10 @@ import {
   ExperienceLevel,
   ROLE_PERMISSIONS,
   AdminRole,
+  DateFormat,
+  TimeFormat,
+  CurrencyFormat,
+  ThemeMode,
 } from '@/stores/settingsStore';
 import {
   Settings,
@@ -70,6 +74,14 @@ import {
   Briefcase,
   ExternalLink,
   Link as LinkIcon,
+  Cog,
+  Sun,
+  Moon,
+  Monitor,
+  Calendar,
+  Clock,
+  DollarSign,
+  Archive,
 } from 'lucide-react';
 
 export default function SettingsPage() {
@@ -77,6 +89,8 @@ export default function SettingsPage() {
   const {
     branding,
     setBranding,
+    general,
+    setGeneral,
     socialLinks,
     addSocialLink,
     updateSocialLink,
@@ -132,6 +146,13 @@ export default function SettingsPage() {
     toast({
       title: 'Notification preferences saved',
       description: 'Your notification settings have been updated.',
+    });
+  };
+
+  const handleSaveGeneral = () => {
+    toast({
+      title: 'General settings saved',
+      description: 'Your general settings have been updated.',
     });
   };
 
@@ -277,10 +298,14 @@ export default function SettingsPage() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 h-auto">
+          <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 h-auto">
             <TabsTrigger value="branding" className="gap-2">
               <Palette className="h-4 w-4" />
               <span className="hidden sm:inline">Branding</span>
+            </TabsTrigger>
+            <TabsTrigger value="general" className="gap-2">
+              <Cog className="h-4 w-4" />
+              <span className="hidden sm:inline">General</span>
             </TabsTrigger>
             <TabsTrigger value="notifications" className="gap-2">
               <Bell className="h-4 w-4" />
@@ -385,9 +410,241 @@ export default function SettingsPage() {
                     />
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Color Settings */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Palette className="h-5 w-5" />
+                  Color Theme
+                </CardTitle>
+                <CardDescription>
+                  Customize primary and accent colors for your website
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="primary-color">Primary Color (HSL)</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="primary-color"
+                        value={branding.primaryColor}
+                        onChange={(e) => setBranding({ primaryColor: e.target.value })}
+                        placeholder="220 60% 20%"
+                      />
+                      <div
+                        className="w-10 h-10 rounded border shrink-0"
+                        style={{ backgroundColor: `hsl(${branding.primaryColor})` }}
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Format: H S% L% (e.g., 220 60% 20%)
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="accent-color">Accent Color (HSL)</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="accent-color"
+                        value={branding.accentColor}
+                        onChange={(e) => setBranding({ accentColor: e.target.value })}
+                        placeholder="38 92% 50%"
+                      />
+                      <div
+                        className="w-10 h-10 rounded border shrink-0"
+                        style={{ backgroundColor: `hsl(${branding.accentColor})` }}
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Format: H S% L% (e.g., 38 92% 50%)
+                    </p>
+                  </div>
+                </div>
                 <Button onClick={handleSaveBranding}>
                   <Save className="h-4 w-4 mr-2" />
                   Save Branding
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* General Tab */}
+          <TabsContent value="general" className="space-y-6">
+            {/* Theme Settings */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sun className="h-5 w-5" />
+                  Appearance
+                </CardTitle>
+                <CardDescription>
+                  Configure light/dark mode preference
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Theme Mode</Label>
+                  <div className="flex gap-2">
+                    {[
+                      { value: 'light', icon: Sun, label: 'Light' },
+                      { value: 'dark', icon: Moon, label: 'Dark' },
+                      { value: 'system', icon: Monitor, label: 'System' },
+                    ].map(({ value, icon: Icon, label }) => (
+                      <Button
+                        key={value}
+                        variant={general.themeMode === value ? 'default' : 'outline'}
+                        className="flex-1"
+                        onClick={() => setGeneral({ themeMode: value as ThemeMode })}
+                      >
+                        <Icon className="h-4 w-4 mr-2" />
+                        {label}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Display Settings */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Cog className="h-5 w-5" />
+                  Display Settings
+                </CardTitle>
+                <CardDescription>
+                  Configure how data is displayed across the admin panel
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="items-per-page">Default Items Per Page</Label>
+                    <Select
+                      value={String(general.itemsPerPage)}
+                      onValueChange={(value) => setGeneral({ itemsPerPage: parseInt(value) })}
+                    >
+                      <SelectTrigger id="items-per-page">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="5">5 items</SelectItem>
+                        <SelectItem value="10">10 items</SelectItem>
+                        <SelectItem value="25">25 items</SelectItem>
+                        <SelectItem value="50">50 items</SelectItem>
+                        <SelectItem value="100">100 items</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="date-format" className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4" />
+                      Date Format
+                    </Label>
+                    <Select
+                      value={general.dateFormat}
+                      onValueChange={(value) => setGeneral({ dateFormat: value as DateFormat })}
+                    >
+                      <SelectTrigger id="date-format">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="MM/DD/YYYY">MM/DD/YYYY</SelectItem>
+                        <SelectItem value="DD/MM/YYYY">DD/MM/YYYY</SelectItem>
+                        <SelectItem value="YYYY-MM-DD">YYYY-MM-DD</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="time-format" className="flex items-center gap-2">
+                      <Clock className="h-4 w-4" />
+                      Time Format
+                    </Label>
+                    <Select
+                      value={general.timeFormat}
+                      onValueChange={(value) => setGeneral({ timeFormat: value as TimeFormat })}
+                    >
+                      <SelectTrigger id="time-format">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="12h">12-hour (1:30 PM)</SelectItem>
+                        <SelectItem value="24h">24-hour (13:30)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="currency-format" className="flex items-center gap-2">
+                      <DollarSign className="h-4 w-4" />
+                      Currency Format
+                    </Label>
+                    <Select
+                      value={general.currencyFormat}
+                      onValueChange={(value) => setGeneral({ currencyFormat: value as CurrencyFormat })}
+                    >
+                      <SelectTrigger id="currency-format">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="USD">USD ($)</SelectItem>
+                        <SelectItem value="EUR">EUR (€)</SelectItem>
+                        <SelectItem value="GBP">GBP (£)</SelectItem>
+                        <SelectItem value="AUD">AUD (A$)</SelectItem>
+                        <SelectItem value="CAD">CAD (C$)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Auto-Archive Settings */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Archive className="h-5 w-5" />
+                  Auto-Archive
+                </CardTitle>
+                <CardDescription>
+                  Automatically archive old applications after a set period
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Enable Auto-Archive</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Automatically archive applications older than the specified days
+                    </p>
+                  </div>
+                  <Switch
+                    checked={general.autoArchiveEnabled}
+                    onCheckedChange={(checked) => setGeneral({ autoArchiveEnabled: checked })}
+                  />
+                </div>
+
+                {general.autoArchiveEnabled && (
+                  <div className="space-y-4">
+                    <Label>Archive After: {general.autoArchiveDays} days</Label>
+                    <Slider
+                      value={[general.autoArchiveDays]}
+                      onValueChange={([value]) => setGeneral({ autoArchiveDays: value })}
+                      max={365}
+                      min={7}
+                      step={1}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Applications older than {general.autoArchiveDays} days will be automatically archived
+                    </p>
+                  </div>
+                )}
+
+                <Button onClick={handleSaveGeneral}>
+                  <Save className="h-4 w-4 mr-2" />
+                  Save General Settings
                 </Button>
               </CardContent>
             </Card>
