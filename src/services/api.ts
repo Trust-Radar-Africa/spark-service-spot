@@ -63,26 +63,72 @@ class ApiService {
 
   // Auth endpoints
   async login(email: string, password: string) {
-    // First, get CSRF cookie for Sanctum
-    await fetch(`${API_BASE_URL}/sanctum/csrf-cookie`, {
-      credentials: 'include',
-    });
+    // Demo mode - bypass API if no backend URL is set or using demo credentials
+    const isDemoMode = !import.meta.env.VITE_LARAVEL_API_URL || 
+                       API_BASE_URL === 'http://localhost:8000';
+    
+    if (isDemoMode && email === 'admin@demo.com' && password === 'demo123') {
+      const demoToken = 'demo-token-' + Date.now();
+      this.setToken(demoToken);
+      return {
+        user: { id: 1, name: 'Demo Admin', email: 'admin@demo.com' },
+        token: demoToken,
+      };
+    }
 
-    const response = await this.request<{ user: any; token: string }>('/api/admin/login', {
-      method: 'POST',
-      body: JSON.stringify({ email, password }),
-    });
+    // Real API call
+    try {
+      // First, get CSRF cookie for Sanctum
+      await fetch(`${API_BASE_URL}/sanctum/csrf-cookie`, {
+        credentials: 'include',
+      });
 
-    this.setToken(response.token);
-    return response;
+      const response = await this.request<{ user: any; token: string }>('/api/admin/login', {
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
+      });
+
+      this.setToken(response.token);
+      return response;
+    } catch (error) {
+      // If API fails and using demo credentials, allow demo login
+      if (email === 'admin@demo.com' && password === 'demo123') {
+        const demoToken = 'demo-token-' + Date.now();
+        this.setToken(demoToken);
+        return {
+          user: { id: 1, name: 'Demo Admin', email: 'admin@demo.com' },
+          token: demoToken,
+        };
+      }
+      throw error;
+    }
   }
 
   async logout() {
-    await this.request('/api/admin/logout', { method: 'POST' });
+    const token = this.token;
     this.setToken(null);
+    
+    // Skip API call for demo tokens
+    if (token?.startsWith('demo-token-')) {
+      return;
+    }
+    
+    try {
+      await this.request('/api/admin/logout', { method: 'POST' });
+    } catch {
+      // Ignore logout errors
+    }
   }
 
   async getUser() {
+    // Demo mode check
+    const token = this.token;
+    if (token?.startsWith('demo-token-')) {
+      return {
+        user: { id: 1, name: 'Demo Admin', email: 'admin@demo.com' },
+      };
+    }
+    
     return this.request<{ user: any }>('/api/admin/user');
   }
 
