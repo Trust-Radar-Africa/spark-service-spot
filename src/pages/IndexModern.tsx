@@ -10,13 +10,12 @@ import {
   Handshake,
   FileSearch,
   Calculator,
-  BarChart3,
-  Play
+  BarChart3
 } from "lucide-react";
 import auditImg from "@/assets/audit-service.jpg";
 import bookkeepingImg from "@/assets/bookkeeping-service.jpg";
 import consultingImg from "@/assets/consulting-service.jpg";
-import teamImg from "@/assets/team.jpg";
+import { HeroCarousel } from "@/components/HeroCarousel";
 
 const stats = [
   { icon: Handshake, value: "100+", label: "Accounting Firms Served" },
@@ -75,77 +74,8 @@ const services = [
 export default function IndexModern() {
   return (
     <LayoutModern>
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-qx-blue via-qx-blue-dark to-qx-blue min-h-[90vh] flex items-center overflow-hidden">
-        {/* Decorative elements */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 right-20 w-96 h-96 bg-qx-orange rounded-full blur-3xl" />
-          <div className="absolute bottom-20 left-20 w-72 h-72 bg-qx-light-blue rounded-full blur-3xl" />
-        </div>
-
-        <div className="container mx-auto px-4 lg:px-8 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 mb-6">
-                <span className="text-xs font-semibold text-qx-orange uppercase tracking-wider">
-                  IFAC Affiliate Member
-                </span>
-              </div>
-
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-montserrat font-bold text-white mb-6 leading-tight">
-                Exceptional{" "}
-                <span className="text-qx-orange">Offshore Accounting</span> Solutions
-              </h1>
-
-              <p className="text-lg text-white/80 mb-8 max-w-xl leading-relaxed">
-                Your premier destination for outsourced offshore accounting solutions. Our team has handled diverse assignments from the US, Canada, Australia, and Europe.
-                Helping accountants grow their firm's capacity and profitability with outsourcing solutions that follow a three-pronged approach: <strong className="text-qx-orange">People, Process & Platforms</strong>.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button 
-                  className="bg-qx-orange hover:bg-qx-orange-dark text-white rounded-full px-8 py-6 text-base"
-                  asChild
-                >
-                  <Link to="/contact">
-                    Book a Free Consultation
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Link>
-                </Button>
-                <Button 
-                  variant="outline"
-                  className="border-white/30 text-white hover:bg-white/10 rounded-full px-8 py-6 text-base"
-                  asChild
-                >
-                  <Link to="/services">
-                    <Play className="mr-2 h-4 w-4" />
-                    See How It Works
-                  </Link>
-                </Button>
-              </div>
-            </div>
-
-            <div className="hidden lg:block relative">
-              <div className="relative">
-                <img
-                  src={teamImg}
-                  alt="Multiverse CPA Team"
-                  className="rounded-2xl shadow-2xl"
-                />
-                {/* Floating stat cards */}
-                <div className="absolute -bottom-6 -left-6 bg-white rounded-xl p-4 shadow-lg">
-                  <div className="text-2xl font-bold text-qx-blue">100+</div>
-                  <div className="text-sm text-qx-gray">Firms Served</div>
-                </div>
-                <div className="absolute -top-6 -right-6 bg-qx-orange rounded-xl p-4 shadow-lg">
-                  <div className="text-2xl font-bold text-white">98%</div>
-                  <div className="text-sm text-white/80">CSAT Score</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Hero Carousel */}
+      <HeroCarousel variant="modern" />
 
       {/* Stats Section */}
       <section className="py-16 bg-white border-b">
