@@ -47,9 +47,13 @@ import {
   Users,
   Globe,
   Calendar,
+  Clock,
+  ExternalLink,
+  RefreshCw,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
+import { Link } from 'react-router-dom';
 
 const experienceLabels: Record<ExperienceLevel, string> = {
   '0-3': '0-3 years',
@@ -118,79 +122,101 @@ export default function EmployerRequestsPage() {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-2xl font-bold">Employer Requests</h1>
-          <p className="text-muted-foreground">
-            View and manage recruitment requests from employers
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold">Employer Requests</h1>
+            <p className="text-muted-foreground">
+              View and manage recruitment requests from employers
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/employers" target="_blank">
+                View Employers Page
+                <ExternalLink className="ml-2 h-3 w-3" />
+              </Link>
+            </Button>
+            <Button onClick={() => fetchRequests()} variant="outline" disabled={isLoading}>
+              <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+          </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription>Total Requests</CardDescription>
-              <CardTitle className="text-3xl">{stats.total}</CardTitle>
-            </CardHeader>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription>This Week</CardDescription>
-              <CardTitle className="text-3xl">{stats.thisWeek}</CardTitle>
-            </CardHeader>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription>Countries</CardDescription>
-              <CardTitle className="text-3xl">{stats.uniqueCountries}</CardTitle>
-            </CardHeader>
-          </Card>
+        {/* Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="bg-card rounded-lg border p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Building2 className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{stats.total}</p>
+                <p className="text-sm text-muted-foreground">Total Requests</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-card rounded-lg border p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-500/10 rounded-lg">
+                <Clock className="h-5 w-5 text-green-500" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{stats.thisWeek}</p>
+                <p className="text-sm text-muted-foreground">This Week</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-card rounded-lg border p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-500/10 rounded-lg">
+                <Globe className="h-5 w-5 text-blue-500" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{stats.uniqueCountries}</p>
+                <p className="text-sm text-muted-foreground">Countries</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Filters */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Filters</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search by firm, email, or position..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-9"
-                />
-              </div>
-              <Select value={countryFilter} onValueChange={setCountryFilter}>
-                <SelectTrigger className="w-full sm:w-[200px]">
-                  <SelectValue placeholder="Country" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Countries</SelectItem>
-                  {countries.map((country) => (
-                    <SelectItem key={country} value={country}>
-                      {country}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select value={experienceFilter} onValueChange={setExperienceFilter}>
-                <SelectTrigger className="w-full sm:w-[180px]">
-                  <SelectValue placeholder="Experience" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Levels</SelectItem>
-                  <SelectItem value="0-3">0-3 years</SelectItem>
-                  <SelectItem value="3-7">3-7 years</SelectItem>
-                  <SelectItem value="7-10">7-10 years</SelectItem>
-                  <SelectItem value="10+">10+ years</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 p-4 bg-card rounded-lg border">
+          <div className="relative sm:col-span-2">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search by firm, email, or position..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+          <Select value={countryFilter} onValueChange={setCountryFilter}>
+            <SelectTrigger>
+              <SelectValue placeholder="Country" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Countries</SelectItem>
+              {countries.map((country) => (
+                <SelectItem key={country} value={country}>
+                  {country}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={experienceFilter} onValueChange={setExperienceFilter}>
+            <SelectTrigger>
+              <SelectValue placeholder="Experience" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Levels</SelectItem>
+              <SelectItem value="0-3">0-3 years</SelectItem>
+              <SelectItem value="3-7">3-7 years</SelectItem>
+              <SelectItem value="7-10">7-10 years</SelectItem>
+              <SelectItem value="10+">10+ years</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
         {/* Requests Table */}
         <Card>
