@@ -4,6 +4,18 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Calendar, User, Clock } from "lucide-react";
 import { BlogSearch } from "@/components/BlogSearch";
 import { useBlogSearch } from "@/hooks/useBlogSearch";
+import { usePagination } from "@/hooks/usePagination";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+
+const POSTS_PER_PAGE = 6;
 
 export default function Blog() {
   const {
@@ -15,9 +27,21 @@ export default function Blog() {
     categories,
   } = useBlogSearch();
 
-  // Get featured post (first post) and other posts
+  // Get featured post (first post) and other posts for pagination
   const featuredPost = filteredPosts[0];
-  const displayPosts = filteredPosts.slice(1);
+  const remainingPosts = filteredPosts.slice(1);
+
+  const {
+    currentPage,
+    totalPages,
+    paginatedItems: displayPosts,
+    goToPage,
+    hasNextPage,
+    hasPrevPage,
+    startIndex,
+    endIndex,
+    totalItems,
+  } = usePagination(remainingPosts, POSTS_PER_PAGE);
 
   return (
     <Layout>
@@ -106,9 +130,15 @@ export default function Blog() {
       {/* Posts Grid */}
       <section className="py-16 bg-muted">
         <div className="container mx-auto px-4 lg:px-8">
-          <h3 className="text-2xl font-serif font-bold text-foreground mb-8">
+          <h3 className="text-2xl font-serif font-bold text-foreground mb-2">
             {filteredPosts.length === 0 ? "No articles found" : "Latest Articles"}
           </h3>
+          
+          {totalItems > 0 && (
+            <p className="text-sm text-muted-foreground mb-8">
+              Showing {startIndex}–{endIndex} of {totalItems} articles
+            </p>
+          )}
 
           {displayPosts.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -154,12 +184,85 @@ export default function Blog() {
             )
           )}
 
-          {displayPosts.length > 0 && (
-            <div className="text-center mt-12">
-              <Button variant="outline" size="lg">
-                Load More Articles
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="mt-12">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() => hasPrevPage && goToPage(currentPage - 1)}
+                      className={!hasPrevPage ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    />
+                  </PaginationItem>
+
+                  {/* First page */}
+                  <PaginationItem>
+                    <PaginationLink
+                      onClick={() => goToPage(1)}
+                      isActive={currentPage === 1}
+                      className="cursor-pointer"
+                    >
+                      1
+                    </PaginationLink>
+                  </PaginationItem>
+
+                  {/* Ellipsis after first page */}
+                  {currentPage > 3 && (
+                    <PaginationItem>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  )}
+
+                  {/* Pages around current */}
+                  {Array.from({ length: totalPages }, (_, i) => i + 1)
+                    .filter(
+                      (page) =>
+                        page !== 1 &&
+                        page !== totalPages &&
+                        page >= currentPage - 1 &&
+                        page <= currentPage + 1
+                    )
+                    .map((page) => (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          onClick={() => goToPage(page)}
+                          isActive={currentPage === page}
+                          className="cursor-pointer"
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+
+                  {/* Ellipsis before last page */}
+                  {currentPage < totalPages - 2 && (
+                    <PaginationItem>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  )}
+
+                  {/* Last page */}
+                  {totalPages > 1 && (
+                    <PaginationItem>
+                      <PaginationLink
+                        onClick={() => goToPage(totalPages)}
+                        isActive={currentPage === totalPages}
+                        className="cursor-pointer"
+                      >
+                        {totalPages}
+                      </PaginationLink>
+                    </PaginationItem>
+                  )}
+
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() => hasNextPage && goToPage(currentPage + 1)}
+                      className={!hasNextPage ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
             </div>
           )}
         </div>
