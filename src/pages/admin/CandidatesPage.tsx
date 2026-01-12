@@ -39,7 +39,11 @@ import {
   ChevronLeft,
   ChevronRight,
   Users,
+  Clock,
+  Globe,
+  ExternalLink,
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const experienceLevels: { value: ExperienceLevel; label: string }[] = [
   { value: '0-3', label: '0-3 years' },
@@ -228,6 +232,18 @@ export default function CandidatesPage() {
     }
   };
 
+  // Calculate stats
+  const stats = {
+    total: mockCandidates.length,
+    thisWeek: mockCandidates.filter((c) => {
+      const created = new Date(c.created_at);
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      return created >= weekAgo;
+    }).length,
+    uniqueNationalities: new Set(mockCandidates.map((c) => c.nationality)).size,
+  };
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -239,10 +255,55 @@ export default function CandidatesPage() {
               Manage and filter candidate resumes
             </p>
           </div>
-          <Button onClick={fetchCandidates} variant="outline" disabled={isLoading}>
-            <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-            Refresh
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/apply" target="_blank">
+                View Apply Page
+                <ExternalLink className="ml-2 h-3 w-3" />
+              </Link>
+            </Button>
+            <Button onClick={fetchCandidates} variant="outline" disabled={isLoading}>
+              <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="bg-card rounded-lg border p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Users className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{stats.total}</p>
+                <p className="text-sm text-muted-foreground">Total Candidates</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-card rounded-lg border p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-500/10 rounded-lg">
+                <Clock className="h-5 w-5 text-green-500" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{stats.thisWeek}</p>
+                <p className="text-sm text-muted-foreground">This Week</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-card rounded-lg border p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-500/10 rounded-lg">
+                <Globe className="h-5 w-5 text-blue-500" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{stats.uniqueNationalities}</p>
+                <p className="text-sm text-muted-foreground">Nationalities</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Filters */}
