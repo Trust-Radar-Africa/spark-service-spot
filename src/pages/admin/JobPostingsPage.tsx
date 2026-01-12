@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { JobPosting, JobPostingFormData, ExperienceLevel } from '@/types/admin';
+import { useState, useEffect, useMemo } from 'react';
+import { JobPosting, JobPostingFormData } from '@/types/admin';
 import AdminLayout from '@/components/admin/AdminLayout';
 import JobPostingForm from '@/components/admin/JobPostingForm';
 import { Button } from '@/components/ui/button';
@@ -49,67 +49,14 @@ import {
   Clock,
   Eye,
   EyeOff,
+  ExternalLink,
 } from 'lucide-react';
-
-// Mock data for demo
-const mockJobPostings: JobPosting[] = [
-  {
-    id: 1,
-    title: 'Senior Accountant',
-    description: 'We are looking for an experienced Senior Accountant to join our team. The ideal candidate will have strong analytical skills and experience with financial reporting.',
-    location: 'London, UK',
-    experience_required: '7-10',
-    requirements: 'CPA or ACCA qualified, 7+ years experience in accounting, proficiency in Excel and accounting software.',
-    benefits: 'Competitive salary, health insurance, pension scheme, flexible working.',
-    salary_range: '£55,000 - £70,000',
-    is_active: true,
-    created_at: '2024-01-10T09:00:00Z',
-    updated_at: '2024-01-10T09:00:00Z',
-  },
-  {
-    id: 2,
-    title: 'Junior Bookkeeper',
-    description: 'Entry-level position for a motivated individual looking to start their career in accounting. Full training provided.',
-    location: 'Manchester, UK',
-    experience_required: '0-3',
-    requirements: 'Basic accounting knowledge, attention to detail, willingness to learn.',
-    benefits: 'Training and development, career progression, friendly team environment.',
-    salary_range: '£25,000 - £30,000',
-    is_active: true,
-    created_at: '2024-01-12T14:30:00Z',
-    updated_at: '2024-01-12T14:30:00Z',
-  },
-  {
-    id: 3,
-    title: 'Tax Consultant',
-    description: 'Experienced Tax Consultant needed for our growing advisory practice. Handle complex tax matters for corporate clients.',
-    location: 'Birmingham, UK',
-    experience_required: '3-7',
-    requirements: 'CTA qualified, experience with corporate tax, excellent communication skills.',
-    benefits: 'Bonus scheme, professional development budget, remote working options.',
-    salary_range: '£45,000 - £55,000',
-    is_active: false,
-    created_at: '2024-01-08T11:00:00Z',
-    updated_at: '2024-01-15T16:00:00Z',
-  },
-  {
-    id: 4,
-    title: 'Finance Director',
-    description: 'Strategic leadership role overseeing all financial operations. Report directly to the CEO and board of directors.',
-    location: 'London, UK',
-    experience_required: '10+',
-    requirements: 'ACA/ACCA/CIMA qualified, 10+ years experience including leadership roles, strategic planning experience.',
-    benefits: 'Executive compensation package, car allowance, private healthcare, equity participation.',
-    salary_range: '£120,000 - £150,000',
-    is_active: true,
-    created_at: '2024-01-05T08:00:00Z',
-    updated_at: '2024-01-05T08:00:00Z',
-  },
-];
+import { Link } from 'react-router-dom';
+import { useJobPostingsStore, getExperienceLabel } from '@/stores/jobPostingsStore';
 
 export default function JobPostingsPage() {
-  const [jobs, setJobs] = useState<JobPosting[]>(mockJobPostings);
-  const [filteredJobs, setFilteredJobs] = useState<JobPosting[]>(mockJobPostings);
+  const { jobs, addJob, updateJob, deleteJob, toggleJobStatus } = useJobPostingsStore();
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [isLoading, setIsLoading] = useState(false);
@@ -121,7 +68,7 @@ export default function JobPostingsPage() {
   const { toast } = useToast();
 
   // Filter jobs based on search and status
-  useEffect(() => {
+  const filteredJobs = useMemo(() => {
     let filtered = [...jobs];
 
     if (searchQuery) {
@@ -140,7 +87,7 @@ export default function JobPostingsPage() {
       );
     }
 
-    setFilteredJobs(filtered);
+    return filtered;
   }, [jobs, searchQuery, statusFilter]);
 
   const handleRefresh = async () => {
@@ -148,6 +95,10 @@ export default function JobPostingsPage() {
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 500));
     setIsLoading(false);
+    toast({
+      title: 'Refreshed',
+      description: 'Job postings have been refreshed.',
+    });
   };
 
   const handleCreate = () => {
@@ -164,33 +115,19 @@ export default function JobPostingsPage() {
     setIsSubmitting(true);
     try {
       // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       if (editingJob) {
-        // Update existing job
-        setJobs((prev) =>
-          prev.map((job) =>
-            job.id === editingJob.id
-              ? { ...job, ...data, updated_at: new Date().toISOString() }
-              : job
-          )
-        );
+        updateJob(editingJob.id, data);
         toast({
           title: 'Job updated',
-          description: `"${data.title}" has been updated successfully.`,
+          description: `"${data.title}" has been updated. Changes are now visible on the Careers page.`,
         });
       } else {
-        // Create new job
-        const newJob: JobPosting = {
-          id: Math.max(...jobs.map((j) => j.id), 0) + 1,
-          ...data,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        };
-        setJobs((prev) => [newJob, ...prev]);
+        addJob(data);
         toast({
           title: 'Job created',
-          description: `"${data.title}" has been created successfully.`,
+          description: `"${data.title}" has been created and is now visible on the Careers page.`,
         });
       }
 
@@ -211,12 +148,11 @@ export default function JobPostingsPage() {
     if (!deletingJob) return;
     setIsDeleting(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      setJobs((prev) => prev.filter((job) => job.id !== deletingJob.id));
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      deleteJob(deletingJob.id);
       toast({
         title: 'Job deleted',
-        description: `"${deletingJob.title}" has been deleted.`,
+        description: `"${deletingJob.title}" has been removed from the Careers page.`,
       });
     } catch (error) {
       toast({
@@ -230,38 +166,16 @@ export default function JobPostingsPage() {
     }
   };
 
-  const handleToggleStatus = async (job: JobPosting) => {
-    try {
-      const newStatus = !job.is_active;
-      setJobs((prev) =>
-        prev.map((j) =>
-          j.id === job.id
-            ? { ...j, is_active: newStatus, updated_at: new Date().toISOString() }
-            : j
-        )
-      );
-      toast({
-        title: newStatus ? 'Job activated' : 'Job deactivated',
-        description: `"${job.title}" is now ${newStatus ? 'visible' : 'hidden'} to candidates.`,
-      });
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to update job status',
-        variant: 'destructive',
-      });
-    }
+  const handleToggleStatus = (job: JobPosting) => {
+    toggleJobStatus(job.id);
+    toast({
+      title: job.is_active ? 'Job deactivated' : 'Job activated',
+      description: `"${job.title}" is now ${job.is_active ? 'hidden from' : 'visible on'} the Careers page.`,
+    });
   };
 
-  const getExperienceLabel = (exp: ExperienceLevel) => {
-    const labels: Record<ExperienceLevel, string> = {
-      '0-3': '0-3 years',
-      '3-7': '3-7 years',
-      '7-10': '7-10 years',
-      '10+': '10+ years',
-    };
-    return labels[exp];
-  };
+  const activeCount = jobs.filter((j) => j.is_active).length;
+  const inactiveCount = jobs.filter((j) => !j.is_active).length;
 
   return (
     <AdminLayout>
@@ -270,9 +184,17 @@ export default function JobPostingsPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold">Job Postings</h1>
-            <p className="text-muted-foreground">Create and manage job advertisements</p>
+            <p className="text-muted-foreground">
+              Create and manage job advertisements for the Careers page
+            </p>
           </div>
           <div className="flex gap-2">
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/careers" target="_blank">
+                View Careers Page
+                <ExternalLink className="ml-2 h-3 w-3" />
+              </Link>
+            </Button>
             <Button onClick={handleRefresh} variant="outline" disabled={isLoading}>
               <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
               Refresh
@@ -330,8 +252,8 @@ export default function JobPostingsPage() {
                 <Eye className="h-5 w-5 text-green-500" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{jobs.filter((j) => j.is_active).length}</p>
-                <p className="text-sm text-muted-foreground">Active</p>
+                <p className="text-2xl font-bold">{activeCount}</p>
+                <p className="text-sm text-muted-foreground">Active (on Careers)</p>
               </div>
             </div>
           </div>
@@ -341,8 +263,8 @@ export default function JobPostingsPage() {
                 <EyeOff className="h-5 w-5 text-muted-foreground" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{jobs.filter((j) => !j.is_active).length}</p>
-                <p className="text-sm text-muted-foreground">Inactive</p>
+                <p className="text-2xl font-bold">{inactiveCount}</p>
+                <p className="text-sm text-muted-foreground">Inactive (hidden)</p>
               </div>
             </div>
           </div>
@@ -395,7 +317,7 @@ export default function JobPostingsPage() {
                       <TableCell>
                         <div className="flex items-center gap-1.5">
                           <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-                          {job.location}
+                          <span className="truncate max-w-[150px]">{job.location}</span>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -453,8 +375,8 @@ export default function JobPostingsPage() {
             <SheetTitle>{editingJob ? 'Edit Job Posting' : 'Create Job Posting'}</SheetTitle>
             <SheetDescription>
               {editingJob
-                ? 'Update the job details below'
-                : 'Fill in the details to create a new job posting'}
+                ? 'Update the job details below. Changes will be reflected on the Careers page.'
+                : 'Fill in the details to create a new job posting. It will appear on the Careers page.'}
             </SheetDescription>
           </SheetHeader>
           <div className="mt-6">
@@ -477,8 +399,8 @@ export default function JobPostingsPage() {
           <DialogHeader>
             <DialogTitle>Delete Job Posting</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete <strong>"{deletingJob?.title}"</strong>? This action
-              cannot be undone.
+              Are you sure you want to delete <strong>"{deletingJob?.title}"</strong>? This will
+              remove it from the Careers page and cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
