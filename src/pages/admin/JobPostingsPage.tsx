@@ -267,11 +267,11 @@ export default function JobPostingsPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold">Job Postings</h1>
-              <Button variant="outline" size="sm" asChild>
+              <Button variant="ghost" size="sm" className="h-7 px-2 text-xs text-muted-foreground" asChild>
                 <Link to="/careers" target="_blank">
-                  <ExternalLink className="h-4 w-4 mr-1" />
+                  <ExternalLink className="h-3 w-3 mr-1" />
                   View Page
                 </Link>
               </Button>
