@@ -1,13 +1,22 @@
 import { useParams, Link, Navigate } from "react-router-dom";
 import { LayoutModern } from "@/components/layout/LayoutModern";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Calendar, User, Clock, Share2, Linkedin, Twitter, Facebook } from "lucide-react";
-import { getPostBySlug, getRelatedPosts } from "@/data/blogData";
+import {
+  ArrowLeft,
+  Calendar,
+  User,
+  Clock,
+  Share2,
+  Linkedin,
+  Twitter,
+  Facebook,
+} from "lucide-react";
+import { useGetPostBySlug, useGetRelatedPosts } from "@/hooks/useBlogSearch";
 
 export default function BlogPostModern() {
   const { slug } = useParams<{ slug: string }>();
-  const post = slug ? getPostBySlug(slug) : undefined;
-  const relatedPosts = slug ? getRelatedPosts(slug, 3) : [];
+  const post = useGetPostBySlug(slug);
+  const relatedPosts = useGetRelatedPosts(slug, 3);
 
   if (!post) {
     return <Navigate to="/blog" replace />;
@@ -18,22 +27,22 @@ export default function BlogPostModern() {
       {/* Hero Section */}
       <section className="pt-28 pb-8 bg-qx-blue">
         <div className="container mx-auto px-4 lg:px-8">
-          <Link 
-            to="/blog" 
+          <Link
+            to="/blog"
             className="inline-flex items-center text-white/70 hover:text-qx-orange transition-colors mb-6"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Blog
           </Link>
-          
+
           <span className="inline-block px-3 py-1 bg-qx-orange/20 text-qx-orange text-sm font-medium rounded-full mb-4">
             {post.category}
           </span>
-          
+
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-montserrat font-bold text-white mb-6 max-w-4xl">
             {post.title}
           </h1>
-          
+
           <div className="flex flex-wrap items-center gap-4 text-sm text-white/70">
             <span className="flex items-center gap-1">
               <User className="w-4 h-4" />
@@ -55,11 +64,7 @@ export default function BlogPostModern() {
       <section className="bg-white">
         <div className="container mx-auto px-4 lg:px-8 -mt-4">
           <div className="aspect-[21/9] rounded-2xl overflow-hidden shadow-xl max-w-5xl mx-auto">
-            <img
-              src={post.image}
-              alt={post.title}
-              className="w-full h-full object-cover"
-            />
+            <img src={post.image} alt={post.title} className="w-full h-full object-cover" />
           </div>
         </div>
       </section>
@@ -70,11 +75,11 @@ export default function BlogPostModern() {
           <div className="grid lg:grid-cols-12 gap-12 max-w-6xl mx-auto">
             {/* Main Content */}
             <article className="lg:col-span-8">
-              <div 
+              <div
                 className="prose prose-lg max-w-none prose-headings:font-montserrat prose-headings:text-qx-blue prose-p:text-qx-gray prose-strong:text-qx-blue prose-a:text-qx-orange hover:prose-a:text-qx-orange-dark prose-ul:text-qx-gray prose-li:marker:text-qx-orange"
                 dangerouslySetInnerHTML={{ __html: formatContent(post.content) }}
               />
-              
+
               {/* Share Section */}
               <div className="mt-12 pt-8 border-t border-gray-100">
                 <div className="flex items-center gap-4">
@@ -101,11 +106,13 @@ export default function BlogPostModern() {
             <aside className="lg:col-span-4">
               {/* Author Bio */}
               <div className="bg-qx-light-gray rounded-xl p-6 mb-8">
-                <h3 className="font-montserrat text-lg font-bold text-qx-blue mb-4">About the Author</h3>
+                <h3 className="font-montserrat text-lg font-bold text-qx-blue mb-4">
+                  About the Author
+                </h3>
                 <div className="flex items-start gap-4">
                   <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
-                    <img 
-                      src={post.author.avatar} 
+                    <img
+                      src={post.author.avatar}
                       alt={post.author.name}
                       className="w-full h-full object-cover"
                     />
@@ -115,9 +122,7 @@ export default function BlogPostModern() {
                     <p className="text-sm text-qx-orange mb-2">{post.author.role}</p>
                   </div>
                 </div>
-                <p className="text-sm text-qx-gray mt-4 leading-relaxed">
-                  {post.author.bio}
-                </p>
+                <p className="text-sm text-qx-gray mt-4 leading-relaxed">{post.author.bio}</p>
               </div>
 
               {/* Newsletter Signup */}
@@ -189,7 +194,11 @@ export default function BlogPostModern() {
           <p className="text-white/70 max-w-xl mx-auto mb-8">
             Discover how our offshore accounting services can help you grow while reducing costs.
           </p>
-          <Button className="bg-qx-orange hover:bg-qx-orange-dark text-white rounded-full px-8" size="lg" asChild>
+          <Button
+            className="bg-qx-orange hover:bg-qx-orange-dark text-white rounded-full px-8"
+            size="lg"
+            asChild
+          >
             <Link to="/contact">Get in Touch</Link>
           </Button>
         </div>
@@ -200,13 +209,15 @@ export default function BlogPostModern() {
 
 function formatContent(content: string): string {
   return content
-    .replace(/## (.*)/g, '<h2>$1</h2>')
-    .replace(/### (.*)/g, '<h3>$1</h3>')
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/^### (.*$)/gm, "<h3>$1</h3>")
+    .replace(/^## (.*$)/gm, "<h2>$1</h2>")
+    .replace(/^# (.*$)/gm, "<h1>$1</h1>")
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.*?)\*/g, "<em>$1</em>")
     .replace(/- \[ \] (.*)/g, '<li><input type="checkbox" disabled /> $1</li>')
-    .replace(/- (.*)/g, '<li>$1</li>')
+    .replace(/^- (.*$)/gm, "<li>$1</li>")
     .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
-    .replace(/\n\n/g, '</p><p>')
-    .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
-    .replace(/<\/ul>\s*<ul>/g, '');
+    .replace(/\n\n/g, "</p><p>")
+    .replace(/(<li>.*<\/li>)/gs, "<ul>$1</ul>")
+    .replace(/<\/ul>\s*<ul>/g, "");
 }
