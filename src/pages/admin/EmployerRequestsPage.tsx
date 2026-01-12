@@ -58,10 +58,13 @@ import {
   Clock,
   ExternalLink,
   RefreshCw,
+  Download,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
+import { SortableTableHead, useSorting } from '@/components/admin/SortableTableHead';
+import { exportToCSV } from '@/utils/csvExport';
 
 const experienceLabels: Record<ExperienceLevel, string> = {
   '0-3': '0-3 years',
