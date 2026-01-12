@@ -46,11 +46,21 @@ import {
   Clock,
   Download,
 } from 'lucide-react';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
 import { SortableTableHead, useSorting } from '@/components/admin/SortableTableHead';
 import { exportToCSV } from '@/utils/csvExport';
+
+const ITEMS_PER_PAGE = 5;
 
 export default function BlogManagementPage() {
   const { posts, addPost, updatePost, deletePost, togglePublish } = useBlogPostsStore();
@@ -60,11 +70,17 @@ export default function BlogManagementPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [currentPage, setCurrentPage] = useState(1);
   const [isEditing, setIsEditing] = useState(false);
   const [editingPost, setEditingPost] = useState<BlogPostData | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [postToDelete, setPostToDelete] = useState<BlogPostData | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter, categoryFilter]);
 
   // Handle CSV export
   const handleExportCSV = () => {
@@ -103,6 +119,34 @@ export default function BlogManagementPage() {
   });
 
   const sortedPosts = sortData(filteredPosts);
+
+  // Pagination
+  const totalPages = Math.max(1, Math.ceil(sortedPosts.length / ITEMS_PER_PAGE));
+  const validCurrentPage = currentPage > totalPages ? 1 : currentPage;
+  const startIndex = (validCurrentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, sortedPosts.length);
+  const paginatedPosts = sortedPosts.slice(startIndex, endIndex);
+
+  const goToPage = (page: number) => {
+    const newPage = Math.max(1, Math.min(page, totalPages));
+    setCurrentPage(newPage);
+  };
+
+  const getPageNumbers = () => {
+    const pages: (number | 'ellipsis')[] = [];
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      if (validCurrentPage <= 3) {
+        pages.push(1, 2, 3, 'ellipsis', totalPages);
+      } else if (validCurrentPage >= totalPages - 2) {
+        pages.push(1, 'ellipsis', totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(1, 'ellipsis', validCurrentPage, 'ellipsis', totalPages);
+      }
+    }
+    return pages;
+  };
 
   const handleCreateNew = () => {
     setEditingPost(null);
@@ -332,7 +376,7 @@ export default function BlogManagementPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {sortedPosts.length === 0 ? (
+                {paginatedPosts.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center py-8">
                       <div className="flex flex-col items-center gap-2">
@@ -345,7 +389,7 @@ export default function BlogManagementPage() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  sortedPosts.map((post) => (
+                  paginatedPosts.map((post) => (
                     <TableRow key={post.id}>
                       <TableCell>
                         <div>
@@ -421,6 +465,48 @@ export default function BlogManagementPage() {
                 )}
               </TableBody>
             </Table>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border-t">
+                <p className="text-sm text-muted-foreground">
+                  Showing {startIndex + 1}-{endIndex} of {sortedPosts.length} posts
+                </p>
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious
+                        onClick={() => goToPage(validCurrentPage - 1)}
+                        className={validCurrentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                    {getPageNumbers().map((page, index) =>
+                      page === 'ellipsis' ? (
+                        <PaginationItem key={`ellipsis-${index}`}>
+                          <span className="px-3 py-2">...</span>
+                        </PaginationItem>
+                      ) : (
+                        <PaginationItem key={page}>
+                          <PaginationLink
+                            onClick={() => goToPage(page)}
+                            isActive={validCurrentPage === page}
+                            className="cursor-pointer"
+                          >
+                            {page}
+                          </PaginationLink>
+                        </PaginationItem>
+                      )
+                    )}
+                    <PaginationItem>
+                      <PaginationNext
+                        onClick={() => goToPage(validCurrentPage + 1)}
+                        className={validCurrentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            )}
           </CardContent>
         </Card>
 

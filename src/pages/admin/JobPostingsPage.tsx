@@ -38,6 +38,14 @@ import {
 } from '@/components/ui/sheet';
 import { useToast } from '@/hooks/use-toast';
 import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
+import {
   Search,
   Plus,
   Pencil,
@@ -57,11 +65,14 @@ import { useJobPostingsStore, getExperienceLabel } from '@/stores/jobPostingsSto
 import { SortableTableHead, useSorting } from '@/components/admin/SortableTableHead';
 import { exportToCSV } from '@/utils/csvExport';
 
+const ITEMS_PER_PAGE = 5;
+
 export default function JobPostingsPage() {
   const { jobs, addJob, updateJob, deleteJob, toggleJobStatus } = useJobPostingsStore();
   
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
+  const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingJob, setEditingJob] = useState<JobPosting | null>(null);
@@ -70,6 +81,11 @@ export default function JobPostingsPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
   const { sortKey, sortDirection, handleSort, sortData } = useSorting<JobPosting>();
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, statusFilter]);
 
   // Filter and sort jobs
   const filteredJobs = useMemo(() => {
@@ -93,6 +109,34 @@ export default function JobPostingsPage() {
 
     return sortData(filtered);
   }, [jobs, searchQuery, statusFilter, sortKey, sortDirection]);
+
+  // Pagination
+  const totalPages = Math.max(1, Math.ceil(filteredJobs.length / ITEMS_PER_PAGE));
+  const validCurrentPage = currentPage > totalPages ? 1 : currentPage;
+  const startIndex = (validCurrentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, filteredJobs.length);
+  const paginatedJobs = filteredJobs.slice(startIndex, endIndex);
+
+  const goToPage = (page: number) => {
+    const newPage = Math.max(1, Math.min(page, totalPages));
+    setCurrentPage(newPage);
+  };
+
+  const getPageNumbers = () => {
+    const pages: (number | 'ellipsis')[] = [];
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      if (validCurrentPage <= 3) {
+        pages.push(1, 2, 3, 'ellipsis', totalPages);
+      } else if (validCurrentPage >= totalPages - 2) {
+        pages.push(1, 'ellipsis', totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(1, 'ellipsis', validCurrentPage, 'ellipsis', totalPages);
+      }
+    }
+    return pages;
+  };
 
   const handleExportCSV = () => {
     exportToCSV(
@@ -303,7 +347,7 @@ export default function JobPostingsPage() {
             <div className="flex items-center justify-center py-12">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
-          ) : filteredJobs.length === 0 ? (
+          ) : paginatedJobs.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <Briefcase className="h-12 w-12 text-muted-foreground mb-4" />
               <h3 className="text-lg font-medium">No job postings found</h3>
@@ -368,7 +412,7 @@ export default function JobPostingsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredJobs.map((job) => (
+                  {paginatedJobs.map((job) => (
                     <TableRow key={job.id}>
                       <TableCell>
                         <div className="font-medium">{job.title}</div>
@@ -425,6 +469,48 @@ export default function JobPostingsPage() {
                   ))}
                 </TableBody>
               </Table>
+            </div>
+          )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border-t">
+              <p className="text-sm text-muted-foreground">
+                Showing {startIndex + 1}-{endIndex} of {filteredJobs.length} jobs
+              </p>
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() => goToPage(validCurrentPage - 1)}
+                      className={validCurrentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    />
+                  </PaginationItem>
+                  {getPageNumbers().map((page, index) =>
+                    page === 'ellipsis' ? (
+                      <PaginationItem key={`ellipsis-${index}`}>
+                        <span className="px-3 py-2">...</span>
+                      </PaginationItem>
+                    ) : (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          onClick={() => goToPage(page)}
+                          isActive={validCurrentPage === page}
+                          className="cursor-pointer"
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    )
+                  )}
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() => goToPage(validCurrentPage + 1)}
+                      className={validCurrentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
             </div>
           )}
         </div>
