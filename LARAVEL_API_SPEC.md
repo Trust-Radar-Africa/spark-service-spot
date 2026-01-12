@@ -550,6 +550,278 @@ Schema::create('blog_posts', function (Blueprint $table) {
 
 ---
 
+## Admin Settings
+
+### GET /api/admin/settings
+Get all admin settings.
+
+**Response:**
+```json
+{
+  "branding": {
+    "logo_url": "/storage/branding/logo.png",
+    "company_name": "Global Outsourced Accounting",
+    "tagline": "Global Out Sourced Offshore Accounting Solutions"
+  },
+  "social_links": [
+    {
+      "id": 1,
+      "platform": "LinkedIn",
+      "url": "https://linkedin.com/company/goa",
+      "icon": "linkedin",
+      "enabled": true
+    }
+  ],
+  "blog_categories": [
+    {
+      "id": 1,
+      "name": "Industry News",
+      "slug": "industry-news",
+      "description": "Latest accounting industry updates",
+      "is_default": true
+    }
+  ],
+  "experience_levels": [
+    {
+      "id": 1,
+      "value": "0-3",
+      "label": "0-3 years",
+      "is_default": true
+    }
+  ],
+  "notifications": {
+    "email_new_candidates": true,
+    "email_new_employer_requests": true,
+    "email_digest_frequency": "daily",
+    "candidate_threshold": 10,
+    "employer_threshold": 5,
+    "threshold_alert_enabled": true
+  }
+}
+```
+
+### PUT /api/admin/settings/branding
+Update branding settings.
+
+**Request:**
+```json
+{
+  "company_name": "Global Outsourced Accounting",
+  "tagline": "Your tagline here"
+}
+```
+
+### POST /api/admin/settings/branding/logo
+Upload company logo.
+
+**Request:** multipart/form-data
+- `logo`: Image file (PNG, JPG, SVG, max 2MB)
+
+**Response:**
+```json
+{
+  "logo_url": "/storage/branding/logo.png"
+}
+```
+
+### DELETE /api/admin/settings/branding/logo
+Remove company logo.
+
+---
+
+## Social Links
+
+### POST /api/admin/settings/social-links
+Create a new social link.
+
+**Request:**
+```json
+{
+  "platform": "LinkedIn",
+  "url": "https://linkedin.com/company/goa",
+  "icon": "linkedin",
+  "enabled": true
+}
+```
+
+### PUT /api/admin/settings/social-links/{id}
+Update a social link.
+
+### DELETE /api/admin/settings/social-links/{id}
+Delete a social link.
+
+---
+
+## Blog Categories
+
+### POST /api/admin/settings/blog-categories
+Create a new category.
+
+**Request:**
+```json
+{
+  "name": "New Category",
+  "slug": "new-category",
+  "description": "Optional description"
+}
+```
+
+### PUT /api/admin/settings/blog-categories/{id}
+Update a category.
+
+### DELETE /api/admin/settings/blog-categories/{id}
+Delete a category. Cannot delete default categories.
+
+---
+
+## Experience Levels
+
+### POST /api/admin/settings/experience-levels
+Create a new experience level.
+
+**Request:**
+```json
+{
+  "value": "15+",
+  "label": "15+ years"
+}
+```
+
+### PUT /api/admin/settings/experience-levels/{id}
+Update an experience level.
+
+### DELETE /api/admin/settings/experience-levels/{id}
+Delete an experience level. Cannot delete default levels.
+
+---
+
+## Notification Preferences
+
+### PUT /api/admin/settings/notifications
+Update notification preferences.
+
+**Request:**
+```json
+{
+  "email_new_candidates": true,
+  "email_new_employer_requests": true,
+  "email_digest_frequency": "daily",
+  "candidate_threshold": 10,
+  "employer_threshold": 5,
+  "threshold_alert_enabled": true
+}
+```
+
+---
+
+## Admin Users & Roles
+
+### GET /api/admin/users
+List all admin users.
+
+**Response:**
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "name": "Admin User",
+      "email": "admin@example.com",
+      "role": "super_admin",
+      "created_at": "2024-01-01T00:00:00Z",
+      "last_login": "2024-01-15T10:30:00Z"
+    }
+  ]
+}
+```
+
+### POST /api/admin/users
+Create/invite a new admin user. Requires super_admin role.
+
+**Request:**
+```json
+{
+  "name": "New Admin",
+  "email": "newadmin@example.com",
+  "role": "editor"
+}
+```
+
+### PUT /api/admin/users/{id}/role
+Update user role. Requires super_admin role.
+
+**Request:**
+```json
+{
+  "role": "viewer"
+}
+```
+
+### DELETE /api/admin/users/{id}
+Delete an admin user. Requires super_admin role.
+
+---
+
+## Role Definitions
+
+| Role | Permissions |
+|------|-------------|
+| super_admin | Full access to all features and settings |
+| editor | Can manage blog posts and job postings only |
+| viewer | Read-only access to all data |
+
+### Laravel Migration for Admin Roles
+
+```php
+// Create roles enum or table
+Schema::create('admin_users', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+    $table->enum('role', ['super_admin', 'editor', 'viewer'])->default('viewer');
+    $table->timestamps();
+});
+```
+
+### Settings Migrations
+
+```php
+Schema::create('settings', function (Blueprint $table) {
+    $table->id();
+    $table->string('key')->unique();
+    $table->text('value')->nullable();
+    $table->timestamps();
+});
+
+Schema::create('social_links', function (Blueprint $table) {
+    $table->id();
+    $table->string('platform');
+    $table->string('url');
+    $table->string('icon')->nullable();
+    $table->boolean('enabled')->default(true);
+    $table->integer('order')->default(0);
+    $table->timestamps();
+});
+
+Schema::create('blog_categories', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->string('slug')->unique();
+    $table->string('description')->nullable();
+    $table->boolean('is_default')->default(false);
+    $table->timestamps();
+});
+
+Schema::create('experience_levels', function (Blueprint $table) {
+    $table->id();
+    $table->string('value')->unique();
+    $table->string('label');
+    $table->boolean('is_default')->default(false);
+    $table->timestamps();
+});
+```
+
+---
+
 ## Environment Variables (Laravel .env)
 
 ```env

@@ -12,9 +12,11 @@ import {
   LogOut,
   Menu,
   X,
+  Settings,
 } from 'lucide-react';
 import { useState } from 'react';
 import NotificationsDropdown from './NotificationsDropdown';
+import { useSettingsStore } from '@/stores/settingsStore';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -26,10 +28,12 @@ const navigation = [
   { name: 'Job Postings', href: '/admin/jobs', icon: Briefcase },
   { name: 'Employer Requests', href: '/admin/employers', icon: Building2 },
   { name: 'Blog Posts', href: '/admin/blog', icon: FileText },
+  { name: 'Settings', href: '/admin/settings', icon: Settings },
 ];
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const { user, logout } = useAdminAuth();
+  const { branding } = useSettingsStore();
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -70,15 +74,23 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           {/* Logo */}
           <div className="p-6 border-b">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                <span className="text-lg font-bold text-primary">GOA</span>
+              <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center overflow-hidden">
+                {branding.logoUrl ? (
+                  <img 
+                    src={branding.logoUrl} 
+                    alt="Company logo" 
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <span className="text-lg font-bold text-primary">GOA</span>
+                )}
               </div>
               <div className="flex-1 min-w-0">
                 <h1 className="text-lg font-bold text-primary truncate">Admin Panel</h1>
               </div>
             </div>
             <p className="text-xs text-muted-foreground mt-3 leading-relaxed">
-              Global Out Sourced Offshore Accounting Solutions
+              {branding.tagline}
             </p>
           </div>
 
