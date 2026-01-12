@@ -78,6 +78,7 @@ const ITEMS_PER_PAGE = 5;
 export default function EmployerRequestsPage() {
   const { requests, isLoading, fetchRequests, deleteRequest } = useEmployerRequestsStore();
   const { toast } = useToast();
+  const { sortKey, sortDirection, handleSort, sortData } = useSorting<EmployerRequest>();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [countryFilter, setCountryFilter] = useState<string>('all');
@@ -86,6 +87,23 @@ export default function EmployerRequestsPage() {
   const [selectedRequest, setSelectedRequest] = useState<EmployerRequest | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [requestToDelete, setRequestToDelete] = useState<EmployerRequest | null>(null);
+
+  // Handle CSV export
+  const handleExportCSV = () => {
+    exportToCSV(filteredRequests, 'employer_requests', [
+      { key: 'firm_name', header: 'Company' },
+      { key: 'email', header: 'Email' },
+      { key: 'country', header: 'Country' },
+      { key: 'position_title', header: 'Position' },
+      { key: 'preferred_location', header: 'Location' },
+      { key: 'years_experience', header: 'Experience Required' },
+      { key: 'created_at', header: 'Request Date' },
+    ]);
+    toast({
+      title: 'Export successful',
+      description: `Exported ${filteredRequests.length} requests to CSV.`,
+    });
+  };
 
   useEffect(() => {
     fetchRequests();
@@ -111,12 +129,13 @@ export default function EmployerRequestsPage() {
     });
   }, [requests, searchTerm, countryFilter, experienceFilter]);
 
-  // Pagination
-  const totalPages = Math.max(1, Math.ceil(filteredRequests.length / ITEMS_PER_PAGE));
+  // Sort and paginate
+  const sortedRequests = sortData(filteredRequests);
+  const totalPages = Math.max(1, Math.ceil(sortedRequests.length / ITEMS_PER_PAGE));
   const validCurrentPage = currentPage > totalPages ? 1 : currentPage;
   const startIndex = (validCurrentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, filteredRequests.length);
-  const paginatedRequests = filteredRequests.slice(startIndex, endIndex);
+  const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, sortedRequests.length);
+  const paginatedRequests = sortedRequests.slice(startIndex, endIndex);
 
   const goToPage = (page: number) => {
     const newPage = Math.max(1, Math.min(page, totalPages));
@@ -185,6 +204,10 @@ export default function EmployerRequestsPage() {
                 View Employers Page
                 <ExternalLink className="ml-2 h-3 w-3" />
               </Link>
+            </Button>
+            <Button onClick={handleExportCSV} variant="outline" disabled={filteredRequests.length === 0}>
+              <Download className="h-4 w-4 mr-2" />
+              Export CSV
             </Button>
             <Button onClick={() => fetchRequests()} variant="outline" disabled={isLoading}>
               <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
@@ -273,11 +296,46 @@ export default function EmployerRequestsPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Company</TableHead>
-                <TableHead>Position</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead>Experience</TableHead>
-                <TableHead>Date</TableHead>
+                <SortableTableHead
+                  sortKey="firm_name"
+                  currentSortKey={sortKey}
+                  currentSortDirection={sortDirection}
+                  onSort={handleSort}
+                >
+                  Company
+                </SortableTableHead>
+                <SortableTableHead
+                  sortKey="position_title"
+                  currentSortKey={sortKey}
+                  currentSortDirection={sortDirection}
+                  onSort={handleSort}
+                >
+                  Position
+                </SortableTableHead>
+                <SortableTableHead
+                  sortKey="preferred_location"
+                  currentSortKey={sortKey}
+                  currentSortDirection={sortDirection}
+                  onSort={handleSort}
+                >
+                  Location
+                </SortableTableHead>
+                <SortableTableHead
+                  sortKey="years_experience"
+                  currentSortKey={sortKey}
+                  currentSortDirection={sortDirection}
+                  onSort={handleSort}
+                >
+                  Experience
+                </SortableTableHead>
+                <SortableTableHead
+                  sortKey="created_at"
+                  currentSortKey={sortKey}
+                  currentSortDirection={sortDirection}
+                  onSort={handleSort}
+                >
+                  Date
+                </SortableTableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>

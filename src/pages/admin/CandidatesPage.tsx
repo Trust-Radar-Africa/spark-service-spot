@@ -160,6 +160,23 @@ export default function CandidatesPage() {
   const [deleteCandidate, setDeleteCandidate] = useState<CandidateApplication | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
+  const { sortKey, sortDirection, handleSort, sortData } = useSorting<CandidateApplication>();
+
+  // Handle CSV export
+  const handleExportCSV = () => {
+    exportToCSV(filteredCandidates, 'candidates', [
+      { key: 'first_name', header: 'First Name' },
+      { key: 'last_name', header: 'Last Name' },
+      { key: 'email', header: 'Email' },
+      { key: 'nationality', header: 'Nationality' },
+      { key: 'experience', header: 'Experience' },
+      { key: 'created_at', header: 'Applied Date' },
+    ]);
+    toast({
+      title: 'Export successful',
+      description: `Exported ${filteredCandidates.length} candidates to CSV.`,
+    });
+  };
 
   // Filter candidates
   const filteredCandidates = useMemo(() => {
@@ -184,12 +201,13 @@ export default function CandidatesPage() {
     return filtered;
   }, [candidates, filters]);
 
-  // Pagination
-  const totalPages = Math.max(1, Math.ceil(filteredCandidates.length / ITEMS_PER_PAGE));
+  // Sort and paginate
+  const sortedCandidates = sortData(filteredCandidates);
+  const totalPages = Math.max(1, Math.ceil(sortedCandidates.length / ITEMS_PER_PAGE));
   const validCurrentPage = currentPage > totalPages ? 1 : currentPage;
   const startIndex = (validCurrentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, filteredCandidates.length);
-  const paginatedCandidates = filteredCandidates.slice(startIndex, endIndex);
+  const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, sortedCandidates.length);
+  const paginatedCandidates = sortedCandidates.slice(startIndex, endIndex);
 
   const goToPage = (page: number) => {
     const newPage = Math.max(1, Math.min(page, totalPages));
@@ -341,6 +359,10 @@ export default function CandidatesPage() {
                 <ExternalLink className="ml-2 h-3 w-3" />
               </Link>
             </Button>
+            <Button onClick={handleExportCSV} variant="outline" disabled={filteredCandidates.length === 0}>
+              <Download className="h-4 w-4 mr-2" />
+              Export CSV
+            </Button>
             <Button onClick={fetchCandidates} variant="outline" disabled={isLoading}>
               <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
               Refresh
@@ -453,11 +475,46 @@ export default function CandidatesPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Nationality</TableHead>
-                    <TableHead>Experience</TableHead>
-                    <TableHead>Applied</TableHead>
+                    <SortableTableHead
+                      sortKey="first_name"
+                      currentSortKey={sortKey}
+                      currentSortDirection={sortDirection}
+                      onSort={handleSort}
+                    >
+                      Name
+                    </SortableTableHead>
+                    <SortableTableHead
+                      sortKey="email"
+                      currentSortKey={sortKey}
+                      currentSortDirection={sortDirection}
+                      onSort={handleSort}
+                    >
+                      Email
+                    </SortableTableHead>
+                    <SortableTableHead
+                      sortKey="nationality"
+                      currentSortKey={sortKey}
+                      currentSortDirection={sortDirection}
+                      onSort={handleSort}
+                    >
+                      Nationality
+                    </SortableTableHead>
+                    <SortableTableHead
+                      sortKey="experience"
+                      currentSortKey={sortKey}
+                      currentSortDirection={sortDirection}
+                      onSort={handleSort}
+                    >
+                      Experience
+                    </SortableTableHead>
+                    <SortableTableHead
+                      sortKey="created_at"
+                      currentSortKey={sortKey}
+                      currentSortDirection={sortDirection}
+                      onSort={handleSort}
+                    >
+                      Applied
+                    </SortableTableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
