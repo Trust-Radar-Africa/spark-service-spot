@@ -78,13 +78,12 @@ const getStoredItemsPerPage = (): ItemsPerPageOption => {
 };
 
 export default function JobPostingsPage() {
-  const { jobs, addJob, updateJob, deleteJob, toggleJobStatus } = useJobPostingsStore();
+  const { jobs, isLoading, fetchJobs, addJob, updateJob, deleteJob, toggleJobStatus } = useJobPostingsStore();
   
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPageOption>(getStoredItemsPerPage);
-  const [isLoading, setIsLoading] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingJob, setEditingJob] = useState<JobPosting | null>(null);
   const [deletingJob, setDeletingJob] = useState<JobPosting | null>(null);
@@ -92,6 +91,10 @@ export default function JobPostingsPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
   const { sortKey, sortDirection, handleSort, sortData } = useSorting<JobPosting>();
+
+  useEffect(() => {
+    fetchJobs();
+  }, [fetchJobs]);
 
   const handleItemsPerPageChange = (value: ItemsPerPageOption) => {
     setItemsPerPage(value);
@@ -175,10 +178,7 @@ export default function JobPostingsPage() {
   };
 
   const handleRefresh = async () => {
-    setIsLoading(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    setIsLoading(false);
+    await fetchJobs();
     toast({
       title: 'Refreshed',
       description: 'Job postings have been refreshed.',

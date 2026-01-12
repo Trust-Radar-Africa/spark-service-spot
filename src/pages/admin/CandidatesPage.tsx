@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { api } from '@/services/api';
-import { CandidateApplication, ExperienceLevel, CandidateFilters } from '@/types/admin';
+import { CandidateFilters, ExperienceLevel } from '@/types/admin';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -36,8 +35,6 @@ import {
   FileText,
   Loader2,
   RefreshCw,
-  ChevronLeft,
-  ChevronRight,
   Users,
   Clock,
   Globe,
@@ -56,100 +53,14 @@ import { SortableTableHead, useSorting } from '@/components/admin/SortableTableH
 import { exportToCSV } from '@/utils/csvExport';
 import ItemsPerPageSelect from '@/components/admin/ItemsPerPageSelect';
 import { ItemsPerPageOption } from '@/hooks/useItemsPerPage';
+import { useCandidatesStore } from '@/stores/candidatesStore';
+import { CandidateApplication } from '@/types/admin';
 
 const experienceLevels: { value: ExperienceLevel; label: string }[] = [
   { value: '0-3', label: '0-3 years' },
   { value: '3-7', label: '3-7 years' },
   { value: '7-10', label: '7-10 years' },
   { value: '10+', label: 'Over 10 years' },
-];
-
-// Mock data for demo (remove when connected to Laravel)
-const mockCandidates: CandidateApplication[] = [
-  {
-    id: 1,
-    first_name: 'John',
-    last_name: 'Smith',
-    email: 'john.smith@example.com',
-    nationality: 'British',
-    experience: '3-7',
-    cv_url: '/uploads/cv-1.docx',
-    cover_letter_url: '/uploads/cl-1.docx',
-    created_at: '2024-01-15T10:30:00Z',
-    updated_at: '2024-01-15T10:30:00Z',
-  },
-  {
-    id: 2,
-    first_name: 'Sarah',
-    last_name: 'Johnson',
-    email: 'sarah.j@example.com',
-    nationality: 'American',
-    experience: '7-10',
-    cv_url: '/uploads/cv-2.docx',
-    cover_letter_url: '/uploads/cl-2.docx',
-    created_at: '2024-01-14T14:20:00Z',
-    updated_at: '2024-01-14T14:20:00Z',
-  },
-  {
-    id: 3,
-    first_name: 'Michael',
-    last_name: 'Chen',
-    email: 'mchen@example.com',
-    nationality: 'Canadian',
-    experience: '0-3',
-    cv_url: '/uploads/cv-3.docx',
-    cover_letter_url: '/uploads/cl-3.docx',
-    created_at: '2024-01-13T09:15:00Z',
-    updated_at: '2024-01-13T09:15:00Z',
-  },
-  {
-    id: 4,
-    first_name: 'Emma',
-    last_name: 'Wilson',
-    email: 'emma.w@example.com',
-    nationality: 'Australian',
-    experience: '10+',
-    cv_url: '/uploads/cv-4.docx',
-    cover_letter_url: '/uploads/cl-4.docx',
-    created_at: '2024-01-12T16:45:00Z',
-    updated_at: '2024-01-12T16:45:00Z',
-  },
-  {
-    id: 5,
-    first_name: 'David',
-    last_name: 'Brown',
-    email: 'david.b@example.com',
-    nationality: 'British',
-    experience: '3-7',
-    cv_url: '/uploads/cv-5.docx',
-    cover_letter_url: '/uploads/cl-5.docx',
-    created_at: '2024-01-11T11:00:00Z',
-    updated_at: '2024-01-11T11:00:00Z',
-  },
-  {
-    id: 6,
-    first_name: 'Lisa',
-    last_name: 'Taylor',
-    email: 'lisa.t@example.com',
-    nationality: 'American',
-    experience: '0-3',
-    cv_url: '/uploads/cv-6.docx',
-    cover_letter_url: '/uploads/cl-6.docx',
-    created_at: '2024-01-10T09:30:00Z',
-    updated_at: '2024-01-10T09:30:00Z',
-  },
-  {
-    id: 7,
-    first_name: 'James',
-    last_name: 'Anderson',
-    email: 'james.a@example.com',
-    nationality: 'Canadian',
-    experience: '7-10',
-    cv_url: '/uploads/cv-7.docx',
-    cover_letter_url: '/uploads/cl-7.docx',
-    created_at: '2024-01-09T14:15:00Z',
-    updated_at: '2024-01-09T14:15:00Z',
-  },
 ];
 
 const getStoredItemsPerPage = (): ItemsPerPageOption => {
@@ -163,15 +74,18 @@ const getStoredItemsPerPage = (): ItemsPerPageOption => {
 };
 
 export default function CandidatesPage() {
-  const [candidates, setCandidates] = useState<CandidateApplication[]>(mockCandidates);
+  const { candidates, isLoading, fetchCandidates, deleteCandidate } = useCandidatesStore();
   const [filters, setFilters] = useState<CandidateFilters>({});
-  const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPageOption>(getStoredItemsPerPage);
-  const [deleteCandidate, setDeleteCandidate] = useState<CandidateApplication | null>(null);
+  const [candidateToDelete, setCandidateToDelete] = useState<CandidateApplication | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
   const { sortKey, sortDirection, handleSort, sortData } = useSorting<CandidateApplication>();
+
+  useEffect(() => {
+    fetchCandidates();
+  }, [fetchCandidates]);
 
   const handleItemsPerPageChange = (value: ItemsPerPageOption) => {
     setItemsPerPage(value);
@@ -236,71 +150,36 @@ export default function CandidatesPage() {
     setCurrentPage(1);
   }, [filters]);
 
-  const fetchCandidates = async () => {
-    setIsLoading(true);
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      setCandidates(mockCandidates);
-      toast({
-        title: 'Refreshed',
-        description: 'Candidate list has been refreshed.',
-      });
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch candidates',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  const handleRefresh = async () => {
+    await fetchCandidates();
+    toast({
+      title: 'Refreshed',
+      description: 'Candidate list has been refreshed.',
+    });
   };
 
   const handleDownloadCV = async (candidate: CandidateApplication) => {
-    try {
-      // Uncomment when Laravel API is ready
-      // await api.downloadCV(candidate.id);
-      toast({
-        title: 'Download started',
-        description: `Downloading CV for ${candidate.first_name} ${candidate.last_name}`,
-      });
-    } catch (error) {
-      toast({
-        title: 'Download failed',
-        description: 'Could not download CV',
-        variant: 'destructive',
-      });
-    }
+    toast({
+      title: 'Download started',
+      description: `Downloading CV for ${candidate.first_name} ${candidate.last_name}`,
+    });
   };
 
   const handleDownloadCoverLetter = async (candidate: CandidateApplication) => {
-    try {
-      // Uncomment when Laravel API is ready
-      // await api.downloadCoverLetter(candidate.id);
-      toast({
-        title: 'Download started',
-        description: `Downloading cover letter for ${candidate.first_name} ${candidate.last_name}`,
-      });
-    } catch (error) {
-      toast({
-        title: 'Download failed',
-        description: 'Could not download cover letter',
-        variant: 'destructive',
-      });
-    }
+    toast({
+      title: 'Download started',
+      description: `Downloading cover letter for ${candidate.first_name} ${candidate.last_name}`,
+    });
   };
 
   const handleDelete = async () => {
-    if (!deleteCandidate) return;
+    if (!candidateToDelete) return;
     setIsDeleting(true);
     try {
-      // Uncomment when Laravel API is ready
-      // await api.deleteCandidate(deleteCandidate.id);
-      setCandidates((prev) => prev.filter((c) => c.id !== deleteCandidate.id));
+      deleteCandidate(candidateToDelete.id);
       toast({
         title: 'Candidate deleted',
-        description: `${deleteCandidate.first_name} ${deleteCandidate.last_name} has been removed.`,
+        description: `${candidateToDelete.first_name} ${candidateToDelete.last_name} has been removed.`,
       });
     } catch (error) {
       toast({
@@ -310,7 +189,7 @@ export default function CandidatesPage() {
       });
     } finally {
       setIsDeleting(false);
-      setDeleteCandidate(null);
+      setCandidateToDelete(null);
     }
   };
 
@@ -382,7 +261,7 @@ export default function CandidatesPage() {
               <Download className="h-4 w-4 mr-2" />
               Export CSV
             </Button>
-            <Button onClick={fetchCandidates} variant="outline" disabled={isLoading}>
+            <Button onClick={handleRefresh} variant="outline" disabled={isLoading}>
               <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
@@ -574,7 +453,7 @@ export default function CandidatesPage() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => setDeleteCandidate(candidate)}
+                            onClick={() => setCandidateToDelete(candidate)}
                             className="text-destructive hover:text-destructive"
                             title="Delete"
                           >
@@ -637,20 +516,20 @@ export default function CandidatesPage() {
       </div>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={!!deleteCandidate} onOpenChange={() => setDeleteCandidate(null)}>
+      <Dialog open={!!candidateToDelete} onOpenChange={() => setCandidateToDelete(null)}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Delete Candidate</DialogTitle>
             <DialogDescription>
               Are you sure you want to delete{' '}
               <strong>
-                {deleteCandidate?.first_name} {deleteCandidate?.last_name}
+                {candidateToDelete?.first_name} {candidateToDelete?.last_name}
               </strong>
               ? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteCandidate(null)}>
+            <Button variant="outline" onClick={() => setCandidateToDelete(null)}>
               Cancel
             </Button>
             <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
