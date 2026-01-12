@@ -64,8 +64,18 @@ import { Link } from 'react-router-dom';
 import { useJobPostingsStore, getExperienceLabel } from '@/stores/jobPostingsStore';
 import { SortableTableHead, useSorting } from '@/components/admin/SortableTableHead';
 import { exportToCSV } from '@/utils/csvExport';
+import ItemsPerPageSelect from '@/components/admin/ItemsPerPageSelect';
+import { ItemsPerPageOption } from '@/hooks/useItemsPerPage';
 
-const ITEMS_PER_PAGE = 5;
+const getStoredItemsPerPage = (): ItemsPerPageOption => {
+  if (typeof window !== 'undefined') {
+    const stored = localStorage.getItem('admin-jobs-items-per-page');
+    if (stored && [5, 10, 25, 50].includes(Number(stored))) {
+      return Number(stored) as ItemsPerPageOption;
+    }
+  }
+  return 5;
+};
 
 export default function JobPostingsPage() {
   const { jobs, addJob, updateJob, deleteJob, toggleJobStatus } = useJobPostingsStore();
@@ -73,6 +83,7 @@ export default function JobPostingsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPageOption>(getStoredItemsPerPage);
   const [isLoading, setIsLoading] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingJob, setEditingJob] = useState<JobPosting | null>(null);
@@ -81,6 +92,12 @@ export default function JobPostingsPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
   const { sortKey, sortDirection, handleSort, sortData } = useSorting<JobPosting>();
+
+  const handleItemsPerPageChange = (value: ItemsPerPageOption) => {
+    setItemsPerPage(value);
+    setCurrentPage(1);
+    localStorage.setItem('admin-jobs-items-per-page', String(value));
+  };
 
   // Reset page when filters change
   useEffect(() => {
@@ -111,10 +128,10 @@ export default function JobPostingsPage() {
   }, [jobs, searchQuery, statusFilter, sortKey, sortDirection]);
 
   // Pagination
-  const totalPages = Math.max(1, Math.ceil(filteredJobs.length / ITEMS_PER_PAGE));
+  const totalPages = Math.max(1, Math.ceil(filteredJobs.length / itemsPerPage));
   const validCurrentPage = currentPage > totalPages ? 1 : currentPage;
-  const startIndex = (validCurrentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, filteredJobs.length);
+  const startIndex = (validCurrentPage - 1) * itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage, filteredJobs.length);
   const paginatedJobs = filteredJobs.slice(startIndex, endIndex);
 
   const goToPage = (page: number) => {
@@ -473,11 +490,14 @@ export default function JobPostingsPage() {
           )}
 
           {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border-t">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border-t">
+            <div className="flex items-center gap-4">
               <p className="text-sm text-muted-foreground">
                 Showing {startIndex + 1}-{endIndex} of {filteredJobs.length} jobs
               </p>
+              <ItemsPerPageSelect value={itemsPerPage} onChange={handleItemsPerPageChange} />
+            </div>
+            {totalPages > 1 && (
               <Pagination>
                 <PaginationContent>
                   <PaginationItem>
@@ -511,8 +531,8 @@ export default function JobPostingsPage() {
                   </PaginationItem>
                 </PaginationContent>
               </Pagination>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
