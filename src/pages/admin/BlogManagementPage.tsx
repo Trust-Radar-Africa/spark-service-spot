@@ -248,16 +248,18 @@ export default function BlogManagementPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold">Blog Management</h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold">Blog Management</h1>
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/blog" target="_blank">
+                  <ExternalLink className="h-4 w-4 mr-1" />
+                  View Page
+                </Link>
+              </Button>
+            </div>
             <p className="text-muted-foreground">Create and manage blog posts</p>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" asChild>
-              <Link to="/blog" target="_blank">
-                View Blog Page
-                <ExternalLink className="ml-2 h-3 w-3" />
-              </Link>
-            </Button>
             <Button onClick={handleExportCSV} variant="outline" disabled={filteredPosts.length === 0}>
               <Download className="w-4 h-4 mr-2" />
               Export CSV

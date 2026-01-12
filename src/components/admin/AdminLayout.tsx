@@ -12,7 +12,6 @@ import {
   LogOut,
   Menu,
   X,
-  ExternalLink,
 } from 'lucide-react';
 import { useState } from 'react';
 import NotificationsDropdown from './NotificationsDropdown';
@@ -22,11 +21,11 @@ interface AdminLayoutProps {
 }
 
 const navigation = [
-  { name: 'Dashboard', href: '/admin', icon: LayoutDashboard, viewHref: null },
-  { name: 'Candidates', href: '/admin/candidates', icon: Users, viewHref: '/apply' },
-  { name: 'Job Postings', href: '/admin/jobs', icon: Briefcase, viewHref: '/careers' },
-  { name: 'Employer Requests', href: '/admin/employers', icon: Building2, viewHref: '/employers' },
-  { name: 'Blog Posts', href: '/admin/blog', icon: FileText, viewHref: '/blog' },
+  { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
+  { name: 'Candidates', href: '/admin/candidates', icon: Users },
+  { name: 'Job Postings', href: '/admin/jobs', icon: Briefcase },
+  { name: 'Employer Requests', href: '/admin/employers', icon: Building2 },
+  { name: 'Blog Posts', href: '/admin/blog', icon: FileText },
 ];
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
@@ -89,32 +88,20 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               const isActive = location.pathname === item.href || 
                 (item.href === '/admin' && location.pathname === '/admin/dashboard');
               return (
-                <div key={item.name} className="flex items-center gap-1">
-                  <Link
-                    to={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={cn(
-                      'flex-1 flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors',
-                      isActive
-                        ? 'bg-primary text-primary-foreground'
-                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                    )}
-                  >
-                    <item.icon className="h-5 w-5" />
-                    {item.name}
-                  </Link>
-                  {item.viewHref && (
-                    <Link
-                      to={item.viewHref}
-                      target="_blank"
-                      onClick={(e) => e.stopPropagation()}
-                      className="p-2 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                      title={`View ${item.name} page`}
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                    </Link>
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={cn(
+                    'flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors',
+                    isActive
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   )}
-                </div>
+                >
+                  <item.icon className="h-5 w-5" />
+                  {item.name}
+                </Link>
               );
             })}
           </nav>

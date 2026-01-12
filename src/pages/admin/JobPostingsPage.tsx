@@ -267,7 +267,15 @@ export default function JobPostingsPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold">Job Postings</h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold">Job Postings</h1>
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/careers" target="_blank">
+                  <ExternalLink className="h-4 w-4 mr-1" />
+                  View Page
+                </Link>
+              </Button>
+            </div>
             <p className="text-muted-foreground">
               Create and manage job advertisements for the Careers page
             </p>
@@ -276,12 +284,6 @@ export default function JobPostingsPage() {
             <Button variant="outline" size="sm" onClick={handleExportCSV}>
               <Download className="h-4 w-4 mr-2" />
               Export CSV
-            </Button>
-            <Button variant="outline" size="sm" asChild>
-              <Link to="/careers" target="_blank">
-                View Careers Page
-                <ExternalLink className="ml-2 h-3 w-3" />
-              </Link>
             </Button>
             <Button onClick={handleRefresh} variant="outline" disabled={isLoading}>
               <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />

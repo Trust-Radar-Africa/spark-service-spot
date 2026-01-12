@@ -210,18 +210,20 @@ export default function EmployerRequestsPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold">Employer Requests</h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold">Employer Requests</h1>
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/employers" target="_blank">
+                  <ExternalLink className="h-4 w-4 mr-1" />
+                  View Page
+                </Link>
+              </Button>
+            </div>
             <p className="text-muted-foreground">
               View and manage recruitment requests from employers
             </p>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" asChild>
-              <Link to="/employers" target="_blank">
-                View Employers Page
-                <ExternalLink className="ml-2 h-3 w-3" />
-              </Link>
-            </Button>
             <Button onClick={handleExportCSV} variant="outline" disabled={filteredRequests.length === 0}>
               <Download className="h-4 w-4 mr-2" />
               Export CSV
