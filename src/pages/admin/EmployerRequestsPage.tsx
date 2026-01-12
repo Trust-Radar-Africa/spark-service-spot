@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -34,6 +34,14 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 import { useEmployerRequestsStore } from '@/stores/employerRequestsStore';
 import { EmployerRequest, ExperienceLevel } from '@/types/admin';
 import {
@@ -62,6 +70,8 @@ const experienceLabels: Record<ExperienceLevel, string> = {
   '10+': '10+ years',
 };
 
+const ITEMS_PER_PAGE = 5;
+
 export default function EmployerRequestsPage() {
   const { requests, isLoading, fetchRequests, deleteRequest } = useEmployerRequestsStore();
   const { toast } = useToast();
@@ -69,6 +79,7 @@ export default function EmployerRequestsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [countryFilter, setCountryFilter] = useState<string>('all');
   const [experienceFilter, setExperienceFilter] = useState<string>('all');
+  const [currentPage, setCurrentPage] = useState(1);
   const [selectedRequest, setSelectedRequest] = useState<EmployerRequest | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [requestToDelete, setRequestToDelete] = useState<EmployerRequest | null>(null);
@@ -81,19 +92,55 @@ export default function EmployerRequestsPage() {
   const countries = [...new Set(requests.map((r) => r.country))].sort();
 
   // Filter requests
-  const filteredRequests = requests.filter((request) => {
-    const matchesSearch =
-      searchTerm === '' ||
-      request.firm_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      request.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      request.position_title?.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredRequests = useMemo(() => {
+    return requests.filter((request) => {
+      const matchesSearch =
+        searchTerm === '' ||
+        request.firm_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        request.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        request.position_title?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesCountry = countryFilter === 'all' || request.country === countryFilter;
-    const matchesExperience =
-      experienceFilter === 'all' || request.years_experience === experienceFilter;
+      const matchesCountry = countryFilter === 'all' || request.country === countryFilter;
+      const matchesExperience =
+        experienceFilter === 'all' || request.years_experience === experienceFilter;
 
-    return matchesSearch && matchesCountry && matchesExperience;
-  });
+      return matchesSearch && matchesCountry && matchesExperience;
+    });
+  }, [requests, searchTerm, countryFilter, experienceFilter]);
+
+  // Pagination
+  const totalPages = Math.max(1, Math.ceil(filteredRequests.length / ITEMS_PER_PAGE));
+  const validCurrentPage = currentPage > totalPages ? 1 : currentPage;
+  const startIndex = (validCurrentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, filteredRequests.length);
+  const paginatedRequests = filteredRequests.slice(startIndex, endIndex);
+
+  const goToPage = (page: number) => {
+    const newPage = Math.max(1, Math.min(page, totalPages));
+    setCurrentPage(newPage);
+  };
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, countryFilter, experienceFilter]);
+
+  // Generate page numbers for pagination
+  const getPageNumbers = () => {
+    const pages: (number | 'ellipsis')[] = [];
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      if (validCurrentPage <= 3) {
+        pages.push(1, 2, 3, 'ellipsis', totalPages);
+      } else if (validCurrentPage >= totalPages - 2) {
+        pages.push(1, 'ellipsis', totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(1, 'ellipsis', validCurrentPage, 'ellipsis', totalPages);
+      }
+    }
+    return pages;
+  };
 
   const handleDelete = () => {
     if (requestToDelete) {
@@ -219,93 +266,133 @@ export default function EmployerRequestsPage() {
         </div>
 
         {/* Requests Table */}
-        <Card>
-          <CardContent className="p-0">
-            <Table>
-              <TableHeader>
+        <div className="bg-card rounded-lg border overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Company</TableHead>
+                <TableHead>Position</TableHead>
+                <TableHead>Location</TableHead>
+                <TableHead>Experience</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
                 <TableRow>
-                  <TableHead>Company</TableHead>
-                  <TableHead>Position</TableHead>
-                  <TableHead>Location</TableHead>
-                  <TableHead>Experience</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableCell colSpan={6} className="text-center py-8">
+                    Loading requests...
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoading ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8">
-                      Loading requests...
+              ) : paginatedRequests.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-8">
+                    <div className="flex flex-col items-center gap-2">
+                      <Building2 className="w-8 h-8 text-muted-foreground" />
+                      <p className="text-muted-foreground">No requests found</p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                paginatedRequests.map((request) => (
+                  <TableRow key={request.id}>
+                    <TableCell>
+                      <div>
+                        <p className="font-medium">{request.firm_name}</p>
+                        <p className="text-sm text-muted-foreground">{request.email}</p>
+                      </div>
                     </TableCell>
-                  </TableRow>
-                ) : filteredRequests.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8">
-                      <div className="flex flex-col items-center gap-2">
-                        <Building2 className="w-8 h-8 text-muted-foreground" />
-                        <p className="text-muted-foreground">No requests found</p>
+                    <TableCell>
+                      {request.position_title || (
+                        <span className="text-muted-foreground">Not specified</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        <MapPin className="w-3 h-3 text-muted-foreground" />
+                        <span className="text-sm">{request.preferred_location}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="secondary">
+                        {experienceLabels[request.years_experience]}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm text-muted-foreground">
+                        {format(new Date(request.created_at), 'MMM d, yyyy')}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setSelectedRequest(request)}
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => {
+                            setRequestToDelete(request);
+                            setDeleteDialogOpen(true);
+                          }}
+                        >
+                          <Trash2 className="w-4 h-4 text-destructive" />
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>
-                ) : (
-                  filteredRequests.map((request) => (
-                    <TableRow key={request.id}>
-                      <TableCell>
-                        <div>
-                          <p className="font-medium">{request.firm_name}</p>
-                          <p className="text-sm text-muted-foreground">{request.email}</p>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {request.position_title || (
-                          <span className="text-muted-foreground">Not specified</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1">
-                          <MapPin className="w-3 h-3 text-muted-foreground" />
-                          <span className="text-sm">{request.preferred_location}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="secondary">
-                          {experienceLabels[request.years_experience]}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-sm text-muted-foreground">
-                          {format(new Date(request.created_at), 'MMM d, yyyy')}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setSelectedRequest(request)}
-                          >
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => {
-                              setRequestToDelete(request);
-                              setDeleteDialogOpen(true);
-                            }}
-                          >
-                            <Trash2 className="w-4 h-4 text-destructive" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+                ))
+              )}
+            </TableBody>
+          </Table>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border-t">
+              <p className="text-sm text-muted-foreground">
+                Showing {startIndex + 1}-{endIndex} of {filteredRequests.length} requests
+              </p>
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() => goToPage(validCurrentPage - 1)}
+                      className={validCurrentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    />
+                  </PaginationItem>
+                  {getPageNumbers().map((page, index) =>
+                    page === 'ellipsis' ? (
+                      <PaginationItem key={`ellipsis-${index}`}>
+                        <span className="px-3 py-2">...</span>
+                      </PaginationItem>
+                    ) : (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          onClick={() => goToPage(page)}
+                          isActive={validCurrentPage === page}
+                          className="cursor-pointer"
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    )
+                  )}
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() => goToPage(validCurrentPage + 1)}
+                      className={validCurrentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
+        </div>
 
         {/* View Details Sheet */}
         <Sheet open={!!selectedRequest} onOpenChange={() => setSelectedRequest(null)}>

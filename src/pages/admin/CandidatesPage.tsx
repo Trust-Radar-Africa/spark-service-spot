@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { api } from '@/services/api';
 import { CandidateApplication, ExperienceLevel, CandidateFilters } from '@/types/admin';
 import AdminLayout from '@/components/admin/AdminLayout';
@@ -44,6 +44,14 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 
 const experienceLevels: { value: ExperienceLevel; label: string }[] = [
   { value: '0-3', label: '0-3 years' },
@@ -102,49 +110,105 @@ const mockCandidates: CandidateApplication[] = [
     created_at: '2024-01-12T16:45:00Z',
     updated_at: '2024-01-12T16:45:00Z',
   },
+  {
+    id: 5,
+    first_name: 'David',
+    last_name: 'Brown',
+    email: 'david.b@example.com',
+    nationality: 'British',
+    experience: '3-7',
+    cv_url: '/uploads/cv-5.docx',
+    cover_letter_url: '/uploads/cl-5.docx',
+    created_at: '2024-01-11T11:00:00Z',
+    updated_at: '2024-01-11T11:00:00Z',
+  },
+  {
+    id: 6,
+    first_name: 'Lisa',
+    last_name: 'Taylor',
+    email: 'lisa.t@example.com',
+    nationality: 'American',
+    experience: '0-3',
+    cv_url: '/uploads/cv-6.docx',
+    cover_letter_url: '/uploads/cl-6.docx',
+    created_at: '2024-01-10T09:30:00Z',
+    updated_at: '2024-01-10T09:30:00Z',
+  },
+  {
+    id: 7,
+    first_name: 'James',
+    last_name: 'Anderson',
+    email: 'james.a@example.com',
+    nationality: 'Canadian',
+    experience: '7-10',
+    cv_url: '/uploads/cv-7.docx',
+    cover_letter_url: '/uploads/cl-7.docx',
+    created_at: '2024-01-09T14:15:00Z',
+    updated_at: '2024-01-09T14:15:00Z',
+  },
 ];
+
+const ITEMS_PER_PAGE = 5;
 
 export default function CandidatesPage() {
   const [candidates, setCandidates] = useState<CandidateApplication[]>(mockCandidates);
   const [filters, setFilters] = useState<CandidateFilters>({});
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [deleteCandidate, setDeleteCandidate] = useState<CandidateApplication | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
 
+  // Filter candidates
+  const filteredCandidates = useMemo(() => {
+    let filtered = [...candidates];
+    if (filters.experience) {
+      filtered = filtered.filter((c) => c.experience === filters.experience);
+    }
+    if (filters.nationality) {
+      filtered = filtered.filter((c) =>
+        c.nationality.toLowerCase().includes(filters.nationality!.toLowerCase())
+      );
+    }
+    if (filters.search) {
+      const search = filters.search.toLowerCase();
+      filtered = filtered.filter(
+        (c) =>
+          c.first_name.toLowerCase().includes(search) ||
+          c.last_name.toLowerCase().includes(search) ||
+          c.email.toLowerCase().includes(search)
+      );
+    }
+    return filtered;
+  }, [candidates, filters]);
+
+  // Pagination
+  const totalPages = Math.max(1, Math.ceil(filteredCandidates.length / ITEMS_PER_PAGE));
+  const validCurrentPage = currentPage > totalPages ? 1 : currentPage;
+  const startIndex = (validCurrentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, filteredCandidates.length);
+  const paginatedCandidates = filteredCandidates.slice(startIndex, endIndex);
+
+  const goToPage = (page: number) => {
+    const newPage = Math.max(1, Math.min(page, totalPages));
+    setCurrentPage(newPage);
+  };
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filters]);
+
   const fetchCandidates = async () => {
     setIsLoading(true);
     try {
-      // Uncomment when Laravel API is ready
-      // const response = await api.getCandidates({
-      //   ...filters,
-      //   page: currentPage,
-      // });
-      // setCandidates(response.data);
-      // setTotalPages(response.meta.last_page);
-
-      // Mock filtering for demo
-      let filtered = [...mockCandidates];
-      if (filters.experience) {
-        filtered = filtered.filter((c) => c.experience === filters.experience);
-      }
-      if (filters.nationality) {
-        filtered = filtered.filter((c) =>
-          c.nationality.toLowerCase().includes(filters.nationality!.toLowerCase())
-        );
-      }
-      if (filters.search) {
-        const search = filters.search.toLowerCase();
-        filtered = filtered.filter(
-          (c) =>
-            c.first_name.toLowerCase().includes(search) ||
-            c.last_name.toLowerCase().includes(search) ||
-            c.email.toLowerCase().includes(search)
-        );
-      }
-      setCandidates(filtered);
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setCandidates(mockCandidates);
+      toast({
+        title: 'Refreshed',
+        description: 'Candidate list has been refreshed.',
+      });
     } catch (error) {
       toast({
         title: 'Error',
@@ -155,10 +219,6 @@ export default function CandidatesPage() {
       setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchCandidates();
-  }, [filters, currentPage]);
 
   const handleDownloadCV = async (candidate: CandidateApplication) => {
     try {
@@ -234,14 +294,31 @@ export default function CandidatesPage() {
 
   // Calculate stats
   const stats = {
-    total: mockCandidates.length,
-    thisWeek: mockCandidates.filter((c) => {
+    total: candidates.length,
+    thisWeek: candidates.filter((c) => {
       const created = new Date(c.created_at);
       const weekAgo = new Date();
       weekAgo.setDate(weekAgo.getDate() - 7);
       return created >= weekAgo;
     }).length,
-    uniqueNationalities: new Set(mockCandidates.map((c) => c.nationality)).size,
+    uniqueNationalities: new Set(candidates.map((c) => c.nationality)).size,
+  };
+
+  // Generate page numbers for pagination
+  const getPageNumbers = () => {
+    const pages: (number | 'ellipsis')[] = [];
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      if (validCurrentPage <= 3) {
+        pages.push(1, 2, 3, 'ellipsis', totalPages);
+      } else if (validCurrentPage >= totalPages - 2) {
+        pages.push(1, 'ellipsis', totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(1, 'ellipsis', validCurrentPage, 'ellipsis', totalPages);
+      }
+    }
+    return pages;
   };
 
   return (
@@ -361,7 +438,7 @@ export default function CandidatesPage() {
             <div className="flex items-center justify-center py-12">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
-          ) : candidates.length === 0 ? (
+          ) : paginatedCandidates.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <Users className="h-12 w-12 text-muted-foreground mb-4" />
               <h3 className="text-lg font-medium">No candidates found</h3>
@@ -383,7 +460,7 @@ export default function CandidatesPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {candidates.map((candidate) => (
+                  {paginatedCandidates.map((candidate) => (
                     <TableRow key={candidate.id}>
                       <TableCell className="font-medium">
                         {candidate.first_name} {candidate.last_name}
@@ -436,28 +513,43 @@ export default function CandidatesPage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between p-4 border-t">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border-t">
               <p className="text-sm text-muted-foreground">
-                Page {currentPage} of {totalPages}
+                Showing {startIndex + 1}-{endIndex} of {filteredCandidates.length} candidates
               </p>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() => goToPage(validCurrentPage - 1)}
+                      className={validCurrentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    />
+                  </PaginationItem>
+                  {getPageNumbers().map((page, index) =>
+                    page === 'ellipsis' ? (
+                      <PaginationItem key={`ellipsis-${index}`}>
+                        <span className="px-3 py-2">...</span>
+                      </PaginationItem>
+                    ) : (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          onClick={() => goToPage(page)}
+                          isActive={validCurrentPage === page}
+                          className="cursor-pointer"
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    )
+                  )}
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() => goToPage(validCurrentPage + 1)}
+                      className={validCurrentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
             </div>
           )}
         </div>
