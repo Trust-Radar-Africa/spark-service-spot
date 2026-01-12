@@ -13,6 +13,7 @@ import Services from "./pages/Services";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import Careers from "./pages/Careers";
+import Apply from "./pages/Apply";
 import Contact from "./pages/Contact";
 
 // Modern theme pages
@@ -22,6 +23,7 @@ import ServicesModern from "./pages/ServicesModern";
 import BlogModern from "./pages/BlogModern";
 import BlogPostModern from "./pages/BlogPostModern";
 import CareersModern from "./pages/CareersModern";
+import ApplyModern from "./pages/ApplyModern";
 import ContactModern from "./pages/ContactModern";
 
 // Admin pages
@@ -48,6 +50,7 @@ function ThemedRoutes() {
         <Route path="/blog" element={<BlogModern />} />
         <Route path="/blog/:slug" element={<BlogPostModern />} />
         <Route path="/careers" element={<CareersModern />} />
+        <Route path="/apply" element={<ApplyModern />} />
         <Route path="/contact" element={<ContactModern />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
@@ -62,6 +65,7 @@ function ThemedRoutes() {
       <Route path="/blog" element={<Blog />} />
       <Route path="/blog/:slug" element={<BlogPost />} />
       <Route path="/careers" element={<Careers />} />
+      <Route path="/apply" element={<Apply />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
