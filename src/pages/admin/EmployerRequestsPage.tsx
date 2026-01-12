@@ -118,7 +118,7 @@ export default function EmployerRequestsPage() {
       { key: 'email', header: 'Email' },
       { key: 'country', header: 'Country' },
       { key: 'position_title', header: 'Position' },
-      { key: 'preferred_location', header: 'Location' },
+      { key: 'location', header: 'Location' },
       { key: 'years_experience', header: 'Experience Required' },
       { key: 'created_at', header: 'Request Date' },
     ]);
@@ -238,7 +238,7 @@ export default function EmployerRequestsPage() {
       { key: 'email', header: 'Email' },
       { key: 'country', header: 'Country' },
       { key: 'position_title', header: 'Position' },
-      { key: 'preferred_location', header: 'Location' },
+      { key: 'location', header: 'Location' },
       { key: 'years_experience', header: 'Experience Required' },
       { key: 'created_at', header: 'Request Date' },
     ]);
@@ -283,7 +283,13 @@ export default function EmployerRequestsPage() {
               <Download className="h-4 w-4 mr-2" />
               Export CSV
             </Button>
-            <Button onClick={() => fetchRequests()} variant="outline" disabled={isLoading}>
+            <Button onClick={async () => {
+              await fetchRequests();
+              toast({
+                title: 'Refreshed',
+                description: 'Employer requests have been refreshed.',
+              });
+            }} variant="outline" disabled={isLoading}>
               <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
@@ -418,7 +424,7 @@ export default function EmployerRequestsPage() {
                   Position
                 </SortableTableHead>
                 <SortableTableHead
-                  sortKey="preferred_location"
+                  sortKey="location"
                   currentSortKey={sortKey}
                   currentSortDirection={sortDirection}
                   onSort={handleSort}
@@ -445,12 +451,18 @@ export default function EmployerRequestsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8">
-                    Loading requests...
-                  </TableCell>
-                </TableRow>
+            {isLoading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell><div className="h-4 w-4 bg-muted animate-pulse rounded" /></TableCell>
+                    <TableCell><div className="space-y-2"><div className="h-4 w-32 bg-muted animate-pulse rounded" /><div className="h-3 w-24 bg-muted animate-pulse rounded" /></div></TableCell>
+                    <TableCell><div className="h-4 w-24 bg-muted animate-pulse rounded" /></TableCell>
+                    <TableCell><div className="h-4 w-28 bg-muted animate-pulse rounded" /></TableCell>
+                    <TableCell><div className="h-6 w-20 bg-muted animate-pulse rounded-full" /></TableCell>
+                    <TableCell><div className="h-4 w-20 bg-muted animate-pulse rounded" /></TableCell>
+                    <TableCell><div className="flex justify-end gap-2"><div className="h-8 w-8 bg-muted animate-pulse rounded" /><div className="h-8 w-8 bg-muted animate-pulse rounded" /></div></TableCell>
+                  </TableRow>
+                ))
               ) : paginatedRequests.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center py-8">
@@ -484,7 +496,7 @@ export default function EmployerRequestsPage() {
                     <TableCell>
                       <div className="flex items-center gap-1">
                         <MapPin className="w-3 h-3 text-muted-foreground" />
-                        <span className="text-sm">{request.preferred_location}</span>
+                        <span className="text-sm">{request.location}</span>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -629,8 +641,8 @@ export default function EmployerRequestsPage() {
                     <div className="flex items-start gap-3">
                       <MapPin className="w-5 h-5 text-muted-foreground mt-0.5" />
                       <div>
-                        <p className="font-medium">{selectedRequest.preferred_location}</p>
-                        <p className="text-sm text-muted-foreground">Preferred Location</p>
+                        <p className="font-medium">{selectedRequest.location}</p>
+                        <p className="text-sm text-muted-foreground">Location</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
