@@ -50,9 +50,12 @@ import {
   Eye,
   EyeOff,
   ExternalLink,
+  Download,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useJobPostingsStore, getExperienceLabel } from '@/stores/jobPostingsStore';
+import { SortableTableHead, useSorting } from '@/components/admin/SortableTableHead';
+import { exportToCSV } from '@/utils/csvExport';
 
 export default function JobPostingsPage() {
   const { jobs, addJob, updateJob, deleteJob, toggleJobStatus } = useJobPostingsStore();
@@ -66,8 +69,9 @@ export default function JobPostingsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
+  const { sortKey, sortDirection, handleSort, sortData } = useSorting<JobPosting>();
 
-  // Filter jobs based on search and status
+  // Filter and sort jobs
   const filteredJobs = useMemo(() => {
     let filtered = [...jobs];
 
@@ -87,8 +91,27 @@ export default function JobPostingsPage() {
       );
     }
 
-    return filtered;
-  }, [jobs, searchQuery, statusFilter]);
+    return sortData(filtered);
+  }, [jobs, searchQuery, statusFilter, sortKey, sortDirection]);
+
+  const handleExportCSV = () => {
+    exportToCSV(
+      filteredJobs,
+      'job_postings',
+      [
+        { key: 'title', header: 'Job Title' },
+        { key: 'location', header: 'Location' },
+        { key: 'experience_required', header: 'Experience Required' },
+        { key: 'salary_range', header: 'Salary Range' },
+        { key: 'is_active', header: 'Active' },
+        { key: 'created_at', header: 'Created At' },
+      ]
+    );
+    toast({
+      title: 'Export complete',
+      description: `Exported ${filteredJobs.length} job postings to CSV.`,
+    });
+  };
 
   const handleRefresh = async () => {
     setIsLoading(true);
@@ -189,6 +212,10 @@ export default function JobPostingsPage() {
             </p>
           </div>
           <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={handleExportCSV}>
+              <Download className="h-4 w-4 mr-2" />
+              Export CSV
+            </Button>
             <Button variant="outline" size="sm" asChild>
               <Link to="/careers" target="_blank">
                 View Careers Page
@@ -204,33 +231,6 @@ export default function JobPostingsPage() {
               New Job
             </Button>
           </div>
-        </div>
-
-        {/* Filters */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-card rounded-lg border">
-          <div className="relative sm:col-span-2">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search by title, location, or description..."
-              className="pl-10"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-
-          <Select
-            value={statusFilter}
-            onValueChange={(value: 'all' | 'active' | 'inactive') => setStatusFilter(value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All statuses</SelectItem>
-              <SelectItem value="active">Active only</SelectItem>
-              <SelectItem value="inactive">Inactive only</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
 
         {/* Stats */}
@@ -270,6 +270,33 @@ export default function JobPostingsPage() {
           </div>
         </div>
 
+        {/* Filters */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-card rounded-lg border">
+          <div className="relative sm:col-span-2">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search by title, location, or description..."
+              className="pl-10"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
+          <Select
+            value={statusFilter}
+            onValueChange={(value: 'all' | 'active' | 'inactive') => setStatusFilter(value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All statuses</SelectItem>
+              <SelectItem value="active">Active only</SelectItem>
+              <SelectItem value="inactive">Inactive only</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         {/* Table */}
         <div className="bg-card rounded-lg border overflow-hidden">
           {isLoading ? (
@@ -297,11 +324,46 @@ export default function JobPostingsPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Job Title</TableHead>
-                    <TableHead>Location</TableHead>
-                    <TableHead>Experience</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Created</TableHead>
+                    <SortableTableHead
+                      sortKey="title"
+                      currentSortKey={sortKey}
+                      currentSortDirection={sortDirection}
+                      onSort={handleSort}
+                    >
+                      Job Title
+                    </SortableTableHead>
+                    <SortableTableHead
+                      sortKey="location"
+                      currentSortKey={sortKey}
+                      currentSortDirection={sortDirection}
+                      onSort={handleSort}
+                    >
+                      Location
+                    </SortableTableHead>
+                    <SortableTableHead
+                      sortKey="experience_required"
+                      currentSortKey={sortKey}
+                      currentSortDirection={sortDirection}
+                      onSort={handleSort}
+                    >
+                      Experience
+                    </SortableTableHead>
+                    <SortableTableHead
+                      sortKey="is_active"
+                      currentSortKey={sortKey}
+                      currentSortDirection={sortDirection}
+                      onSort={handleSort}
+                    >
+                      Status
+                    </SortableTableHead>
+                    <SortableTableHead
+                      sortKey="created_at"
+                      currentSortKey={sortKey}
+                      currentSortDirection={sortDirection}
+                      onSort={handleSort}
+                    >
+                      Created
+                    </SortableTableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
