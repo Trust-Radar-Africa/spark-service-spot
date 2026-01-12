@@ -478,8 +478,33 @@ export default function JobPostingsPage() {
         {/* Table */}
         <div className="bg-card rounded-lg border overflow-hidden">
           {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[40px]"><div className="h-4 w-4 bg-muted animate-pulse rounded" /></TableHead>
+                    <TableHead><div className="h-4 w-24 bg-muted animate-pulse rounded" /></TableHead>
+                    <TableHead><div className="h-4 w-20 bg-muted animate-pulse rounded" /></TableHead>
+                    <TableHead><div className="h-4 w-16 bg-muted animate-pulse rounded" /></TableHead>
+                    <TableHead><div className="h-4 w-20 bg-muted animate-pulse rounded" /></TableHead>
+                    <TableHead><div className="h-4 w-16 bg-muted animate-pulse rounded" /></TableHead>
+                    <TableHead><div className="h-4 w-16 bg-muted animate-pulse rounded" /></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell><div className="h-4 w-4 bg-muted animate-pulse rounded" /></TableCell>
+                      <TableCell><div className="space-y-2"><div className="h-4 w-36 bg-muted animate-pulse rounded" /><div className="h-3 w-24 bg-muted animate-pulse rounded" /></div></TableCell>
+                      <TableCell><div className="h-4 w-28 bg-muted animate-pulse rounded" /></TableCell>
+                      <TableCell><div className="h-6 w-16 bg-muted animate-pulse rounded-full" /></TableCell>
+                      <TableCell><div className="h-6 w-20 bg-muted animate-pulse rounded-full" /></TableCell>
+                      <TableCell><div className="h-6 w-10 bg-muted animate-pulse rounded-full" /></TableCell>
+                      <TableCell><div className="flex gap-2"><div className="h-8 w-8 bg-muted animate-pulse rounded" /><div className="h-8 w-8 bg-muted animate-pulse rounded" /></div></TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
           ) : paginatedJobs.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">

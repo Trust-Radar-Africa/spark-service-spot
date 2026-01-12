@@ -40,7 +40,8 @@ Returns CSRF token cookie for Sanctum authentication.
   "user": {
     "id": 1,
     "name": "Admin User",
-    "email": "admin@example.com"
+    "email": "admin@example.com",
+    "role": "super_admin"
   },
   "token": "Bearer token string"
 }
@@ -57,7 +58,72 @@ Returns the authenticated user. Requires authentication.
   "user": {
     "id": 1,
     "name": "Admin User",
-    "email": "admin@example.com"
+    "email": "admin@example.com",
+    "role": "super_admin"
+  }
+}
+```
+
+---
+
+## Dashboard
+
+### GET /api/admin/dashboard
+Get dashboard statistics and overview data. Requires authentication.
+
+**Response:**
+```json
+{
+  "stats": {
+    "total_candidates": 156,
+    "candidates_this_week": 12,
+    "total_jobs": 25,
+    "active_jobs": 18,
+    "total_employer_requests": 42,
+    "employer_requests_this_week": 5,
+    "total_blog_posts": 15,
+    "published_blog_posts": 12
+  },
+  "recent_candidates": [
+    {
+      "id": 1,
+      "first_name": "John",
+      "last_name": "Doe",
+      "email": "john@example.com",
+      "nationality": "British",
+      "country": "United Kingdom",
+      "location": "London",
+      "experience": "3-7",
+      "created_at": "2024-01-15T10:30:00Z"
+    }
+  ],
+  "recent_employer_requests": [
+    {
+      "id": 1,
+      "firm_name": "ABC Accounting",
+      "email": "hr@abc.com",
+      "country": "United Arab Emirates",
+      "location": "Dubai",
+      "position_title": "Senior Accountant",
+      "created_at": "2024-01-15T10:30:00Z"
+    }
+  ],
+  "charts": {
+    "candidates_by_experience": {
+      "0-3": 45,
+      "3-7": 62,
+      "7-10": 32,
+      "10+": 17
+    },
+    "candidates_by_month": [
+      { "month": "Jan", "count": 25 },
+      { "month": "Feb", "count": 32 },
+      { "month": "Mar", "count": 28 }
+    ],
+    "jobs_by_status": {
+      "active": 18,
+      "inactive": 7
+    }
   }
 }
 ```
@@ -72,6 +138,8 @@ List all candidate applications with filtering and pagination.
 **Query Parameters:**
 - `experience` (optional): Filter by experience level (0-3, 3-7, 7-10, 10+)
 - `nationality` (optional): Filter by nationality
+- `country` (optional): Filter by country
+- `location` (optional): Filter by location
 - `search` (optional): Search by name or email
 - `page` (optional): Page number for pagination
 
@@ -85,6 +153,8 @@ List all candidate applications with filtering and pagination.
       "last_name": "Doe",
       "email": "john@example.com",
       "nationality": "British",
+      "country": "United Kingdom",
+      "location": "London",
       "experience": "3-7",
       "cv_url": "/storage/cvs/cv-1.docx",
       "cover_letter_url": "/storage/cover-letters/cl-1.docx",
@@ -106,8 +176,31 @@ Download candidate's CV file. Returns the Word document as a binary stream.
 ### GET /api/admin/candidates/{id}/cover-letter
 Download candidate's cover letter. Returns the Word document as a binary stream.
 
+### POST /api/admin/candidates/bulk-download
+Download multiple CVs or cover letters as a ZIP file.
+
+**Request:**
+```json
+{
+  "candidate_ids": [1, 2, 3, 4],
+  "type": "cv" | "cover_letter" | "both"
+}
+```
+
+**Response:** Binary ZIP file stream
+
 ### DELETE /api/admin/candidates/{id}
 Delete a candidate application. Requires authentication.
+
+### DELETE /api/admin/candidates/bulk
+Bulk delete candidate applications. Requires authentication.
+
+**Request:**
+```json
+{
+  "ids": [1, 2, 3]
+}
+```
 
 ### GET /api/admin/nationalities
 Get list of unique nationalities for filter dropdown.
@@ -128,6 +221,9 @@ List all job postings with filtering and pagination.
 **Query Parameters:**
 - `search` (optional): Search by title, location, or description
 - `status` (optional): Filter by status (active, inactive)
+- `country` (optional): Filter by country
+- `work_type` (optional): Filter by work type (remote, hybrid, on-site, flexible)
+- `experience` (optional): Filter by experience level
 - `page` (optional): Page number for pagination
 
 **Response:**
@@ -138,11 +234,14 @@ List all job postings with filtering and pagination.
       "id": 1,
       "title": "Senior Accountant",
       "description": "We are looking for an experienced Senior Accountant...",
-      "location": "London, UK",
+      "country": "United Kingdom",
+      "location": "London",
+      "work_type": "hybrid",
       "experience_required": "7-10",
       "requirements": "CPA or ACCA qualified...",
       "benefits": "Competitive salary...",
-      "salary_range": "£55,000 - £70,000",
+      "salary_range": "55000-70000",
+      "currency_override": "GBP",
       "is_active": true,
       "created_at": "2024-01-10T09:00:00Z",
       "updated_at": "2024-01-10T09:00:00Z"
@@ -164,11 +263,14 @@ Create a new job posting. Requires authentication.
 {
   "title": "Senior Accountant",
   "description": "Full job description...",
-  "location": "London, UK",
+  "country": "United Kingdom",
+  "location": "London",
+  "work_type": "hybrid",
   "experience_required": "7-10",
   "requirements": "CPA or ACCA qualified...",
   "benefits": "Competitive salary...",
-  "salary_range": "£55,000 - £70,000",
+  "salary_range": "55000-70000",
+  "currency_override": "GBP",
   "is_active": true
 }
 ```
@@ -215,8 +317,8 @@ Public endpoint for employers to submit recruitment requests.
   "firm_name": "ABC Accounting Firm",
   "email": "hr@company.com",
   "country": "United Arab Emirates",
+  "location": "Dubai",
   "position_title": "Senior Accountant",
-  "preferred_location": "Dubai, UAE",
   "preferred_nationality": "Arab",
   "years_experience": "7-10",
   "other_qualifications": "CPA/CA certified, Big 4 experience preferred"
@@ -235,6 +337,7 @@ List all employer requests with filtering and pagination. Requires authenticatio
 
 **Query Parameters:**
 - `country` (optional): Filter by country
+- `location` (optional): Filter by location
 - `experience` (optional): Filter by experience level (0-3, 3-7, 7-10, 10+)
 - `search` (optional): Search by firm name, email, or position title
 - `page` (optional): Page number for pagination
@@ -248,8 +351,8 @@ List all employer requests with filtering and pagination. Requires authenticatio
       "firm_name": "ABC Accounting Firm",
       "email": "hr@company.com",
       "country": "United Arab Emirates",
+      "location": "Dubai",
       "position_title": "Senior Accountant",
-      "preferred_location": "Dubai, UAE",
       "preferred_nationality": "Arab",
       "years_experience": "7-10",
       "other_qualifications": "CPA/CA certified, Big 4 experience preferred",
@@ -268,9 +371,21 @@ List all employer requests with filtering and pagination. Requires authenticatio
 ### DELETE /api/admin/employer-requests/{id}
 Delete an employer request. Requires authentication.
 
+### DELETE /api/admin/employer-requests/bulk
+Bulk delete employer requests. Requires authentication.
+
+**Request:**
+```json
+{
+  "ids": [1, 2, 3]
+}
+```
+
 ---
 
-## Employer Requests Migration
+## Database Migrations
+
+### Employer Requests Migration
 
 ```php
 Schema::create('employer_requests', function (Blueprint $table) {
@@ -278,8 +393,8 @@ Schema::create('employer_requests', function (Blueprint $table) {
     $table->string('firm_name');
     $table->string('email');
     $table->string('country');
+    $table->string('location');
     $table->string('position_title')->nullable();
-    $table->string('preferred_location');
     $table->string('preferred_nationality');
     $table->enum('years_experience', ['0-3', '3-7', '7-10', '10+']);
     $table->text('other_qualifications')->nullable();
@@ -287,21 +402,40 @@ Schema::create('employer_requests', function (Blueprint $table) {
 });
 ```
 
----
-
-## Job Postings Migration
+### Job Postings Migration
 
 ```php
 Schema::create('job_postings', function (Blueprint $table) {
     $table->id();
     $table->string('title');
     $table->text('description');
+    $table->string('country');
     $table->string('location');
+    $table->enum('work_type', ['remote', 'hybrid', 'on-site', 'flexible'])->default('on-site');
     $table->enum('experience_required', ['0-3', '3-7', '7-10', '10+']);
     $table->text('requirements')->nullable();
     $table->text('benefits')->nullable();
     $table->string('salary_range')->nullable();
+    $table->string('currency_override', 3)->nullable();
     $table->boolean('is_active')->default(true);
+    $table->timestamps();
+});
+```
+
+### Candidate Applications Migration
+
+```php
+Schema::create('candidate_applications', function (Blueprint $table) {
+    $table->id();
+    $table->string('first_name');
+    $table->string('last_name');
+    $table->string('email');
+    $table->string('nationality');
+    $table->string('country');
+    $table->string('location');
+    $table->enum('experience', ['0-3', '3-7', '7-10', '10+']);
+    $table->string('cv_path');
+    $table->string('cover_letter_path');
     $table->timestamps();
 });
 ```
@@ -318,6 +452,8 @@ Public endpoint for candidates to submit their application.
 - `last_name`: string, required, max 50 chars
 - `email`: string, required, valid email
 - `nationality`: string, required, max 50 chars
+- `country`: string, required, max 100 chars
+- `location`: string, required, max 100 chars
 - `experience`: string, required (0-3, 3-7, 7-10, 10+)
 - `cv`: file, required, mime: docx (application/vnd.openxmlformats-officedocument.wordprocessingml.document), max 5MB
 - `cover_letter`: file, required, mime: docx, max 5MB
@@ -338,24 +474,6 @@ Public endpoint for candidates to submit their application.
     "cv": ["The cv must be a file of type: docx."]
   }
 }
-```
-
----
-
-## Laravel Migration Example
-
-```php
-Schema::create('candidate_applications', function (Blueprint $table) {
-    $table->id();
-    $table->string('first_name');
-    $table->string('last_name');
-    $table->string('email');
-    $table->string('nationality');
-    $table->enum('experience', ['0-3', '3-7', '7-10', '10+']);
-    $table->string('cv_path');
-    $table->string('cover_letter_path');
-    $table->timestamps();
-});
 ```
 
 ---
@@ -910,16 +1028,44 @@ Schema::create('audit_logs', function (Blueprint $table) {
 
 ---
 
-## Job Postings - Currency Override
+## Currencies
 
-Job postings now support a `currency_override` field to manually specify the currency when auto-detection from location is incorrect.
+The application supports 60+ currencies with automatic detection based on country. Available currencies include:
 
-**Updated Job Posting Schema:**
-```php
-Schema::table('job_postings', function (Blueprint $table) {
-    $table->string('currency_override', 3)->nullable()->after('salary_range');
-});
-```
+| Code | Name | Symbol |
+|------|------|--------|
+| USD | US Dollar | $ |
+| EUR | Euro | € |
+| GBP | British Pound | £ |
+| JPY | Japanese Yen | ¥ |
+| AUD | Australian Dollar | A$ |
+| CAD | Canadian Dollar | C$ |
+| CHF | Swiss Franc | CHF |
+| CNY | Chinese Yuan | ¥ |
+| INR | Indian Rupee | ₹ |
+| AED | UAE Dirham | د.إ |
+| SAR | Saudi Riyal | ر.س |
+| ZAR | South African Rand | R |
+| NGN | Nigerian Naira | ₦ |
+| KES | Kenyan Shilling | KSh |
+| ... | ... | ... |
+
+### Currency Override
+
+Job postings support a `currency_override` field to manually specify the currency when auto-detection from location is incorrect.
+
+---
+
+## Work Types
+
+Job postings support the following work types:
+
+| Value | Label |
+|-------|-------|
+| remote | Remote |
+| hybrid | Hybrid |
+| on-site | On-site |
+| flexible | Flexible |
 
 ---
 

@@ -67,28 +67,10 @@ const experienceLevels: { value: ExperienceLevel; label: string }[] = [
   { value: '10+', label: 'Over 10 years' },
 ];
 
-const nationalityOptions = [
-  { value: 'United States', label: 'United States' },
-  { value: 'United Kingdom', label: 'United Kingdom' },
-  { value: 'Canada', label: 'Canada' },
-  { value: 'Australia', label: 'Australia' },
-  { value: 'Germany', label: 'Germany' },
-  { value: 'France', label: 'France' },
-  { value: 'India', label: 'India' },
-  { value: 'China', label: 'China' },
-  { value: 'Japan', label: 'Japan' },
-  { value: 'Brazil', label: 'Brazil' },
-  { value: 'South Africa', label: 'South Africa' },
-  { value: 'Nigeria', label: 'Nigeria' },
-  { value: 'Kenya', label: 'Kenya' },
-  { value: 'UAE', label: 'United Arab Emirates' },
-  { value: 'Saudi Arabia', label: 'Saudi Arabia' },
-  { value: 'Singapore', label: 'Singapore' },
-  { value: 'Malaysia', label: 'Malaysia' },
-  { value: 'Philippines', label: 'Philippines' },
-  { value: 'Pakistan', label: 'Pakistan' },
-  { value: 'Egypt', label: 'Egypt' },
-];
+import { COUNTRIES, NATIONALITIES } from '@/data/countries';
+
+const nationalityOptions = NATIONALITIES.map((n) => ({ value: n, label: n }));
+const countryOptions = COUNTRIES.map((c) => ({ value: c.name, label: c.name }));
 
 const getStoredItemsPerPage = (): ItemsPerPageOption => {
   if (typeof window !== 'undefined') {
@@ -146,6 +128,16 @@ export default function CandidatesPage() {
     if (filters.nationality) {
       filtered = filtered.filter((c) =>
         c.nationality.toLowerCase().includes(filters.nationality!.toLowerCase())
+      );
+    }
+    if (filters.country) {
+      filtered = filtered.filter((c) =>
+        c.country?.toLowerCase().includes(filters.country!.toLowerCase())
+      );
+    }
+    if (filters.location) {
+      filtered = filtered.filter((c) =>
+        c.location?.toLowerCase().includes(filters.location!.toLowerCase())
       );
     }
     if (filters.search) {
@@ -373,8 +365,8 @@ export default function CandidatesPage() {
         </div>
 
         {/* Filters */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-card rounded-lg border">
-          <div className="relative">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 p-4 bg-card rounded-lg border">
+          <div className="relative lg:col-span-2">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search by name or email..."
@@ -394,10 +386,10 @@ export default function CandidatesPage() {
             }
           >
             <SelectTrigger>
-              <SelectValue placeholder="Filter by experience" />
+              <SelectValue placeholder="Experience" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All experience levels</SelectItem>
+              <SelectItem value="all">All Levels</SelectItem>
               {experienceLevels.map((level) => (
                 <SelectItem key={level.value} value={level.value}>
                   {level.label}
@@ -414,12 +406,20 @@ export default function CandidatesPage() {
             searchPlaceholder="Search nationality..."
           />
 
+          <SearchableSelect
+            options={countryOptions}
+            value={filters.country || ''}
+            onValueChange={(value) => setFilters({ ...filters, country: value })}
+            placeholder="All Countries"
+            searchPlaceholder="Search country..."
+          />
+
           <Button
             variant="ghost"
             onClick={() => setFilters({})}
             className="text-muted-foreground"
           >
-            Clear filters
+            Clear Filters
           </Button>
         </div>
 
@@ -434,11 +434,72 @@ export default function CandidatesPage() {
           onClearSelection={clearSelection}
         />
 
+        {/* Bulk Download Actions */}
+        {selectedCount > 0 && (
+          <div className="flex gap-2 p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                selectedItems.forEach((c) => handleDownloadCV(c));
+                toast({
+                  title: 'Bulk download started',
+                  description: `Downloading ${selectedCount} CVs.`,
+                });
+              }}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Download CVs ({selectedCount})
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                selectedItems.forEach((c) => handleDownloadCoverLetter(c));
+                toast({
+                  title: 'Bulk download started',
+                  description: `Downloading ${selectedCount} cover letters.`,
+                });
+              }}
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              Download Cover Letters ({selectedCount})
+            </Button>
+          </div>
+        )}
+
         {/* Table */}
         <div className="bg-card rounded-lg border overflow-hidden">
           {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[40px]"><div className="h-4 w-4 bg-muted animate-pulse rounded" /></TableHead>
+                    <TableHead><div className="h-4 w-16 bg-muted animate-pulse rounded" /></TableHead>
+                    <TableHead><div className="h-4 w-16 bg-muted animate-pulse rounded" /></TableHead>
+                    <TableHead><div className="h-4 w-20 bg-muted animate-pulse rounded" /></TableHead>
+                    <TableHead><div className="h-4 w-24 bg-muted animate-pulse rounded" /></TableHead>
+                    <TableHead><div className="h-4 w-24 bg-muted animate-pulse rounded" /></TableHead>
+                    <TableHead><div className="h-4 w-16 bg-muted animate-pulse rounded" /></TableHead>
+                    <TableHead><div className="h-4 w-16 bg-muted animate-pulse rounded" /></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell><div className="h-4 w-4 bg-muted animate-pulse rounded" /></TableCell>
+                      <TableCell><div className="h-4 w-28 bg-muted animate-pulse rounded" /></TableCell>
+                      <TableCell><div className="h-4 w-36 bg-muted animate-pulse rounded" /></TableCell>
+                      <TableCell><div className="h-4 w-24 bg-muted animate-pulse rounded" /></TableCell>
+                      <TableCell><div className="h-6 w-20 bg-muted animate-pulse rounded-full" /></TableCell>
+                      <TableCell><div className="h-4 w-20 bg-muted animate-pulse rounded" /></TableCell>
+                      <TableCell><div className="flex gap-2"><div className="h-8 w-8 bg-muted animate-pulse rounded" /><div className="h-8 w-8 bg-muted animate-pulse rounded" /></div></TableCell>
+                      <TableCell><div className="h-8 w-8 bg-muted animate-pulse rounded" /></TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
           ) : paginatedCandidates.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
