@@ -55,6 +55,7 @@ import { exportToCSV } from '@/utils/csvExport';
 export default function BlogManagementPage() {
   const { posts, addPost, updatePost, deletePost, togglePublish } = useBlogPostsStore();
   const { toast } = useToast();
+  const { sortKey, sortDirection, handleSort, sortData } = useSorting<BlogPostData>();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -65,10 +66,25 @@ export default function BlogManagementPage() {
   const [postToDelete, setPostToDelete] = useState<BlogPostData | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
+  // Handle CSV export
+  const handleExportCSV = () => {
+    exportToCSV(filteredPosts, 'blog_posts', [
+      { key: 'title', header: 'Title' },
+      { key: 'author', header: 'Author' },
+      { key: 'category', header: 'Category' },
+      { key: 'is_published', header: 'Published' },
+      { key: 'created_at', header: 'Created Date' },
+    ]);
+    toast({
+      title: 'Export successful',
+      description: `Exported ${filteredPosts.length} posts to CSV.`,
+    });
+  };
+
   // Get unique categories
   const categories = [...new Set(posts.map((p) => p.category))].sort();
 
-  // Filter posts
+  // Filter and sort posts
   const filteredPosts = posts.filter((post) => {
     const matchesSearch =
       searchTerm === '' ||
@@ -85,6 +101,8 @@ export default function BlogManagementPage() {
 
     return matchesSearch && matchesStatus && matchesCategory;
   });
+
+  const sortedPosts = sortData(filteredPosts);
 
   const handleCreateNew = () => {
     setEditingPost(null);
@@ -179,6 +197,10 @@ export default function BlogManagementPage() {
                 <ExternalLink className="ml-2 h-3 w-3" />
               </Link>
             </Button>
+            <Button onClick={handleExportCSV} variant="outline" disabled={filteredPosts.length === 0}>
+              <Download className="w-4 h-4 mr-2" />
+              Export CSV
+            </Button>
             <Button onClick={handleCreateNew}>
               <Plus className="w-4 h-4 mr-2" />
               New Post
@@ -265,16 +287,52 @@ export default function BlogManagementPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[40%]">Post</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Author</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Date</TableHead>
+                  <SortableTableHead
+                    sortKey="title"
+                    currentSortKey={sortKey}
+                    currentSortDirection={sortDirection}
+                    onSort={handleSort}
+                    className="w-[40%]"
+                  >
+                    Post
+                  </SortableTableHead>
+                  <SortableTableHead
+                    sortKey="category"
+                    currentSortKey={sortKey}
+                    currentSortDirection={sortDirection}
+                    onSort={handleSort}
+                  >
+                    Category
+                  </SortableTableHead>
+                  <SortableTableHead
+                    sortKey="author"
+                    currentSortKey={sortKey}
+                    currentSortDirection={sortDirection}
+                    onSort={handleSort}
+                  >
+                    Author
+                  </SortableTableHead>
+                  <SortableTableHead
+                    sortKey="is_published"
+                    currentSortKey={sortKey}
+                    currentSortDirection={sortDirection}
+                    onSort={handleSort}
+                  >
+                    Status
+                  </SortableTableHead>
+                  <SortableTableHead
+                    sortKey="created_at"
+                    currentSortKey={sortKey}
+                    currentSortDirection={sortDirection}
+                    onSort={handleSort}
+                  >
+                    Date
+                  </SortableTableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredPosts.length === 0 ? (
+                {sortedPosts.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center py-8">
                       <div className="flex flex-col items-center gap-2">
@@ -287,7 +345,7 @@ export default function BlogManagementPage() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredPosts.map((post) => (
+                  sortedPosts.map((post) => (
                     <TableRow key={post.id}>
                       <TableCell>
                         <div>
