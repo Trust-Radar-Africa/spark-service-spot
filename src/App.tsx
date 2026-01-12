@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeVersionProvider, useThemeVersion } from "@/contexts/ThemeVersionContext";
+import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
 
 // Classic theme pages
 import Index from "./pages/Index";
@@ -22,6 +23,14 @@ import BlogModern from "./pages/BlogModern";
 import BlogPostModern from "./pages/BlogPostModern";
 import CareersModern from "./pages/CareersModern";
 import ContactModern from "./pages/ContactModern";
+
+// Admin pages
+import AdminLogin from "./pages/admin/AdminLogin";
+import CandidatesPage from "./pages/admin/CandidatesPage";
+import JobPostingsPage from "./pages/admin/JobPostingsPage";
+import EmployerRequestsPage from "./pages/admin/EmployerRequestsPage";
+import BlogManagementPage from "./pages/admin/BlogManagementPage";
+import ProtectedRoute from "./components/admin/ProtectedRoute";
 
 import NotFound from "./pages/NotFound";
 
@@ -62,13 +71,52 @@ function ThemedRoutes() {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeVersionProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <ThemedRoutes />
-        </BrowserRouter>
-      </TooltipProvider>
+      <AdminAuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              {/* Admin Routes */}
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route
+                path="/admin/candidates"
+                element={
+                  <ProtectedRoute>
+                    <CandidatesPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/jobs"
+                element={
+                  <ProtectedRoute>
+                    <JobPostingsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/employers"
+                element={
+                  <ProtectedRoute>
+                    <EmployerRequestsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/blog"
+                element={
+                  <ProtectedRoute>
+                    <BlogManagementPage />
+                  </ProtectedRoute>
+                }
+              />
+              {/* Public Routes */}
+              <Route path="/*" element={<ThemedRoutes />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AdminAuthProvider>
     </ThemeVersionProvider>
   </QueryClientProvider>
 );
