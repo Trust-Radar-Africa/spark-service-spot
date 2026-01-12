@@ -16,6 +16,7 @@ import auditImg from "@/assets/audit-service.jpg";
 import bookkeepingImg from "@/assets/bookkeeping-service.jpg";
 import consultingImg from "@/assets/consulting-service.jpg";
 import { HeroCarousel } from "@/components/HeroCarousel";
+import { TestimonialsCarousel } from "@/components/TestimonialsCarousel";
 
 const stats = [
   { icon: Handshake, value: "100+", label: "Accounting Firms Served" },
@@ -188,6 +189,9 @@ export default function IndexModern() {
           </div>
         </div>
       </section>
+
+      {/* Testimonials Section */}
+      <TestimonialsCarousel variant="modern" />
 
       {/* CTA Section */}
       <section className="py-20 bg-qx-blue">
