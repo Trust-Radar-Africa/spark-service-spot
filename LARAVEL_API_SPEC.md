@@ -120,6 +120,109 @@ Get list of unique nationalities for filter dropdown.
 
 ---
 
+## Job Postings
+
+### GET /api/admin/jobs
+List all job postings with filtering and pagination.
+
+**Query Parameters:**
+- `search` (optional): Search by title, location, or description
+- `status` (optional): Filter by status (active, inactive)
+- `page` (optional): Page number for pagination
+
+**Response:**
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "title": "Senior Accountant",
+      "description": "We are looking for an experienced Senior Accountant...",
+      "location": "London, UK",
+      "experience_required": "7-10",
+      "requirements": "CPA or ACCA qualified...",
+      "benefits": "Competitive salary...",
+      "salary_range": "£55,000 - £70,000",
+      "is_active": true,
+      "created_at": "2024-01-10T09:00:00Z",
+      "updated_at": "2024-01-10T09:00:00Z"
+    }
+  ],
+  "meta": {
+    "current_page": 1,
+    "last_page": 3,
+    "total": 25
+  }
+}
+```
+
+### POST /api/admin/jobs
+Create a new job posting. Requires authentication.
+
+**Request:**
+```json
+{
+  "title": "Senior Accountant",
+  "description": "Full job description...",
+  "location": "London, UK",
+  "experience_required": "7-10",
+  "requirements": "CPA or ACCA qualified...",
+  "benefits": "Competitive salary...",
+  "salary_range": "£55,000 - £70,000",
+  "is_active": true
+}
+```
+
+**Response:**
+```json
+{
+  "job": {
+    "id": 1,
+    "title": "Senior Accountant",
+    ...
+  }
+}
+```
+
+### PUT /api/admin/jobs/{id}
+Update an existing job posting. Requires authentication.
+
+**Request:** Same as POST
+
+### DELETE /api/admin/jobs/{id}
+Delete a job posting. Requires authentication.
+
+### PATCH /api/admin/jobs/{id}/toggle-status
+Toggle the active status of a job posting.
+
+**Request:**
+```json
+{
+  "is_active": true
+}
+```
+
+---
+
+## Job Postings Migration
+
+```php
+Schema::create('job_postings', function (Blueprint $table) {
+    $table->id();
+    $table->string('title');
+    $table->text('description');
+    $table->string('location');
+    $table->enum('experience_required', ['0-3', '3-7', '7-10', '10+']);
+    $table->text('requirements')->nullable();
+    $table->text('benefits')->nullable();
+    $table->string('salary_range')->nullable();
+    $table->boolean('is_active')->default(true);
+    $table->timestamps();
+});
+```
+
+---
+
 ## Candidate Submission (Public)
 
 ### POST /api/candidates/apply

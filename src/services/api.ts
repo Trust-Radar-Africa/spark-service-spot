@@ -199,6 +199,50 @@ class ApiService {
   async getNationalities() {
     return this.request<{ nationalities: string[] }>('/api/admin/nationalities');
   }
+
+  // Job Postings endpoints
+  async getJobPostings(filters?: {
+    search?: string;
+    status?: 'active' | 'inactive' | 'all';
+    page?: number;
+  }) {
+    const params = new URLSearchParams();
+    if (filters?.search) params.append('search', filters.search);
+    if (filters?.status && filters.status !== 'all') params.append('status', filters.status);
+    if (filters?.page) params.append('page', filters.page.toString());
+
+    return this.request<{
+      data: any[];
+      meta: { current_page: number; last_page: number; total: number };
+    }>(`/api/admin/jobs?${params.toString()}`);
+  }
+
+  async createJobPosting(data: any) {
+    return this.request<{ job: any }>('/api/admin/jobs', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateJobPosting(id: number, data: any) {
+    return this.request<{ job: any }>(`/api/admin/jobs/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteJobPosting(id: number) {
+    return this.request(`/api/admin/jobs/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async toggleJobStatus(id: number, isActive: boolean) {
+    return this.request<{ job: any }>(`/api/admin/jobs/${id}/toggle-status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ is_active: isActive }),
+    });
+  }
 }
 
 export const api = new ApiService();
