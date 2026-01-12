@@ -7,7 +7,7 @@ import auditImg from "@/assets/audit-service.jpg";
 import bookkeepingImg from "@/assets/bookkeeping-service.jpg";
 import consultingImg from "@/assets/consulting-service.jpg";
 import { HeroCarousel } from "@/components/HeroCarousel";
-
+import { TestimonialsCarousel } from "@/components/TestimonialsCarousel";
 const services = [
   {
     title: "Bookkeeping",
@@ -167,6 +167,9 @@ export default function Index() {
           </div>
         </div>
       </section>
+
+      {/* Testimonials Section */}
+      <TestimonialsCarousel variant="classic" />
 
       {/* About Preview Section */}
       <section className="py-24 bg-background">
