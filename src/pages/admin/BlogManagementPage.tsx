@@ -648,6 +648,27 @@ export default function BlogManagementPage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Bulk Delete Confirmation Dialog */}
+        <Dialog open={bulkDeleteOpen} onOpenChange={setBulkDeleteOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Delete Selected Posts</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete {selectedCount} selected posts? This action cannot be
+                undone.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setBulkDeleteOpen(false)}>
+                Cancel
+              </Button>
+              <Button variant="destructive" onClick={handleBulkDelete}>
+                Delete {selectedCount} Posts
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </AdminLayout>
   );

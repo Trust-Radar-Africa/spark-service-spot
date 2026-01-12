@@ -30,6 +30,7 @@ export interface JobPosting {
   requirements?: string;
   benefits?: string;
   salary_range?: string;
+  currency_override?: string; // Optional currency override
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -43,6 +44,7 @@ export interface JobPostingFormData {
   requirements?: string;
   benefits?: string;
   salary_range?: string;
+  currency_override?: string;
   is_active: boolean;
 }
 
@@ -66,6 +68,7 @@ export interface AdminUser {
   id: number;
   name: string;
   email: string;
+  role?: 'super_admin' | 'editor' | 'viewer';
 }
 
 export interface AuthState {
@@ -73,4 +76,24 @@ export interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+}
+
+// Audit Log Types
+export interface AuditLog {
+  id: string;
+  timestamp: string;
+  user_id: string;
+  user_name: string;
+  user_email: string;
+  user_role: string;
+  action: 'create' | 'update' | 'delete' | 'archive' | 'deactivate' | 'activate' | 'publish' | 'unpublish';
+  module: 'candidates' | 'jobs' | 'employer_requests' | 'blog';
+  resource_id: number | string;
+  resource_name: string;
+  changes?: {
+    field: string;
+    old_value: any;
+    new_value: any;
+  }[];
+  metadata?: Record<string, any>;
 }

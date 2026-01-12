@@ -569,7 +569,7 @@ export default function JobPostingsPage() {
                         <div className="font-medium">{job.title}</div>
                         {job.salary_range && (
                           <div className="text-sm text-muted-foreground">
-                            {formatSalaryRange(job.salary_range, job.location)}
+                            {formatSalaryRange(job.salary_range, job.location, job.currency_override)}
                           </div>
                         )}
                         <div className="md:hidden text-xs text-muted-foreground mt-1">

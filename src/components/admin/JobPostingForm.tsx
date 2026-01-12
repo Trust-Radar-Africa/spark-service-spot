@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Loader2 } from 'lucide-react';
+import { AVAILABLE_CURRENCIES, getCurrencyFromLocation } from '@/utils/currencyUtils';
 
 const experienceLevels: { value: ExperienceLevel; label: string }[] = [
   { value: '0-3', label: '0-3 years' },
@@ -39,6 +40,7 @@ const jobPostingSchema = z.object({
   requirements: z.string().max(2000).optional(),
   benefits: z.string().max(2000).optional(),
   salary_range: z.string().max(100).optional(),
+  currency_override: z.string().optional(),
   is_active: z.boolean(),
 });
 
@@ -65,9 +67,13 @@ export default function JobPostingForm({
       requirements: initialData?.requirements || '',
       benefits: initialData?.benefits || '',
       salary_range: initialData?.salary_range || '',
+      currency_override: initialData?.currency_override || '',
       is_active: initialData?.is_active ?? true,
     },
   });
+
+  const watchedLocation = form.watch('location');
+  const detectedCurrency = watchedLocation ? getCurrencyFromLocation(watchedLocation) : 'USD';
 
   const handleSubmit = async (data: JobPostingFormData) => {
     await onSubmit(data);
@@ -139,13 +145,50 @@ export default function JobPostingForm({
               <FormItem>
                 <FormLabel>Salary Range</FormLabel>
                 <FormControl>
-                  <Input placeholder="e.g., $50,000 - $70,000" {...field} />
+                  <Input placeholder="e.g., 50000 - 70000" {...field} />
                 </FormControl>
+                <FormDescription>
+                  Enter numbers only, currency will be formatted automatically
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
         </div>
+
+        <FormField
+          control={form.control}
+          name="currency_override"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Currency</FormLabel>
+              <Select 
+                onValueChange={(value) => field.onChange(value === 'auto' ? '' : value)} 
+                defaultValue={field.value || 'auto'}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Auto-detect from location" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent className="max-h-60">
+                  <SelectItem value="auto">
+                    Auto-detect ({detectedCurrency})
+                  </SelectItem>
+                  {AVAILABLE_CURRENCIES.map((currency) => (
+                    <SelectItem key={currency.value} value={currency.value}>
+                      {currency.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormDescription>
+                Currency is auto-detected from location. Override if detection is wrong.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <FormField
           control={form.control}

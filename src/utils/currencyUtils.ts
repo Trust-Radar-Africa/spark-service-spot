@@ -67,33 +67,44 @@ const COUNTRY_TO_CURRENCY: Record<string, string> = {
 };
 
 // Currency symbols and formatting
-const CURRENCY_CONFIG: Record<string, { symbol: string; position: 'before' | 'after'; locale: string }> = {
-  USD: { symbol: '$', position: 'before', locale: 'en-US' },
-  EUR: { symbol: '€', position: 'before', locale: 'de-DE' },
-  GBP: { symbol: '£', position: 'before', locale: 'en-GB' },
-  CAD: { symbol: 'C$', position: 'before', locale: 'en-CA' },
-  AUD: { symbol: 'A$', position: 'before', locale: 'en-AU' },
-  NZD: { symbol: 'NZ$', position: 'before', locale: 'en-NZ' },
-  JPY: { symbol: '¥', position: 'before', locale: 'ja-JP' },
-  CNY: { symbol: '¥', position: 'before', locale: 'zh-CN' },
-  CHF: { symbol: 'CHF', position: 'before', locale: 'de-CH' },
-  SGD: { symbol: 'S$', position: 'before', locale: 'en-SG' },
-  HKD: { symbol: 'HK$', position: 'before', locale: 'zh-HK' },
-  INR: { symbol: '₹', position: 'before', locale: 'en-IN' },
-  AED: { symbol: 'AED', position: 'before', locale: 'ar-AE' },
-  SAR: { symbol: 'SAR', position: 'before', locale: 'ar-SA' },
-  PHP: { symbol: '₱', position: 'before', locale: 'en-PH' },
-  MYR: { symbol: 'RM', position: 'before', locale: 'ms-MY' },
-  THB: { symbol: '฿', position: 'before', locale: 'th-TH' },
-  BRL: { symbol: 'R$', position: 'before', locale: 'pt-BR' },
-  MXN: { symbol: 'MX$', position: 'before', locale: 'es-MX' },
-  ZAR: { symbol: 'R', position: 'before', locale: 'en-ZA' },
-  SEK: { symbol: 'kr', position: 'after', locale: 'sv-SE' },
-  NOK: { symbol: 'kr', position: 'after', locale: 'nb-NO' },
-  DKK: { symbol: 'kr', position: 'after', locale: 'da-DK' },
-  PLN: { symbol: 'zł', position: 'after', locale: 'pl-PL' },
-  KRW: { symbol: '₩', position: 'before', locale: 'ko-KR' },
+export const CURRENCY_CONFIG: Record<string, { symbol: string; position: 'before' | 'after'; locale: string; name: string }> = {
+  USD: { symbol: '$', position: 'before', locale: 'en-US', name: 'US Dollar' },
+  EUR: { symbol: '€', position: 'before', locale: 'de-DE', name: 'Euro' },
+  GBP: { symbol: '£', position: 'before', locale: 'en-GB', name: 'British Pound' },
+  CAD: { symbol: 'C$', position: 'before', locale: 'en-CA', name: 'Canadian Dollar' },
+  AUD: { symbol: 'A$', position: 'before', locale: 'en-AU', name: 'Australian Dollar' },
+  NZD: { symbol: 'NZ$', position: 'before', locale: 'en-NZ', name: 'New Zealand Dollar' },
+  JPY: { symbol: '¥', position: 'before', locale: 'ja-JP', name: 'Japanese Yen' },
+  CNY: { symbol: '¥', position: 'before', locale: 'zh-CN', name: 'Chinese Yuan' },
+  CHF: { symbol: 'CHF', position: 'before', locale: 'de-CH', name: 'Swiss Franc' },
+  SGD: { symbol: 'S$', position: 'before', locale: 'en-SG', name: 'Singapore Dollar' },
+  HKD: { symbol: 'HK$', position: 'before', locale: 'zh-HK', name: 'Hong Kong Dollar' },
+  INR: { symbol: '₹', position: 'before', locale: 'en-IN', name: 'Indian Rupee' },
+  AED: { symbol: 'AED', position: 'before', locale: 'ar-AE', name: 'UAE Dirham' },
+  SAR: { symbol: 'SAR', position: 'before', locale: 'ar-SA', name: 'Saudi Riyal' },
+  PHP: { symbol: '₱', position: 'before', locale: 'en-PH', name: 'Philippine Peso' },
+  MYR: { symbol: 'RM', position: 'before', locale: 'ms-MY', name: 'Malaysian Ringgit' },
+  THB: { symbol: '฿', position: 'before', locale: 'th-TH', name: 'Thai Baht' },
+  BRL: { symbol: 'R$', position: 'before', locale: 'pt-BR', name: 'Brazilian Real' },
+  MXN: { symbol: 'MX$', position: 'before', locale: 'es-MX', name: 'Mexican Peso' },
+  ZAR: { symbol: 'R', position: 'before', locale: 'en-ZA', name: 'South African Rand' },
+  SEK: { symbol: 'kr', position: 'after', locale: 'sv-SE', name: 'Swedish Krona' },
+  NOK: { symbol: 'kr', position: 'after', locale: 'nb-NO', name: 'Norwegian Krone' },
+  DKK: { symbol: 'kr', position: 'after', locale: 'da-DK', name: 'Danish Krone' },
+  PLN: { symbol: 'zł', position: 'after', locale: 'pl-PL', name: 'Polish Zloty' },
+  KRW: { symbol: '₩', position: 'before', locale: 'ko-KR', name: 'South Korean Won' },
+  QAR: { symbol: 'QAR', position: 'before', locale: 'ar-QA', name: 'Qatari Riyal' },
+  NGN: { symbol: '₦', position: 'before', locale: 'en-NG', name: 'Nigerian Naira' },
+  KES: { symbol: 'KSh', position: 'before', locale: 'en-KE', name: 'Kenyan Shilling' },
+  EGP: { symbol: 'E£', position: 'before', locale: 'ar-EG', name: 'Egyptian Pound' },
+  ILS: { symbol: '₪', position: 'before', locale: 'he-IL', name: 'Israeli Shekel' },
 };
+
+// Get list of available currencies for dropdown
+export const AVAILABLE_CURRENCIES = Object.entries(CURRENCY_CONFIG).map(([code, config]) => ({
+  value: code,
+  label: `${code} (${config.symbol}) - ${config.name}`,
+}));
 
 /**
  * Get currency code from a location string
@@ -118,10 +129,10 @@ export function getCurrencyFromLocation(location: string): string {
 }
 
 /**
- * Format currency amount based on location
+ * Format currency amount based on location or currency override
  */
-export function formatCurrency(amount: number, location: string): string {
-  const currencyCode = getCurrencyFromLocation(location);
+export function formatCurrency(amount: number, location: string, currencyOverride?: string): string {
+  const currencyCode = currencyOverride || getCurrencyFromLocation(location);
   const config = CURRENCY_CONFIG[currencyCode] || CURRENCY_CONFIG.USD;
   
   try {
@@ -141,12 +152,12 @@ export function formatCurrency(amount: number, location: string): string {
 }
 
 /**
- * Format a salary range string based on location
+ * Format a salary range string based on location or currency override
  */
-export function formatSalaryRange(salaryRange: string, location: string): string {
+export function formatSalaryRange(salaryRange: string, location: string, currencyOverride?: string): string {
   if (!salaryRange) return '';
   
-  const currencyCode = getCurrencyFromLocation(location);
+  const currencyCode = currencyOverride || getCurrencyFromLocation(location);
   const config = CURRENCY_CONFIG[currencyCode] || CURRENCY_CONFIG.USD;
   
   // Try to parse the salary range
@@ -160,11 +171,11 @@ export function formatSalaryRange(salaryRange: string, location: string): string
   const parsedNumbers = numbers.map(n => parseInt(n.replace(/,/g, '')));
   
   if (parsedNumbers.length === 1) {
-    return formatCurrency(parsedNumbers[0], location);
+    return formatCurrency(parsedNumbers[0], location, currencyOverride);
   }
   
   if (parsedNumbers.length >= 2) {
-    return `${formatCurrency(parsedNumbers[0], location)} - ${formatCurrency(parsedNumbers[1], location)}`;
+    return `${formatCurrency(parsedNumbers[0], location, currencyOverride)} - ${formatCurrency(parsedNumbers[1], location, currencyOverride)}`;
   }
   
   return salaryRange;
@@ -173,8 +184,8 @@ export function formatSalaryRange(salaryRange: string, location: string): string
 /**
  * Get currency symbol for a location
  */
-export function getCurrencySymbol(location: string): string {
-  const currencyCode = getCurrencyFromLocation(location);
+export function getCurrencySymbol(location: string, currencyOverride?: string): string {
+  const currencyCode = currencyOverride || getCurrencyFromLocation(location);
   const config = CURRENCY_CONFIG[currencyCode] || CURRENCY_CONFIG.USD;
   return config.symbol;
 }

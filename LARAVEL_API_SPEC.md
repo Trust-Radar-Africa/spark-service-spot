@@ -842,6 +842,87 @@ Schema::create('experience_levels', function (Blueprint $table) {
 
 ---
 
+## Audit Logs
+
+### GET /api/admin/audit-logs
+List all audit log entries with filtering. Requires authentication.
+
+**Query Parameters:**
+- `module` (optional): Filter by module (candidates, jobs, employer_requests, blog)
+- `action` (optional): Filter by action type (create, update, delete, archive, publish)
+- `user_id` (optional): Filter by user ID
+- `page` (optional): Page number for pagination
+
+**Response:**
+```json
+{
+  "data": [
+    {
+      "id": "uuid",
+      "timestamp": "2024-01-15T10:30:00Z",
+      "user_id": "1",
+      "user_name": "Admin User",
+      "user_email": "admin@example.com",
+      "user_role": "super_admin",
+      "action": "update",
+      "module": "jobs",
+      "resource_id": 5,
+      "resource_name": "Senior Accountant",
+      "changes": [
+        {
+          "field": "salary_range",
+          "old_value": "$50,000 - $60,000",
+          "new_value": "$55,000 - $65,000"
+        }
+      ]
+    }
+  ],
+  "meta": {
+    "current_page": 1,
+    "last_page": 10,
+    "total": 250
+  }
+}
+```
+
+### Audit Logs Migration
+
+```php
+Schema::create('audit_logs', function (Blueprint $table) {
+    $table->uuid('id')->primary();
+    $table->timestamp('timestamp');
+    $table->foreignId('user_id')->constrained('admin_users')->cascadeOnDelete();
+    $table->string('user_name');
+    $table->string('user_email');
+    $table->string('user_role');
+    $table->enum('action', ['create', 'update', 'delete', 'archive', 'deactivate', 'activate', 'publish', 'unpublish']);
+    $table->enum('module', ['candidates', 'jobs', 'employer_requests', 'blog']);
+    $table->string('resource_id');
+    $table->string('resource_name');
+    $table->json('changes')->nullable();
+    $table->json('metadata')->nullable();
+    $table->timestamps();
+    
+    $table->index(['module', 'timestamp']);
+    $table->index(['user_id', 'timestamp']);
+});
+```
+
+---
+
+## Job Postings - Currency Override
+
+Job postings now support a `currency_override` field to manually specify the currency when auto-detection from location is incorrect.
+
+**Updated Job Posting Schema:**
+```php
+Schema::table('job_postings', function (Blueprint $table) {
+    $table->string('currency_override', 3)->nullable()->after('salary_range');
+});
+```
+
+---
+
 ## Environment Variables (Laravel .env)
 
 ```env
