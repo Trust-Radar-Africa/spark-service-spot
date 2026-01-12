@@ -5,6 +5,8 @@ export interface CandidateApplication {
   last_name: string;
   email: string;
   nationality: string;
+  country: string;
+  location: string;
   experience: ExperienceLevel;
   cv_url: string;
   cover_letter_url: string;
@@ -17,20 +19,27 @@ export type ExperienceLevel = '0-3' | '3-7' | '7-10' | '10+';
 export interface CandidateFilters {
   experience?: ExperienceLevel;
   nationality?: string;
+  country?: string;
+  location?: string;
   search?: string;
 }
+
+// Work Type Options
+export type WorkType = 'remote' | 'hybrid' | 'on-site' | 'flexible';
 
 // Job Posting Types
 export interface JobPosting {
   id: number;
   title: string;
   description: string;
+  country: string;
   location: string;
+  work_type: WorkType;
   experience_required: ExperienceLevel;
   requirements?: string;
   benefits?: string;
   salary_range?: string;
-  currency_override?: string; // Optional currency override
+  currency_override?: string;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -39,7 +48,9 @@ export interface JobPosting {
 export interface JobPostingFormData {
   title: string;
   description: string;
+  country: string;
   location: string;
+  work_type: WorkType;
   experience_required: ExperienceLevel;
   requirements?: string;
   benefits?: string;
@@ -47,15 +58,14 @@ export interface JobPostingFormData {
   currency_override?: string;
   is_active: boolean;
 }
-
 // Employer Request Types
 export interface EmployerRequest {
   id: number;
   firm_name: string;
   email: string;
   country: string;
+  location: string;
   position_title?: string;
-  preferred_location: string;
   preferred_nationality: string;
   years_experience: ExperienceLevel;
   other_qualifications?: string;
