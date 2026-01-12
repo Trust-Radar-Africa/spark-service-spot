@@ -4,20 +4,20 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Calendar, User, Clock } from "lucide-react";
 import { BlogSearch } from "@/components/BlogSearch";
 import { useBlogSearch } from "@/hooks/useBlogSearch";
-import { featuredPost, categories } from "@/data/blogData";
 
 export default function Blog() {
-  const { 
-    setSearchQuery, 
-    filteredPosts, 
-    isLoading, 
-    selectedCategory, 
-    setSelectedCategory 
+  const {
+    setSearchQuery,
+    filteredPosts,
+    isLoading,
+    selectedCategory,
+    setSelectedCategory,
+    categories,
   } = useBlogSearch();
 
-  // Separate featured from other posts in filtered results
-  const isFeaturedInResults = filteredPosts.some(p => p.slug === featuredPost.slug);
-  const displayPosts = filteredPosts.filter(p => p.slug !== featuredPost.slug);
+  // Get featured post (first post) and other posts
+  const featuredPost = filteredPosts[0];
+  const displayPosts = filteredPosts.slice(1);
 
   return (
     <Layout>
@@ -55,8 +55,8 @@ export default function Blog() {
         </div>
       </section>
 
-      {/* Featured Post - only show if in results or no filter */}
-      {isFeaturedInResults && (
+      {/* Featured Post */}
+      {featuredPost && (
         <section className="py-16 bg-background">
           <div className="container mx-auto px-4 lg:px-8">
             <div className="grid lg:grid-cols-2 gap-8 items-center">
@@ -109,7 +109,7 @@ export default function Blog() {
           <h3 className="text-2xl font-serif font-bold text-foreground mb-8">
             {filteredPosts.length === 0 ? "No articles found" : "Latest Articles"}
           </h3>
-          
+
           {displayPosts.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {displayPosts.map((post) => (
@@ -146,10 +146,12 @@ export default function Blog() {
                 </Link>
               ))}
             </div>
-          ) : !isFeaturedInResults && (
-            <p className="text-center text-muted-foreground py-12">
-              No articles match your search criteria. Try a different search term or category.
-            </p>
+          ) : (
+            !featuredPost && (
+              <p className="text-center text-muted-foreground py-12">
+                No articles match your search criteria. Try a different search term or category.
+              </p>
+            )
           )}
 
           {displayPosts.length > 0 && (
@@ -170,7 +172,8 @@ export default function Blog() {
             Stay Updated
           </h3>
           <p className="text-primary-foreground/70 max-w-xl mx-auto mb-8">
-            Subscribe to our newsletter for the latest insights on accounting outsourcing and industry trends.
+            Subscribe to our newsletter for the latest insights on accounting outsourcing and
+            industry trends.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
             <input

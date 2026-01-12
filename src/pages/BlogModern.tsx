@@ -4,20 +4,20 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Calendar, User, Clock } from "lucide-react";
 import { BlogSearch } from "@/components/BlogSearch";
 import { useBlogSearch } from "@/hooks/useBlogSearch";
-import { featuredPost, categories } from "@/data/blogData";
 
 export default function BlogModern() {
-  const { 
-    setSearchQuery, 
-    filteredPosts, 
-    isLoading, 
-    selectedCategory, 
-    setSelectedCategory 
+  const {
+    setSearchQuery,
+    filteredPosts,
+    isLoading,
+    selectedCategory,
+    setSelectedCategory,
+    categories,
   } = useBlogSearch();
 
-  // Separate featured from other posts in filtered results
-  const isFeaturedInResults = filteredPosts.some(p => p.slug === featuredPost.slug);
-  const displayPosts = filteredPosts.filter(p => p.slug !== featuredPost.slug);
+  // Get featured post (first post) and other posts
+  const featuredPost = filteredPosts[0];
+  const displayPosts = filteredPosts.slice(1);
 
   return (
     <LayoutModern>
@@ -55,8 +55,8 @@ export default function BlogModern() {
         </div>
       </section>
 
-      {/* Featured Post - only show if in results */}
-      {isFeaturedInResults && (
+      {/* Featured Post */}
+      {featuredPost && (
         <section className="py-16 bg-white">
           <div className="container mx-auto px-4 lg:px-8">
             <div className="grid lg:grid-cols-2 gap-8 items-center">
@@ -74,9 +74,7 @@ export default function BlogModern() {
                 <h2 className="text-3xl md:text-4xl font-montserrat font-bold text-qx-blue mb-4">
                   {featuredPost.title}
                 </h2>
-                <p className="text-qx-gray mb-6 leading-relaxed">
-                  {featuredPost.excerpt}
-                </p>
+                <p className="text-qx-gray mb-6 leading-relaxed">{featuredPost.excerpt}</p>
                 <div className="flex flex-wrap items-center gap-4 text-sm text-qx-gray mb-6">
                   <span className="flex items-center gap-1">
                     <User className="w-4 h-4" />
@@ -91,7 +89,10 @@ export default function BlogModern() {
                     {featuredPost.readTime}
                   </span>
                 </div>
-                <Button className="bg-qx-orange hover:bg-qx-orange-dark text-white rounded-full px-8" asChild>
+                <Button
+                  className="bg-qx-orange hover:bg-qx-orange-dark text-white rounded-full px-8"
+                  asChild
+                >
                   <Link to={`/blog/${featuredPost.slug}`}>
                     Read Article
                     <ArrowRight className="ml-2 h-4 w-4" />
@@ -109,7 +110,7 @@ export default function BlogModern() {
           <h3 className="text-2xl font-montserrat font-bold text-qx-blue mb-8">
             {filteredPosts.length === 0 ? "No articles found" : "Latest Articles"}
           </h3>
-          
+
           {displayPosts.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {displayPosts.map((post) => (
@@ -132,9 +133,7 @@ export default function BlogModern() {
                     <h4 className="font-montserrat text-lg font-bold text-qx-blue mb-2 group-hover:text-qx-orange transition-colors line-clamp-2">
                       {post.title}
                     </h4>
-                    <p className="text-qx-gray text-sm mb-4 line-clamp-2">
-                      {post.excerpt}
-                    </p>
+                    <p className="text-qx-gray text-sm mb-4 line-clamp-2">{post.excerpt}</p>
                     <div className="flex items-center justify-between text-xs text-qx-gray">
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
@@ -146,16 +145,18 @@ export default function BlogModern() {
                 </Link>
               ))}
             </div>
-          ) : !isFeaturedInResults && (
-            <p className="text-center text-qx-gray py-12">
-              No articles match your search criteria. Try a different search term or category.
-            </p>
+          ) : (
+            !featuredPost && (
+              <p className="text-center text-qx-gray py-12">
+                No articles match your search criteria. Try a different search term or category.
+              </p>
+            )
           )}
 
           {displayPosts.length > 0 && (
             <div className="text-center mt-12">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="border-qx-blue text-qx-blue hover:bg-qx-blue hover:text-white rounded-full px-8"
               >
                 Load More Articles
@@ -173,7 +174,8 @@ export default function BlogModern() {
             Stay Updated
           </h3>
           <p className="text-white/70 max-w-xl mx-auto mb-8">
-            Subscribe to our newsletter for the latest insights on accounting outsourcing and industry trends.
+            Subscribe to our newsletter for the latest insights on accounting outsourcing and
+            industry trends.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
             <input
