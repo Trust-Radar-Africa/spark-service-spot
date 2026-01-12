@@ -386,6 +386,112 @@ public function store(Request $request)
 
 ---
 
+## Blog Posts
+
+### GET /api/admin/blog
+List all blog posts with filtering and pagination. Requires authentication.
+
+**Query Parameters:**
+- `search` (optional): Search by title, excerpt, or author
+- `status` (optional): Filter by status (published, draft)
+- `category` (optional): Filter by category
+- `page` (optional): Page number for pagination
+
+**Response:**
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "title": "The Future of Offshore Accounting",
+      "slug": "future-offshore-accounting-2024",
+      "excerpt": "Discover how technological advancements...",
+      "content": "# The Future of Offshore Accounting\n\n...",
+      "category": "Industry Insights",
+      "author": "Sarah Mitchell",
+      "image_url": "/storage/blog/image.jpg",
+      "is_published": true,
+      "published_at": "2024-01-10T09:00:00Z",
+      "created_at": "2024-01-10T08:00:00Z",
+      "updated_at": "2024-01-10T09:00:00Z"
+    }
+  ],
+  "meta": {
+    "current_page": 1,
+    "last_page": 3,
+    "total": 25
+  }
+}
+```
+
+### POST /api/admin/blog
+Create a new blog post. Requires authentication.
+
+**Request:**
+```json
+{
+  "title": "My New Blog Post",
+  "excerpt": "Brief description of the post",
+  "content": "# Full markdown content...",
+  "category": "Industry Insights",
+  "author": "Sarah Mitchell",
+  "image_url": "/storage/blog/image.jpg",
+  "is_published": false
+}
+```
+
+**Response:**
+```json
+{
+  "post": {
+    "id": 1,
+    "title": "My New Blog Post",
+    "slug": "my-new-blog-post",
+    ...
+  }
+}
+```
+
+### PUT /api/admin/blog/{id}
+Update an existing blog post. Requires authentication.
+
+**Request:** Same as POST
+
+### DELETE /api/admin/blog/{id}
+Delete a blog post. Requires authentication.
+
+### PATCH /api/admin/blog/{id}/publish
+Toggle publish status of a blog post.
+
+**Request:**
+```json
+{
+  "is_published": true
+}
+```
+
+---
+
+## Blog Posts Migration
+
+```php
+Schema::create('blog_posts', function (Blueprint $table) {
+    $table->id();
+    $table->string('title');
+    $table->string('slug')->unique();
+    $table->text('excerpt');
+    $table->longText('content');
+    $table->string('category');
+    $table->string('author');
+    $table->string('image_url')->nullable();
+    $table->boolean('is_published')->default(false);
+    $table->timestamp('published_at')->nullable();
+    $table->timestamps();
+});
+```
+
+---
+
 ## Environment Variables (Laravel .env)
 
 ```env
