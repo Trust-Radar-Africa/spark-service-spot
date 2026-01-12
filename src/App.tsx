@@ -32,6 +32,7 @@ import EmployersModern from "./pages/EmployersModern";
 
 // Admin pages
 import AdminLogin from "./pages/admin/AdminLogin";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 import CandidatesPage from "./pages/admin/CandidatesPage";
 import JobPostingsPage from "./pages/admin/JobPostingsPage";
 import EmployerRequestsPage from "./pages/admin/EmployerRequestsPage";
@@ -89,6 +90,22 @@ const App = () => (
             <Routes>
               {/* Admin Routes */}
               <Route path="/admin/login" element={<AdminLogin />} />
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/admin/candidates"
                 element={
