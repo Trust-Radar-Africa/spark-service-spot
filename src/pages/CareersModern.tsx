@@ -378,7 +378,7 @@ export default function CareersModern() {
                             className="bg-qx-orange hover:bg-qx-orange-dark text-white rounded-full"
                             asChild
                           >
-                            <Link to="/contact">
+                            <Link to={`/apply?job=${encodeURIComponent(job.title)}`}>
                               Apply Now
                               <ArrowRight className="ml-2 h-4 w-4" />
                             </Link>
@@ -444,7 +444,7 @@ export default function CareersModern() {
             className="bg-qx-orange hover:bg-qx-orange-dark text-white rounded-full px-8 py-6 text-base"
             asChild
           >
-            <Link to="/contact">
+            <Link to="/apply">
               Submit Your Resume
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>

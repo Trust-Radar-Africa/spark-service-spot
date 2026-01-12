@@ -356,7 +356,7 @@ export default function Careers() {
 
                         <div className="flex flex-wrap gap-4 pt-6 border-t border-border">
                           <Button variant="gold" size="lg" asChild>
-                            <Link to="/contact">
+                            <Link to={`/apply?job=${encodeURIComponent(job.title)}`}>
                               Apply Now
                               <ArrowRight className="ml-2 h-4 w-4" />
                             </Link>
@@ -420,7 +420,7 @@ export default function Careers() {
             skills and experience.
           </p>
           <Button variant="hero" size="xl" asChild>
-            <Link to="/contact">
+            <Link to="/apply">
               Submit Your Resume
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>

@@ -229,13 +229,14 @@ Schema::create('job_postings', function (Blueprint $table) {
 Public endpoint for candidates to submit their application.
 
 **Request (multipart/form-data):**
-- `first_name`: string, required
-- `last_name`: string, required
+- `first_name`: string, required, max 50 chars
+- `last_name`: string, required, max 50 chars
 - `email`: string, required, valid email
-- `nationality`: string, required
+- `nationality`: string, required, max 50 chars
 - `experience`: string, required (0-3, 3-7, 7-10, 10+)
-- `cv`: file, required, mime: docx (application/vnd.openxmlformats-officedocument.wordprocessingml.document)
-- `cover_letter`: file, required, mime: docx
+- `cv`: file, required, mime: docx (application/vnd.openxmlformats-officedocument.wordprocessingml.document), max 5MB
+- `cover_letter`: file, required, mime: docx, max 5MB
+- `job_title`: string, optional (if applying for a specific job)
 
 **Response (Success):**
 ```json
