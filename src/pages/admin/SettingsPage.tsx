@@ -81,7 +81,9 @@ import {
   Archive,
   Server,
   ToggleLeft,
+  RotateCcw,
 } from 'lucide-react';
+import { DEFAULT_COLORS } from '@/components/BrandingProvider';
 
 // Helper functions for color conversion
 function hslToHex(hslString: string): string {
@@ -493,7 +495,7 @@ export default function SettingsPage() {
                   Color Theme
                 </CardTitle>
                 <CardDescription>
-                  Customize primary and accent colors for your website
+                  Customize primary and accent colors for your website. Changes apply in real-time.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -517,7 +519,7 @@ export default function SettingsPage() {
                           className="text-sm"
                         />
                         <p className="text-xs text-muted-foreground">
-                          HSL format: H S% L%
+                          HSL format: H S% L% (Default: {DEFAULT_COLORS.primaryColor})
                         </p>
                       </div>
                     </div>
@@ -541,16 +543,34 @@ export default function SettingsPage() {
                           className="text-sm"
                         />
                         <p className="text-xs text-muted-foreground">
-                          HSL format: H S% L%
+                          HSL format: H S% L% (Default: {DEFAULT_COLORS.accentColor})
                         </p>
                       </div>
                     </div>
                   </div>
                 </div>
-                <Button onClick={handleSaveBranding}>
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Branding
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button onClick={handleSaveBranding}>
+                    <Save className="h-4 w-4 mr-2" />
+                    Save Branding
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setBranding({
+                        primaryColor: DEFAULT_COLORS.primaryColor,
+                        accentColor: DEFAULT_COLORS.accentColor,
+                      });
+                      toast({
+                        title: 'Colors reset',
+                        description: 'Colors have been reset to defaults.',
+                      });
+                    }}
+                  >
+                    <RotateCcw className="h-4 w-4 mr-2" />
+                    Reset to Defaults
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

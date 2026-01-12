@@ -30,13 +30,13 @@ interface AdminLayoutProps {
   children: ReactNode;
 }
 
+// Remove Settings from sidebar navigation
 const navigation = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { name: 'Candidates', href: '/admin/candidates', icon: Users },
   { name: 'Job Postings', href: '/admin/jobs', icon: Briefcase },
   { name: 'Employer Requests', href: '/admin/employers', icon: Building2 },
   { name: 'Blog Posts', href: '/admin/blog', icon: FileText },
-  { name: 'Settings', href: '/admin/settings', icon: Settings },
 ];
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
@@ -89,11 +89,18 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 </div>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="w-56 bg-popover border shadow-lg z-50">
               <div className="px-2 py-1.5">
                 <p className="text-sm font-medium">{user?.name || 'Admin'}</p>
                 <p className="text-xs text-muted-foreground">{user?.email}</p>
               </div>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link to="/admin/settings" className="flex items-center cursor-pointer">
+                  <Settings className="h-4 w-4 mr-2" />
+                  Settings
+                </Link>
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout} className="text-destructive">
                 <LogOut className="h-4 w-4 mr-2" />
@@ -123,7 +130,14 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" className="w-56 bg-popover border shadow-lg z-50">
+            <DropdownMenuItem asChild>
+              <Link to="/admin/settings" className="flex items-center cursor-pointer">
+                <Settings className="h-4 w-4 mr-2" />
+                Settings
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout} className="text-destructive">
               <LogOut className="h-4 w-4 mr-2" />
               Sign out
@@ -199,7 +213,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
       {/* Main content */}
       <main className="lg:pl-64 pt-14 lg:pt-14">
-        <div className="p-6 lg:p-8">{children}</div>
+        <div className="p-4 sm:p-6 lg:p-8">{children}</div>
       </main>
     </div>
   );

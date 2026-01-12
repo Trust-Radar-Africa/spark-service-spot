@@ -339,10 +339,12 @@ export default function CandidatesPage() {
             </SelectContent>
           </Select>
 
-          <Input
-            placeholder="Filter by nationality..."
+          <SearchableSelect
+            options={nationalityOptions}
             value={filters.nationality || ''}
-            onChange={(e) => setFilters({ ...filters, nationality: e.target.value })}
+            onValueChange={(value) => setFilters({ ...filters, nationality: value })}
+            placeholder="All Nationalities"
+            searchPlaceholder="Search nationality..."
           />
 
           <Button
