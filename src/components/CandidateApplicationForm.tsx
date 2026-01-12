@@ -20,9 +20,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { SearchableSelect } from '@/components/ui/searchable-select';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Upload, FileText, CheckCircle2, X, AlertCircle } from 'lucide-react';
 import { ExperienceLevel } from '@/types/admin';
+import { getCountryOptions, getNationalityOptions } from '@/data/countries';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_FILE_TYPE = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
@@ -52,6 +54,8 @@ const candidateFormSchema = z.object({
     .string()
     .min(2, 'Nationality is required')
     .max(50, 'Nationality must be less than 50 characters'),
+  country: z.string().min(2, 'Country is required'),
+  location: z.string().max(100, 'Location must be less than 100 characters').optional(),
   experience: z.enum(['0-3', '3-7', '7-10', '10+'] as const, {
     required_error: 'Please select your experience level',
   }),
@@ -68,29 +72,8 @@ const experienceLevels: { value: ExperienceLevel; label: string }[] = [
   { value: '10+', label: 'Over 10 years' },
 ];
 
-const nationalities = [
-  'Afghan', 'Albanian', 'Algerian', 'American', 'Andorran', 'Angolan', 'Argentine', 'Armenian',
-  'Australian', 'Austrian', 'Azerbaijani', 'Bahamian', 'Bahraini', 'Bangladeshi', 'Barbadian',
-  'Belarusian', 'Belgian', 'Belizean', 'Beninese', 'Bhutanese', 'Bolivian', 'Bosnian', 'Brazilian',
-  'British', 'Bruneian', 'Bulgarian', 'Burkinabe', 'Burmese', 'Burundian', 'Cambodian', 'Cameroonian',
-  'Canadian', 'Cape Verdean', 'Central African', 'Chadian', 'Chilean', 'Chinese', 'Colombian',
-  'Comoran', 'Congolese', 'Costa Rican', 'Croatian', 'Cuban', 'Cypriot', 'Czech', 'Danish',
-  'Djiboutian', 'Dominican', 'Dutch', 'Ecuadorian', 'Egyptian', 'Emirati', 'English', 'Eritrean',
-  'Estonian', 'Ethiopian', 'Fijian', 'Filipino', 'Finnish', 'French', 'Gabonese', 'Gambian',
-  'Georgian', 'German', 'Ghanaian', 'Greek', 'Grenadian', 'Guatemalan', 'Guinean', 'Guyanese',
-  'Haitian', 'Honduran', 'Hungarian', 'Icelandic', 'Indian', 'Indonesian', 'Iranian', 'Iraqi',
-  'Irish', 'Israeli', 'Italian', 'Ivorian', 'Jamaican', 'Japanese', 'Jordanian', 'Kazakh',
-  'Kenyan', 'Korean', 'Kuwaiti', 'Kyrgyz', 'Laotian', 'Latvian', 'Lebanese', 'Liberian',
-  'Libyan', 'Lithuanian', 'Luxembourgish', 'Macedonian', 'Malagasy', 'Malawian', 'Malaysian',
-  'Maldivian', 'Malian', 'Maltese', 'Mauritanian', 'Mauritian', 'Mexican', 'Moldovan', 'Mongolian',
-  'Montenegrin', 'Moroccan', 'Mozambican', 'Namibian', 'Nepalese', 'New Zealander', 'Nicaraguan',
-  'Nigerian', 'Norwegian', 'Omani', 'Pakistani', 'Panamanian', 'Paraguayan', 'Peruvian', 'Polish',
-  'Portuguese', 'Qatari', 'Romanian', 'Russian', 'Rwandan', 'Saudi', 'Scottish', 'Senegalese',
-  'Serbian', 'Singaporean', 'Slovak', 'Slovenian', 'Somali', 'South African', 'Spanish',
-  'Sri Lankan', 'Sudanese', 'Swedish', 'Swiss', 'Syrian', 'Taiwanese', 'Tajik', 'Tanzanian',
-  'Thai', 'Togolese', 'Trinidadian', 'Tunisian', 'Turkish', 'Turkmen', 'Ugandan', 'Ukrainian',
-  'Uruguayan', 'Uzbek', 'Venezuelan', 'Vietnamese', 'Welsh', 'Yemeni', 'Zambian', 'Zimbabwean',
-];
+const countryOptions = getCountryOptions();
+const nationalityOptions = getNationalityOptions();
 
 interface CandidateApplicationFormProps {
   jobTitle?: string;
@@ -112,6 +95,8 @@ export default function CandidateApplicationForm({ jobTitle, onSuccess }: Candid
       last_name: '',
       email: '',
       nationality: '',
+      country: '',
+      location: '',
       experience: undefined,
     },
   });
@@ -284,20 +269,37 @@ export default function CandidateApplicationForm({ jobTitle, onSuccess }: Candid
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Nationality *</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isSubmitting}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select nationality" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent className="max-h-[300px]">
-                    {nationalities.map((nat) => (
-                      <SelectItem key={nat} value={nat}>
-                        {nat}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <FormControl>
+                  <SearchableSelect
+                    options={nationalityOptions}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    placeholder="Select nationality"
+                    searchPlaceholder="Search nationality..."
+                    disabled={isSubmitting}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="country"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Country of Residence *</FormLabel>
+                <FormControl>
+                  <SearchableSelect
+                    options={countryOptions}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    placeholder="Select country"
+                    searchPlaceholder="Search country..."
+                    disabled={isSubmitting}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}

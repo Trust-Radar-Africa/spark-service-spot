@@ -22,8 +22,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { SearchableSelect } from '@/components/ui/searchable-select';
 import { Loader2 } from 'lucide-react';
 import { AVAILABLE_CURRENCIES, getCurrencyFromLocation } from '@/utils/currencyUtils';
+import { getCountryOptions } from '@/data/countries';
 
 const experienceLevels: { value: ExperienceLevel; label: string }[] = [
   { value: '0-3', label: '0-3 years' },
@@ -32,10 +34,13 @@ const experienceLevels: { value: ExperienceLevel; label: string }[] = [
   { value: '10+', label: 'Over 10 years' },
 ];
 
+const countryOptions = getCountryOptions();
+
 const jobPostingSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters').max(100),
   description: z.string().min(20, 'Description must be at least 20 characters').max(5000),
-  location: z.string().min(2, 'Location is required').max(100),
+  country: z.string().min(2, 'Country is required'),
+  location: z.string().min(2, 'Specific location is required').max(100),
   experience_required: z.enum(['0-3', '3-7', '7-10', '10+'] as const),
   requirements: z.string().max(2000).optional(),
   benefits: z.string().max(2000).optional(),
@@ -57,12 +62,13 @@ export default function JobPostingForm({
   onCancel,
   isLoading,
 }: JobPostingFormProps) {
-  const form = useForm<JobPostingFormData>({
+  const form = useForm<JobPostingFormData & { country: string }>({
     resolver: zodResolver(jobPostingSchema),
     defaultValues: {
       title: initialData?.title || '',
       description: initialData?.description || '',
-      location: initialData?.location || '',
+      country: initialData?.location?.split(',').pop()?.trim() || '',
+      location: initialData?.location?.split(',').slice(0, -1).join(',').trim() || '',
       experience_required: initialData?.experience_required || '0-3',
       requirements: initialData?.requirements || '',
       benefits: initialData?.benefits || '',
@@ -72,11 +78,17 @@ export default function JobPostingForm({
     },
   });
 
+  const watchedCountry = form.watch('country');
   const watchedLocation = form.watch('location');
-  const detectedCurrency = watchedLocation ? getCurrencyFromLocation(watchedLocation) : 'USD';
+  const fullLocation = watchedLocation && watchedCountry ? `${watchedLocation}, ${watchedCountry}` : watchedCountry || '';
+  const detectedCurrency = fullLocation ? getCurrencyFromLocation(fullLocation) : 'USD';
 
-  const handleSubmit = async (data: JobPostingFormData) => {
-    await onSubmit(data);
+  const handleSubmit = async (data: JobPostingFormData & { country: string }) => {
+    const formData: JobPostingFormData = {
+      ...data,
+      location: `${data.location}, ${data.country}`,
+    };
+    await onSubmit(formData);
   };
 
   return (
@@ -99,13 +111,34 @@ export default function JobPostingForm({
 
           <FormField
             control={form.control}
+            name="country"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Country *</FormLabel>
+                <FormControl>
+                  <SearchableSelect
+                    options={countryOptions}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    placeholder="Select country"
+                    searchPlaceholder="Search country..."
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
             name="location"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Location *</FormLabel>
+                <FormLabel>Specific Location *</FormLabel>
                 <FormControl>
-                  <Input placeholder="e.g., London, UK" {...field} />
+                  <Input placeholder="e.g., London, Dublin, Atlanta" {...field} />
                 </FormControl>
+                <FormDescription>City or region within the selected country</FormDescription>
                 <FormMessage />
               </FormItem>
             )}

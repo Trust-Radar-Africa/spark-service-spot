@@ -20,9 +20,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { SearchableSelect } from '@/components/ui/searchable-select';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, CheckCircle2, Building2 } from 'lucide-react';
 import { ExperienceLevel } from '@/types/admin';
+import { getCountryOptions, getNationalityOptions } from '@/data/countries';
 
 const employerRequestSchema = z.object({
   firm_name: z
@@ -64,23 +66,10 @@ const experienceLevels: { value: ExperienceLevel; label: string }[] = [
   { value: '10+', label: 'Over 10 years' },
 ];
 
-const countries = [
-  'United Arab Emirates', 'Saudi Arabia', 'Qatar', 'Kuwait', 'Bahrain', 'Oman',
-  'United States', 'United Kingdom', 'Canada', 'Australia', 'Germany', 'France',
-  'Netherlands', 'Switzerland', 'Singapore', 'Hong Kong', 'Japan', 'South Korea',
-  'India', 'Pakistan', 'Egypt', 'Jordan', 'Lebanon', 'Morocco', 'South Africa',
-  'Nigeria', 'Kenya', 'Brazil', 'Mexico', 'Argentina', 'Chile', 'Colombia',
-  'Malaysia', 'Indonesia', 'Philippines', 'Thailand', 'Vietnam', 'Turkey',
-  'Poland', 'Czech Republic', 'Ireland', 'Sweden', 'Norway', 'Denmark', 'Finland',
-  'Belgium', 'Austria', 'Portugal', 'Spain', 'Italy', 'Greece', 'Other',
-];
-
-const nationalities = [
-  'Any', 'Arab', 'Western', 'Asian', 'African', 'South Asian', 'Southeast Asian',
-  'European', 'North American', 'South American', 'Middle Eastern', 'GCC National',
-  'Emirati', 'Saudi', 'Qatari', 'Kuwaiti', 'Bahraini', 'Omani', 'Egyptian',
-  'Jordanian', 'Lebanese', 'Syrian', 'Palestinian', 'Iraqi', 'Indian', 'Pakistani',
-  'Filipino', 'British', 'American', 'Canadian', 'Australian', 'South African', 'Other',
+const countryOptions = getCountryOptions();
+const nationalityOptions = [
+  { value: 'Any', label: 'Any Nationality' },
+  ...getNationalityOptions()
 ];
 
 interface EmployerRequestFormProps {
@@ -207,20 +196,16 @@ export default function EmployerRequestForm({ onSuccess }: EmployerRequestFormPr
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Country *</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isSubmitting}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select country" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent className="max-h-[300px]">
-                    {countries.map((country) => (
-                      <SelectItem key={country} value={country}>
-                        {country}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <FormControl>
+                  <SearchableSelect
+                    options={countryOptions}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    placeholder="Select country"
+                    searchPlaceholder="Search country..."
+                    disabled={isSubmitting}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -269,20 +254,16 @@ export default function EmployerRequestForm({ onSuccess }: EmployerRequestFormPr
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Preferred Nationality *</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isSubmitting}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select preference" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="max-h-[300px]">
-                      {nationalities.map((nat) => (
-                        <SelectItem key={nat} value={nat}>
-                          {nat}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <SearchableSelect
+                      options={nationalityOptions}
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      placeholder="Select preference"
+                      searchPlaceholder="Search nationality..."
+                      disabled={isSubmitting}
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

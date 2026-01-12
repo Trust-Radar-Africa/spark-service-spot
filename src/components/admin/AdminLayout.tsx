@@ -25,6 +25,7 @@ import {
 import NotificationsDropdown from './NotificationsDropdown';
 import { ThemeToggle } from './ThemeToggle';
 import { useSettingsStore } from '@/stores/settingsStore';
+import Breadcrumbs from './Breadcrumbs';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -106,16 +107,16 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </Button>
         </div>
         {/* Centered logo on mobile */}
-        <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden bg-primary/10">
+        <div className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden bg-primary/10">
             {branding.logoUrl ? (
               <img 
                 src={branding.logoUrl} 
                 alt="Logo" 
-                className="w-full h-full object-contain"
+                className="w-full h-full object-contain p-0.5"
               />
             ) : (
-              <span className="text-sm font-bold text-primary">GOA</span>
+              <span className="text-base font-bold text-primary">GOA</span>
             )}
           </div>
         </div>
@@ -198,20 +199,20 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       >
         <div className="flex flex-col h-full">
           {/* Logo & Branding - same height as top bar */}
-          <div className="h-14 px-4 border-b flex items-center gap-3">
-            <div className="w-9 h-9 bg-primary/10 rounded-lg flex items-center justify-center overflow-hidden shrink-0">
+          <div className="h-14 px-3 border-b flex items-center gap-2">
+            <div className="w-10 h-10 min-w-[40px] bg-primary/10 rounded-lg flex items-center justify-center overflow-hidden">
               {branding.logoUrl ? (
                 <img 
                   src={branding.logoUrl} 
                   alt="Company logo" 
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain p-0.5"
                 />
               ) : (
-                <span className="text-lg font-bold text-primary">GOA</span>
+                <span className="text-base font-bold text-primary">GOA</span>
               )}
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs text-muted-foreground leading-tight line-clamp-2">
+            <div className="flex-1 min-w-0 px-2 py-1.5 border border-border/50 rounded-md bg-muted/30">
+              <p className="text-[10px] text-muted-foreground leading-tight line-clamp-2 text-center font-medium">
                 {branding.tagline}
               </p>
             </div>
@@ -256,7 +257,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
       {/* Main content */}
       <main className="lg:pl-64 pt-14">
-        <div className="p-4 sm:p-6 lg:p-8">{children}</div>
+        <div className="p-4 sm:p-6 lg:p-8">
+          <Breadcrumbs />
+          {children}
+        </div>
       </main>
     </div>
   );
