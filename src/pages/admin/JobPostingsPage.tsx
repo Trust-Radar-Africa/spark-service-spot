@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { JobPosting, JobPostingFormData, ExperienceLevel } from '@/types/admin';
+import { JobPosting, JobPostingFormData, ExperienceLevel, WorkType } from '@/types/admin';
 import AdminLayout from '@/components/admin/AdminLayout';
 import JobPostingForm from '@/components/admin/JobPostingForm';
 import { Button } from '@/components/ui/button';
@@ -62,7 +62,7 @@ import {
   Download,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useJobPostingsStore, getExperienceLabel } from '@/stores/jobPostingsStore';
+import { useJobPostingsStore, getExperienceLabel, WORK_TYPE_LABELS } from '@/stores/jobPostingsStore';
 import { SortableTableHead, useSorting } from '@/components/admin/SortableTableHead';
 import { exportToCSV } from '@/utils/csvExport';
 import ItemsPerPageSelect from '@/components/admin/ItemsPerPageSelect';
@@ -100,6 +100,7 @@ export default function JobPostingsPage() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [countryFilter, setCountryFilter] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
+  const [workTypeFilter, setWorkTypeFilter] = useState<WorkType | ''>('');
   const [experienceFilter, setExperienceFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPageOption>(getStoredItemsPerPage);
@@ -127,7 +128,7 @@ export default function JobPostingsPage() {
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, statusFilter, countryFilter, locationFilter, experienceFilter]);
+  }, [searchQuery, statusFilter, countryFilter, locationFilter, workTypeFilter, experienceFilter]);
 
   // Filter and sort jobs
   const filteredJobs = useMemo(() => {
@@ -157,12 +158,16 @@ export default function JobPostingsPage() {
       filtered = filtered.filter((job) => job.location.toLowerCase().includes(locationFilter.toLowerCase()));
     }
 
+    if (workTypeFilter) {
+      filtered = filtered.filter((job) => job.work_type === workTypeFilter);
+    }
+
     if (experienceFilter) {
       filtered = filtered.filter((job) => job.experience_required === experienceFilter);
     }
 
     return sortData(filtered);
-  }, [jobs, searchQuery, statusFilter, countryFilter, locationFilter, experienceFilter, sortKey, sortDirection]);
+  }, [jobs, searchQuery, statusFilter, countryFilter, locationFilter, workTypeFilter, experienceFilter, sortKey, sortDirection]);
 
   // Bulk selection
   const {
@@ -416,7 +421,7 @@ export default function JobPostingsPage() {
         />
 
         {/* Filters */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4 p-3 sm:p-4 bg-card rounded-lg border">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-3 sm:gap-4 p-3 sm:p-4 bg-card rounded-lg border">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -440,6 +445,22 @@ export default function JobPostingsPage() {
             value={locationFilter}
             onChange={(e) => setLocationFilter(e.target.value)}
           />
+
+          <Select
+            value={workTypeFilter || 'all'}
+            onValueChange={(value) => setWorkTypeFilter(value === 'all' ? '' : value as WorkType)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Work Type" />
+            </SelectTrigger>
+            <SelectContent className="bg-popover border shadow-lg z-50">
+              <SelectItem value="all">All Work Types</SelectItem>
+              <SelectItem value="remote">Remote</SelectItem>
+              <SelectItem value="hybrid">Hybrid</SelectItem>
+              <SelectItem value="on-site">On-site</SelectItem>
+              <SelectItem value="flexible">Flexible</SelectItem>
+            </SelectContent>
+          </Select>
 
           <Select
             value={experienceFilter || 'all'}
@@ -478,6 +499,7 @@ export default function JobPostingsPage() {
               setSearchQuery('');
               setCountryFilter('');
               setLocationFilter('');
+              setWorkTypeFilter('');
               setExperienceFilter('');
               setStatusFilter('all');
             }}
@@ -555,6 +577,15 @@ export default function JobPostingsPage() {
                       Job Title
                     </SortableTableHead>
                     <SortableTableHead
+                      sortKey="country"
+                      currentSortKey={sortKey}
+                      currentSortDirection={sortDirection}
+                      onSort={handleSort}
+                      className="hidden lg:table-cell"
+                    >
+                      Country
+                    </SortableTableHead>
+                    <SortableTableHead
                       sortKey="location"
                       currentSortKey={sortKey}
                       currentSortDirection={sortDirection}
@@ -564,11 +595,20 @@ export default function JobPostingsPage() {
                       Location
                     </SortableTableHead>
                     <SortableTableHead
-                      sortKey="experience_required"
+                      sortKey="work_type"
                       currentSortKey={sortKey}
                       currentSortDirection={sortDirection}
                       onSort={handleSort}
                       className="hidden lg:table-cell"
+                    >
+                      Work Type
+                    </SortableTableHead>
+                    <SortableTableHead
+                      sortKey="experience_required"
+                      currentSortKey={sortKey}
+                      currentSortDirection={sortDirection}
+                      onSort={handleSort}
+                      className="hidden xl:table-cell"
                     >
                       Experience
                     </SortableTableHead>
@@ -579,15 +619,6 @@ export default function JobPostingsPage() {
                       onSort={handleSort}
                     >
                       Status
-                    </SortableTableHead>
-                    <SortableTableHead
-                      sortKey="created_at"
-                      currentSortKey={sortKey}
-                      currentSortDirection={sortDirection}
-                      onSort={handleSort}
-                      className="hidden sm:table-cell"
-                    >
-                      Created
                     </SortableTableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -606,21 +637,29 @@ export default function JobPostingsPage() {
                         <div className="font-medium">{job.title}</div>
                         {job.salary_range && (
                           <div className="text-sm text-muted-foreground">
-                            {formatSalaryRange(job.salary_range, job.location, job.currency_override)}
+                            {formatSalaryRange(job.salary_range, job.country, job.currency_override)}
                           </div>
                         )}
                         <div className="md:hidden text-xs text-muted-foreground mt-1">
                           <MapPin className="h-3 w-3 inline mr-1" />
-                          {job.location}
+                          {job.country} - {job.location}
                         </div>
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell">
+                        <span className="truncate max-w-[120px]">{job.country}</span>
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
                         <div className="flex items-center gap-1.5">
                           <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-                          <span className="truncate max-w-[150px]">{job.location}</span>
+                          <span className="truncate max-w-[120px]">{job.location}</span>
                         </div>
                       </TableCell>
                       <TableCell className="hidden lg:table-cell">
+                        <Badge variant={job.work_type === 'remote' ? 'default' : 'secondary'}>
+                          {WORK_TYPE_LABELS[job.work_type]}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="hidden xl:table-cell">
                         <div className="flex items-center gap-1.5">
                           <Clock className="h-3.5 w-3.5 text-muted-foreground" />
                           {getExperienceLabel(job.experience_required)}
@@ -636,9 +675,6 @@ export default function JobPostingsPage() {
                             {job.is_active ? 'Active' : 'Inactive'}
                           </Badge>
                         </div>
-                      </TableCell>
-                      <TableCell className="hidden sm:table-cell">
-                        {new Date(job.created_at).toLocaleDateString()}
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-1">
