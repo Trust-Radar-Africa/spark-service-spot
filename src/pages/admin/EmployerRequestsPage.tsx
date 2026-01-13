@@ -72,12 +72,17 @@ import { SearchableSelect, SearchableSelectOption } from '@/components/ui/search
 import { BulkActionsBar } from '@/components/admin/BulkActionsBar';
 import { useBulkSelection } from '@/hooks/useBulkSelection';
 
+import { COUNTRIES, NATIONALITIES } from '@/data/countries';
+
 const experienceLabels: Record<ExperienceLevel, string> = {
   '0-3': '0-3 years',
   '3-7': '3-7 years',
   '7-10': '7-10 years',
   '10+': '10+ years',
 };
+
+const nationalityOptions = NATIONALITIES.map((n) => ({ value: n, label: n }));
+const countryOptions = COUNTRIES.map((c) => ({ value: c.name, label: c.name }));
 
 const getStoredItemsPerPage = (): ItemsPerPageOption => {
   if (typeof window !== 'undefined') {
@@ -96,6 +101,8 @@ export default function EmployerRequestsPage() {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [countryFilter, setCountryFilter] = useState('');
+  const [locationFilter, setLocationFilter] = useState('');
+  const [nationalityFilter, setNationalityFilter] = useState('');
   const [positionFilter, setPositionFilter] = useState('');
   const [experienceFilter, setExperienceFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
@@ -154,13 +161,15 @@ export default function EmployerRequestsPage() {
         request.position_title?.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesCountry = !countryFilter || request.country === countryFilter;
+      const matchesLocation = !locationFilter || request.location?.toLowerCase().includes(locationFilter.toLowerCase());
+      const matchesNationality = !nationalityFilter || request.preferred_nationality === nationalityFilter;
       const matchesPosition = !positionFilter || request.position_title === positionFilter;
       const matchesExperience =
         experienceFilter === 'all' || request.years_experience === experienceFilter;
 
-      return matchesSearch && matchesCountry && matchesPosition && matchesExperience;
+      return matchesSearch && matchesCountry && matchesLocation && matchesNationality && matchesPosition && matchesExperience;
     });
-  }, [requests, searchTerm, countryFilter, positionFilter, experienceFilter]);
+  }, [requests, searchTerm, countryFilter, locationFilter, nationalityFilter, positionFilter, experienceFilter]);
 
   // Bulk selection
   const {
@@ -189,7 +198,7 @@ export default function EmployerRequestsPage() {
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, countryFilter, positionFilter, experienceFilter]);
+  }, [searchTerm, countryFilter, locationFilter, nationalityFilter, positionFilter, experienceFilter]);
 
   // Generate page numbers for pagination
   const getPageNumbers = () => {
@@ -345,22 +354,22 @@ export default function EmployerRequestsPage() {
         />
 
         {/* Filters */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 p-4 bg-card rounded-lg border">
-          <div className="relative sm:col-span-2 lg:col-span-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4 p-4 bg-card rounded-lg border">
+          <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search by firm, email..."
+              placeholder="Search..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-9"
             />
           </div>
           <SearchableSelect
-            options={positionOptions}
-            value={positionFilter}
-            onValueChange={setPositionFilter}
-            placeholder="All Positions"
-            searchPlaceholder="Search position..."
+            options={nationalityOptions}
+            value={nationalityFilter}
+            onValueChange={setNationalityFilter}
+            placeholder="All Nationalities"
+            searchPlaceholder="Search nationality..."
           />
           <SearchableSelect
             options={countryOptions}
@@ -368,6 +377,18 @@ export default function EmployerRequestsPage() {
             onValueChange={setCountryFilter}
             placeholder="All Countries"
             searchPlaceholder="Search country..."
+          />
+          <Input
+            placeholder="Filter by location..."
+            value={locationFilter}
+            onChange={(e) => setLocationFilter(e.target.value)}
+          />
+          <SearchableSelect
+            options={positionOptions}
+            value={positionFilter}
+            onValueChange={setPositionFilter}
+            placeholder="All Positions"
+            searchPlaceholder="Search position..."
           />
           <Select value={experienceFilter} onValueChange={setExperienceFilter}>
             <SelectTrigger>
@@ -385,8 +406,10 @@ export default function EmployerRequestsPage() {
             variant="ghost"
             onClick={() => {
               setSearchTerm('');
-              setPositionFilter('');
+              setNationalityFilter('');
               setCountryFilter('');
+              setLocationFilter('');
+              setPositionFilter('');
               setExperienceFilter('all');
             }}
             className="text-muted-foreground"

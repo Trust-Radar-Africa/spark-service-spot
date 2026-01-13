@@ -275,7 +275,7 @@ export const useJobPostingsStore = create<JobPostingsState>()(
 
 // Work type labels
 export const WORK_TYPE_LABELS: Record<WorkType, string> = {
-  'remote': '100% Remote',
+  'remote': 'Remote',
   'hybrid': 'Hybrid',
   'on-site': 'On-site',
   'flexible': 'Flexible',

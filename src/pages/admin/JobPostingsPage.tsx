@@ -72,12 +72,16 @@ import { BulkActionsBar } from '@/components/admin/BulkActionsBar';
 import { useBulkSelection } from '@/hooks/useBulkSelection';
 import { formatSalaryRange } from '@/utils/currencyUtils';
 
+import { COUNTRIES } from '@/data/countries';
+
 const experienceLevels: { value: ExperienceLevel; label: string }[] = [
   { value: '0-3', label: '0-3 years' },
   { value: '3-7', label: '3-7 years' },
   { value: '7-10', label: '7-10 years' },
   { value: '10+', label: '10+ years' },
 ];
+
+const countryOptions = COUNTRIES.map((c) => ({ value: c.name, label: c.name }));
 
 const getStoredItemsPerPage = (): ItemsPerPageOption => {
   if (typeof window !== 'undefined') {
@@ -94,6 +98,7 @@ export default function JobPostingsPage() {
   
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
+  const [countryFilter, setCountryFilter] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
   const [experienceFilter, setExperienceFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -117,16 +122,12 @@ export default function JobPostingsPage() {
     localStorage.setItem('admin-jobs-items-per-page', String(value));
   };
 
-  // Get unique locations for filter
-  const locationOptions: SearchableSelectOption[] = useMemo(() => {
-    const uniqueLocations = [...new Set(jobs.map((job) => job.location))].sort();
-    return uniqueLocations.map((loc) => ({ value: loc, label: loc }));
-  }, [jobs]);
+
 
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, statusFilter, locationFilter, experienceFilter]);
+  }, [searchQuery, statusFilter, countryFilter, locationFilter, experienceFilter]);
 
   // Filter and sort jobs
   const filteredJobs = useMemo(() => {
@@ -148,8 +149,12 @@ export default function JobPostingsPage() {
       );
     }
 
+    if (countryFilter) {
+      filtered = filtered.filter((job) => job.country === countryFilter);
+    }
+
     if (locationFilter) {
-      filtered = filtered.filter((job) => job.location === locationFilter);
+      filtered = filtered.filter((job) => job.location.toLowerCase().includes(locationFilter.toLowerCase()));
     }
 
     if (experienceFilter) {
@@ -157,7 +162,7 @@ export default function JobPostingsPage() {
     }
 
     return sortData(filtered);
-  }, [jobs, searchQuery, statusFilter, locationFilter, experienceFilter, sortKey, sortDirection]);
+  }, [jobs, searchQuery, statusFilter, countryFilter, locationFilter, experienceFilter, sortKey, sortDirection]);
 
   // Bulk selection
   const {
@@ -411,8 +416,8 @@ export default function JobPostingsPage() {
         />
 
         {/* Filters */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 p-3 sm:p-4 bg-card rounded-lg border">
-          <div className="relative sm:col-span-2 lg:col-span-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4 p-3 sm:p-4 bg-card rounded-lg border">
+          <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search..."
@@ -423,11 +428,17 @@ export default function JobPostingsPage() {
           </div>
 
           <SearchableSelect
-            options={locationOptions}
-            value={locationFilter}
-            onValueChange={setLocationFilter}
-            placeholder="All Locations"
+            options={countryOptions}
+            value={countryFilter}
+            onValueChange={setCountryFilter}
+            placeholder="All Countries"
             searchPlaceholder="Search country..."
+          />
+
+          <Input
+            placeholder="Filter by location..."
+            value={locationFilter}
+            onChange={(e) => setLocationFilter(e.target.value)}
           />
 
           <Select
@@ -465,6 +476,7 @@ export default function JobPostingsPage() {
             variant="ghost"
             onClick={() => {
               setSearchQuery('');
+              setCountryFilter('');
               setLocationFilter('');
               setExperienceFilter('');
               setStatusFilter('all');
