@@ -37,6 +37,10 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
+import {
+  Collapsible,
+  CollapsibleContent,
+} from '@/components/ui/collapsible';
 import { useToast } from '@/hooks/use-toast';
 import {
   Pagination,
@@ -60,6 +64,9 @@ import {
   EyeOff,
   ExternalLink,
   Download,
+  SlidersHorizontal,
+  Globe,
+  Building2,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useJobPostingsStore, getExperienceLabel, WORK_TYPE_LABELS } from '@/stores/jobPostingsStore';
@@ -110,8 +117,12 @@ export default function JobPostingsPage() {
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
   const { toast } = useToast();
   const { sortKey, sortDirection, handleSort, sortData } = useSorting<JobPosting>();
+
+  const hasActiveFilters = !!(searchQuery || countryFilter || locationFilter || workTypeFilter || experienceFilter || statusFilter !== 'all');
+  const activeFilterCount = [countryFilter, locationFilter, workTypeFilter, experienceFilter, statusFilter !== 'all' ? statusFilter : ''].filter(Boolean).length;
 
   useEffect(() => {
     fetchJobs();
@@ -421,92 +432,172 @@ export default function JobPostingsPage() {
         />
 
         {/* Filters */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-3 sm:gap-4 p-3 sm:p-4 bg-card rounded-lg border">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search..."
-              className="pl-10"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+        <div className="bg-card rounded-lg border overflow-hidden">
+          {/* Main search row */}
+          <div className="p-3 sm:p-4 flex flex-col sm:flex-row gap-3 sm:gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by title, location, or description..."
+                className="pl-10"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => setFiltersExpanded(!filtersExpanded)}
+              className="gap-2"
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+              Filters
+              {activeFilterCount > 0 && (
+                <Badge variant="secondary" className="ml-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
+                  {activeFilterCount}
+                </Badge>
+              )}
+            </Button>
           </div>
 
-          <SearchableSelect
-            options={countryOptions}
-            value={countryFilter}
-            onValueChange={setCountryFilter}
-            placeholder="All Countries"
-            searchPlaceholder="Search country..."
-          />
+          {/* Expandable filters */}
+          <Collapsible open={filtersExpanded} onOpenChange={setFiltersExpanded}>
+            <CollapsibleContent>
+              <div className="px-3 sm:px-4 pb-3 sm:pb-4 border-t border-border pt-3 sm:pt-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4">
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
+                      <Globe className="h-3 w-3" />
+                      Country
+                    </label>
+                    <SearchableSelect
+                      options={countryOptions}
+                      value={countryFilter}
+                      onValueChange={setCountryFilter}
+                      placeholder="All Countries"
+                      searchPlaceholder="Search country..."
+                    />
+                  </div>
 
-          <Input
-            placeholder="Filter by location..."
-            value={locationFilter}
-            onChange={(e) => setLocationFilter(e.target.value)}
-          />
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
+                      <MapPin className="h-3 w-3" />
+                      City/Location
+                    </label>
+                    <Input
+                      placeholder="Filter by location..."
+                      value={locationFilter}
+                      onChange={(e) => setLocationFilter(e.target.value)}
+                    />
+                  </div>
 
-          <Select
-            value={workTypeFilter || 'all'}
-            onValueChange={(value) => setWorkTypeFilter(value === 'all' ? '' : value as WorkType)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Work Type" />
-            </SelectTrigger>
-            <SelectContent className="bg-popover border shadow-lg z-50">
-              <SelectItem value="all">All Work Types</SelectItem>
-              <SelectItem value="remote">Remote</SelectItem>
-              <SelectItem value="hybrid">Hybrid</SelectItem>
-              <SelectItem value="on-site">On-site</SelectItem>
-              <SelectItem value="flexible">Flexible</SelectItem>
-            </SelectContent>
-          </Select>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
+                      <Building2 className="h-3 w-3" />
+                      Work Type
+                    </label>
+                    <Select
+                      value={workTypeFilter || 'all'}
+                      onValueChange={(value) => setWorkTypeFilter(value === 'all' ? '' : value as WorkType)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="All Types" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover border shadow-lg z-50">
+                        <SelectItem value="all">All Types</SelectItem>
+                        <SelectItem value="remote">Remote</SelectItem>
+                        <SelectItem value="hybrid">Hybrid</SelectItem>
+                        <SelectItem value="on-site">On-site</SelectItem>
+                        <SelectItem value="flexible">Flexible</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-          <Select
-            value={experienceFilter || 'all'}
-            onValueChange={(value) => setExperienceFilter(value === 'all' ? '' : value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Experience" />
-            </SelectTrigger>
-            <SelectContent className="bg-popover border shadow-lg z-50">
-              <SelectItem value="all">All Levels</SelectItem>
-              {experienceLevels.map((level) => (
-                <SelectItem key={level.value} value={level.value}>
-                  {level.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
+                      <Clock className="h-3 w-3" />
+                      Experience
+                    </label>
+                    <Select
+                      value={experienceFilter || 'all'}
+                      onValueChange={(value) => setExperienceFilter(value === 'all' ? '' : value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="All Levels" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover border shadow-lg z-50">
+                        <SelectItem value="all">All Levels</SelectItem>
+                        {experienceLevels.map((level) => (
+                          <SelectItem key={level.value} value={level.value}>
+                            {level.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-          <Select
-            value={statusFilter}
-            onValueChange={(value: 'all' | 'active' | 'inactive') => setStatusFilter(value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent className="bg-popover border shadow-lg z-50">
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
-            </SelectContent>
-          </Select>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
+                      <Eye className="h-3 w-3" />
+                      Status
+                    </label>
+                    <Select
+                      value={statusFilter}
+                      onValueChange={(value: 'all' | 'active' | 'inactive') => setStatusFilter(value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="All Status" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover border shadow-lg z-50">
+                        <SelectItem value="all">All Status</SelectItem>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="inactive">Inactive</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-          <Button
-            variant="ghost"
-            onClick={() => {
-              setSearchQuery('');
-              setCountryFilter('');
-              setLocationFilter('');
-              setWorkTypeFilter('');
-              setExperienceFilter('');
-              setStatusFilter('all');
-            }}
-            className="text-muted-foreground"
-          >
-            Clear Filters
-          </Button>
+                  <div className="flex items-end">
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        setSearchQuery('');
+                        setCountryFilter('');
+                        setLocationFilter('');
+                        setWorkTypeFilter('');
+                        setExperienceFilter('');
+                        setStatusFilter('all');
+                      }}
+                      className="text-muted-foreground w-full"
+                    >
+                      Clear Filters
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+
+          {/* Results summary */}
+          {hasActiveFilters && (
+            <div className="flex items-center justify-between px-3 sm:px-4 py-3 bg-muted/50 border-t border-border">
+              <p className="text-sm text-muted-foreground">
+                Showing {filteredJobs.length} of {jobs.length} jobs
+              </p>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setSearchQuery('');
+                  setCountryFilter('');
+                  setLocationFilter('');
+                  setWorkTypeFilter('');
+                  setExperienceFilter('');
+                  setStatusFilter('all');
+                }}
+              >
+                Clear filters
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Table */}
