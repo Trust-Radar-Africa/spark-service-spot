@@ -365,7 +365,7 @@ export default function CandidatesPage() {
         </div>
 
         {/* Filters */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 p-4 bg-card rounded-lg border">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4 p-4 bg-card rounded-lg border">
           <div className="relative lg:col-span-2">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -375,6 +375,28 @@ export default function CandidatesPage() {
               onChange={(e) => setFilters({ ...filters, search: e.target.value })}
             />
           </div>
+
+          <SearchableSelect
+            options={nationalityOptions}
+            value={filters.nationality || ''}
+            onValueChange={(value) => setFilters({ ...filters, nationality: value })}
+            placeholder="All Nationalities"
+            searchPlaceholder="Search nationality..."
+          />
+
+          <SearchableSelect
+            options={countryOptions}
+            value={filters.country || ''}
+            onValueChange={(value) => setFilters({ ...filters, country: value })}
+            placeholder="All Countries"
+            searchPlaceholder="Search country..."
+          />
+
+          <Input
+            placeholder="Filter by location..."
+            value={filters.location || ''}
+            onChange={(e) => setFilters({ ...filters, location: e.target.value })}
+          />
 
           <Select
             value={filters.experience || 'all'}
@@ -397,22 +419,6 @@ export default function CandidatesPage() {
               ))}
             </SelectContent>
           </Select>
-
-          <SearchableSelect
-            options={nationalityOptions}
-            value={filters.nationality || ''}
-            onValueChange={(value) => setFilters({ ...filters, nationality: value })}
-            placeholder="All Nationalities"
-            searchPlaceholder="Search nationality..."
-          />
-
-          <SearchableSelect
-            options={countryOptions}
-            value={filters.country || ''}
-            onValueChange={(value) => setFilters({ ...filters, country: value })}
-            placeholder="All Countries"
-            searchPlaceholder="Search country..."
-          />
 
           <Button
             variant="ghost"

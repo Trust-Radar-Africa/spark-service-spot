@@ -153,6 +153,8 @@ export default function CandidateApplicationForm({ jobTitle, onSuccess }: Candid
       formData.append('last_name', data.last_name);
       formData.append('email', data.email);
       formData.append('nationality', data.nationality);
+      formData.append('country', data.country);
+      if (data.location) formData.append('location', data.location);
       formData.append('experience', data.experience);
       formData.append('cv', data.cv);
       formData.append('cover_letter', data.cover_letter);
@@ -261,7 +263,7 @@ export default function CandidateApplicationForm({ jobTitle, onSuccess }: Candid
           )}
         />
 
-        {/* Nationality and Experience */}
+        {/* Nationality, Country, Location, Experience */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -300,6 +302,27 @@ export default function CandidateApplicationForm({ jobTitle, onSuccess }: Candid
                     disabled={isSubmitting}
                   />
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="location"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>City / Location</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="e.g., Dublin, London, New York"
+                    {...field}
+                    disabled={isSubmitting}
+                  />
+                </FormControl>
+                <FormDescription className="text-xs">
+                  Your current city or preferred work location
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
