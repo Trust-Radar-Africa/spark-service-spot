@@ -443,14 +443,34 @@ export default function EmployerRequestsPage() {
                   currentSortKey={sortKey}
                   currentSortDirection={sortDirection}
                   onSort={handleSort}
+                  className="hidden sm:table-cell"
                 >
                   Position
+                </SortableTableHead>
+                <SortableTableHead
+                  sortKey="preferred_nationality"
+                  currentSortKey={sortKey}
+                  currentSortDirection={sortDirection}
+                  onSort={handleSort}
+                  className="hidden lg:table-cell"
+                >
+                  Pref. Nationality
+                </SortableTableHead>
+                <SortableTableHead
+                  sortKey="country"
+                  currentSortKey={sortKey}
+                  currentSortDirection={sortDirection}
+                  onSort={handleSort}
+                  className="hidden lg:table-cell"
+                >
+                  Country
                 </SortableTableHead>
                 <SortableTableHead
                   sortKey="location"
                   currentSortKey={sortKey}
                   currentSortDirection={sortDirection}
                   onSort={handleSort}
+                  className="hidden xl:table-cell"
                 >
                   Location
                 </SortableTableHead>
@@ -459,6 +479,7 @@ export default function EmployerRequestsPage() {
                   currentSortKey={sortKey}
                   currentSortDirection={sortDirection}
                   onSort={handleSort}
+                  className="hidden md:table-cell"
                 >
                   Experience
                 </SortableTableHead>
@@ -467,6 +488,7 @@ export default function EmployerRequestsPage() {
                   currentSortKey={sortKey}
                   currentSortDirection={sortDirection}
                   onSort={handleSort}
+                  className="hidden sm:table-cell"
                 >
                   Date
                 </SortableTableHead>
@@ -479,16 +501,18 @@ export default function EmployerRequestsPage() {
                   <TableRow key={i}>
                     <TableCell><div className="h-4 w-4 bg-muted animate-pulse rounded" /></TableCell>
                     <TableCell><div className="space-y-2"><div className="h-4 w-32 bg-muted animate-pulse rounded" /><div className="h-3 w-24 bg-muted animate-pulse rounded" /></div></TableCell>
-                    <TableCell><div className="h-4 w-24 bg-muted animate-pulse rounded" /></TableCell>
-                    <TableCell><div className="h-4 w-28 bg-muted animate-pulse rounded" /></TableCell>
-                    <TableCell><div className="h-6 w-20 bg-muted animate-pulse rounded-full" /></TableCell>
-                    <TableCell><div className="h-4 w-20 bg-muted animate-pulse rounded" /></TableCell>
-                    <TableCell><div className="flex justify-end gap-2"><div className="h-8 w-8 bg-muted animate-pulse rounded" /><div className="h-8 w-8 bg-muted animate-pulse rounded" /></div></TableCell>
+                    <TableCell className="hidden sm:table-cell"><div className="h-4 w-24 bg-muted animate-pulse rounded" /></TableCell>
+                    <TableCell className="hidden lg:table-cell"><div className="h-4 w-20 bg-muted animate-pulse rounded" /></TableCell>
+                    <TableCell className="hidden lg:table-cell"><div className="h-4 w-20 bg-muted animate-pulse rounded" /></TableCell>
+                    <TableCell className="hidden xl:table-cell"><div className="h-4 w-20 bg-muted animate-pulse rounded" /></TableCell>
+                    <TableCell className="hidden md:table-cell"><div className="h-6 w-20 bg-muted animate-pulse rounded-full" /></TableCell>
+                    <TableCell className="hidden sm:table-cell"><div className="h-4 w-20 bg-muted animate-pulse rounded" /></TableCell>
+                    <TableCell><div className="flex justify-end gap-1"><div className="h-8 w-8 bg-muted animate-pulse rounded" /><div className="h-8 w-8 bg-muted animate-pulse rounded" /></div></TableCell>
                   </TableRow>
                 ))
               ) : paginatedRequests.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8">
+                  <TableCell colSpan={9} className="text-center py-8">
                     <div className="flex flex-col items-center gap-2">
                       <Building2 className="w-8 h-8 text-muted-foreground" />
                       <p className="text-muted-foreground">No requests found</p>
@@ -511,29 +535,37 @@ export default function EmployerRequestsPage() {
                         <p className="text-sm text-muted-foreground">{request.email}</p>
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden sm:table-cell">
                       {request.position_title || (
-                        <span className="text-muted-foreground">Not specified</span>
+                        <span className="text-muted-foreground">—</span>
                       )}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden lg:table-cell">
+                      {request.preferred_nationality || (
+                        <span className="text-muted-foreground">Any</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="hidden lg:table-cell">
+                      {request.country}
+                    </TableCell>
+                    <TableCell className="hidden xl:table-cell">
                       <div className="flex items-center gap-1">
                         <MapPin className="w-3 h-3 text-muted-foreground" />
-                        <span className="text-sm">{request.location}</span>
+                        <span className="text-sm truncate max-w-[100px]">{request.location}</span>
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden md:table-cell">
                       <Badge variant="secondary">
                         {experienceLabels[request.years_experience]}
                       </Badge>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden sm:table-cell">
                       <span className="text-sm text-muted-foreground">
                         {format(new Date(request.created_at), 'MMM d, yyyy')}
                       </span>
                     </TableCell>
                     <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
+                      <div className="flex items-center justify-end gap-1">
                         <Button
                           variant="ghost"
                           size="icon"

@@ -540,6 +540,7 @@ export default function CandidatesPage() {
                       currentSortKey={sortKey}
                       currentSortDirection={sortDirection}
                       onSort={handleSort}
+                      className="hidden md:table-cell"
                     >
                       Email
                     </SortableTableHead>
@@ -548,8 +549,27 @@ export default function CandidatesPage() {
                       currentSortKey={sortKey}
                       currentSortDirection={sortDirection}
                       onSort={handleSort}
+                      className="hidden lg:table-cell"
                     >
                       Nationality
+                    </SortableTableHead>
+                    <SortableTableHead
+                      sortKey="country"
+                      currentSortKey={sortKey}
+                      currentSortDirection={sortDirection}
+                      onSort={handleSort}
+                      className="hidden lg:table-cell"
+                    >
+                      Country
+                    </SortableTableHead>
+                    <SortableTableHead
+                      sortKey="location"
+                      currentSortKey={sortKey}
+                      currentSortDirection={sortDirection}
+                      onSort={handleSort}
+                      className="hidden xl:table-cell"
+                    >
+                      Location
                     </SortableTableHead>
                     <SortableTableHead
                       sortKey="experience"
@@ -564,6 +584,7 @@ export default function CandidatesPage() {
                       currentSortKey={sortKey}
                       currentSortDirection={sortDirection}
                       onSort={handleSort}
+                      className="hidden sm:table-cell"
                     >
                       Applied
                     </SortableTableHead>
@@ -580,21 +601,28 @@ export default function CandidatesPage() {
                           aria-label={`Select ${candidate.first_name} ${candidate.last_name}`}
                         />
                       </TableCell>
-                      <TableCell className="font-medium">
-                        {candidate.first_name} {candidate.last_name}
+                      <TableCell>
+                        <div className="font-medium">
+                          {candidate.first_name} {candidate.last_name}
+                        </div>
+                        <div className="md:hidden text-xs text-muted-foreground">{candidate.email}</div>
                       </TableCell>
-                      <TableCell>{candidate.email}</TableCell>
-                      <TableCell>{candidate.nationality}</TableCell>
+                      <TableCell className="hidden md:table-cell">{candidate.email}</TableCell>
+                      <TableCell className="hidden lg:table-cell">{candidate.nationality}</TableCell>
+                      <TableCell className="hidden lg:table-cell">{candidate.country}</TableCell>
+                      <TableCell className="hidden xl:table-cell">
+                        {candidate.location || <span className="text-muted-foreground">—</span>}
+                      </TableCell>
                       <TableCell>
                         <Badge variant={getExperienceBadgeVariant(candidate.experience)}>
-                          {candidate.experience} years
+                          {candidate.experience} yrs
                         </Badge>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="hidden sm:table-cell">
                         {new Date(candidate.created_at).toLocaleDateString()}
                       </TableCell>
                       <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-2">
+                        <div className="flex items-center justify-end gap-1">
                           <Button
                             variant="ghost"
                             size="icon"
