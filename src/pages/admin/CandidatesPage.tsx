@@ -27,6 +27,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  Collapsible,
+  CollapsibleContent,
+} from '@/components/ui/collapsible';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -40,6 +44,9 @@ import {
   Clock,
   Globe,
   ExternalLink,
+  SlidersHorizontal,
+  MapPin,
+  Flag,
 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { BulkActionsBar } from '@/components/admin/BulkActionsBar';
@@ -90,8 +97,12 @@ export default function CandidatesPage() {
   const [candidateToDelete, setCandidateToDelete] = useState<CandidateApplication | null>(null);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
   const { toast } = useToast();
   const { sortKey, sortDirection, handleSort, sortData } = useSorting<CandidateApplication>();
+
+  const hasActiveFilters = !!(filters.search || filters.nationality || filters.country || filters.location || filters.experience);
+  const activeFilterCount = [filters.nationality, filters.country, filters.location, filters.experience].filter(Boolean).length;
 
   useEffect(() => {
     fetchCandidates();
@@ -365,68 +376,131 @@ export default function CandidatesPage() {
         </div>
 
         {/* Filters */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4 p-4 bg-card rounded-lg border">
-          <div className="relative lg:col-span-2">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search by name or email..."
-              className="pl-10"
-              value={filters.search || ''}
-              onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-            />
+        <div className="bg-card rounded-lg border overflow-hidden">
+          {/* Main search row */}
+          <div className="p-4 flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by name or email..."
+                className="pl-10"
+                value={filters.search || ''}
+                onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+              />
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => setFiltersExpanded(!filtersExpanded)}
+              className="gap-2"
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+              Filters
+              {activeFilterCount > 0 && (
+                <Badge variant="secondary" className="ml-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
+                  {activeFilterCount}
+                </Badge>
+              )}
+            </Button>
           </div>
 
-          <SearchableSelect
-            options={nationalityOptions}
-            value={filters.nationality || ''}
-            onValueChange={(value) => setFilters({ ...filters, nationality: value })}
-            placeholder="All Nationalities"
-            searchPlaceholder="Search nationality..."
-          />
+          {/* Expandable filters */}
+          <Collapsible open={filtersExpanded} onOpenChange={setFiltersExpanded}>
+            <CollapsibleContent>
+              <div className="px-4 pb-4 border-t border-border pt-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
+                      <Flag className="h-3 w-3" />
+                      Nationality
+                    </label>
+                    <SearchableSelect
+                      options={nationalityOptions}
+                      value={filters.nationality || ''}
+                      onValueChange={(value) => setFilters({ ...filters, nationality: value })}
+                      placeholder="All Nationalities"
+                      searchPlaceholder="Search nationality..."
+                    />
+                  </div>
 
-          <SearchableSelect
-            options={countryOptions}
-            value={filters.country || ''}
-            onValueChange={(value) => setFilters({ ...filters, country: value })}
-            placeholder="All Countries"
-            searchPlaceholder="Search country..."
-          />
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
+                      <Globe className="h-3 w-3" />
+                      Country
+                    </label>
+                    <SearchableSelect
+                      options={countryOptions}
+                      value={filters.country || ''}
+                      onValueChange={(value) => setFilters({ ...filters, country: value })}
+                      placeholder="All Countries"
+                      searchPlaceholder="Search country..."
+                    />
+                  </div>
 
-          <Input
-            placeholder="Filter by location..."
-            value={filters.location || ''}
-            onChange={(e) => setFilters({ ...filters, location: e.target.value })}
-          />
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
+                      <MapPin className="h-3 w-3" />
+                      City/Location
+                    </label>
+                    <Input
+                      placeholder="Filter by location..."
+                      value={filters.location || ''}
+                      onChange={(e) => setFilters({ ...filters, location: e.target.value })}
+                    />
+                  </div>
 
-          <Select
-            value={filters.experience || 'all'}
-            onValueChange={(value) =>
-              setFilters({
-                ...filters,
-                experience: value === 'all' ? undefined : (value as ExperienceLevel),
-              })
-            }
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Experience" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Levels</SelectItem>
-              {experienceLevels.map((level) => (
-                <SelectItem key={level.value} value={level.value}>
-                  {level.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
+                      <Clock className="h-3 w-3" />
+                      Experience
+                    </label>
+                    <Select
+                      value={filters.experience || 'all'}
+                      onValueChange={(value) =>
+                        setFilters({
+                          ...filters,
+                          experience: value === 'all' ? undefined : (value as ExperienceLevel),
+                        })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="All Levels" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Levels</SelectItem>
+                        {experienceLevels.map((level) => (
+                          <SelectItem key={level.value} value={level.value}>
+                            {level.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-          <Button
-            variant="ghost"
-            onClick={() => setFilters({})}
-            className="text-muted-foreground"
-          >
-            Clear Filters
-          </Button>
+                  <div className="flex items-end">
+                    <Button
+                      variant="ghost"
+                      onClick={() => setFilters({})}
+                      className="text-muted-foreground w-full"
+                    >
+                      Clear Filters
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+
+          {/* Results summary */}
+          {hasActiveFilters && (
+            <div className="flex items-center justify-between px-4 py-3 bg-muted/50 border-t border-border">
+              <p className="text-sm text-muted-foreground">
+                Showing {filteredCandidates.length} of {candidates.length} candidates
+              </p>
+              <Button variant="ghost" size="sm" onClick={() => setFilters({})}>
+                Clear filters
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Bulk Actions */}
