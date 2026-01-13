@@ -20,6 +20,11 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination';
 import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
+import {
   ArrowRight,
   MapPin,
   Clock,
@@ -30,9 +35,12 @@ import {
   ChevronDown,
   ChevronUp,
   DollarSign,
+  Globe,
+  Building2,
+  SlidersHorizontal,
 } from 'lucide-react';
-import { useJobPostingsStore, getExperienceLabel } from '@/stores/jobPostingsStore';
-import { ExperienceLevel } from '@/types/admin';
+import { useJobPostingsStore, getExperienceLabel, WORK_TYPE_LABELS, WORK_TYPE_OPTIONS } from '@/stores/jobPostingsStore';
+import { ExperienceLevel, WorkType } from '@/types/admin';
 
 const benefits = [
   'Challenging and rewarding environment',
@@ -51,14 +59,17 @@ export default function Careers() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [experienceFilter, setExperienceFilter] = useState<string>('all');
-  const [locationFilter, setLocationFilter] = useState<string>('all');
+  const [countryFilter, setCountryFilter] = useState<string>('all');
+  const [locationFilter, setLocationFilter] = useState('');
+  const [workTypeFilter, setWorkTypeFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedJobs, setExpandedJobs] = useState<Set<number>>(new Set());
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
 
-  // Get unique locations for filter
-  const locations = useMemo(() => {
-    const locs = new Set(activeJobs.map((job) => job.location));
-    return Array.from(locs).sort();
+  // Get unique countries for filter
+  const countries = useMemo(() => {
+    const ctrs = new Set(activeJobs.map((job) => job.country));
+    return Array.from(ctrs).sort();
   }, [activeJobs]);
 
   // Filter jobs
@@ -68,17 +79,24 @@ export default function Careers() {
         !searchQuery ||
         job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         job.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.location.toLowerCase().includes(searchQuery.toLowerCase());
+        job.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        job.country.toLowerCase().includes(searchQuery.toLowerCase());
 
       const matchesExperience =
         experienceFilter === 'all' || job.experience_required === experienceFilter;
 
-      const matchesLocation =
-        locationFilter === 'all' || job.location === locationFilter;
+      const matchesCountry = countryFilter === 'all' || job.country === countryFilter;
 
-      return matchesSearch && matchesExperience && matchesLocation;
+      const matchesLocation =
+        !locationFilter || job.location.toLowerCase().includes(locationFilter.toLowerCase());
+
+      const matchesWorkType = workTypeFilter === 'all' || job.work_type === workTypeFilter;
+
+      return matchesSearch && matchesExperience && matchesCountry && matchesLocation && matchesWorkType;
     });
-  }, [activeJobs, searchQuery, experienceFilter, locationFilter]);
+  }, [activeJobs, searchQuery, experienceFilter, countryFilter, locationFilter, workTypeFilter]);
+
+  const hasActiveFilters = searchQuery || experienceFilter !== 'all' || countryFilter !== 'all' || locationFilter || workTypeFilter !== 'all';
 
   // Pagination
   const totalPages = Math.ceil(filteredJobs.length / JOBS_PER_PAGE);
@@ -107,7 +125,9 @@ export default function Careers() {
   const clearFilters = () => {
     setSearchQuery('');
     setExperienceFilter('all');
-    setLocationFilter('all');
+    setCountryFilter('all');
+    setLocationFilter('');
+    setWorkTypeFilter('all');
     setCurrentPage(1);
   };
 
@@ -197,12 +217,13 @@ export default function Careers() {
 
           {/* Filters */}
           <div className="max-w-4xl mx-auto mb-8">
-            <div className="bg-card rounded-xl p-4 border border-border shadow-sm">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="relative lg:col-span-2">
+            <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
+              {/* Main search row */}
+              <div className="p-4 flex flex-col sm:flex-row gap-4">
+                <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Search jobs..."
+                    placeholder="Search jobs by title, description, or location..."
                     className="pl-10"
                     value={searchQuery}
                     onChange={(e) => {
@@ -211,49 +232,125 @@ export default function Careers() {
                     }}
                   />
                 </div>
-
-                <Select
-                  value={experienceFilter}
-                  onValueChange={(value) => {
-                    setExperienceFilter(value);
-                    setCurrentPage(1);
-                  }}
+                <Button
+                  variant="outline"
+                  onClick={() => setFiltersExpanded(!filtersExpanded)}
+                  className="gap-2"
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Experience" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All experience levels</SelectItem>
-                    <SelectItem value="0-3">0-3 years</SelectItem>
-                    <SelectItem value="3-7">3-7 years</SelectItem>
-                    <SelectItem value="7-10">7-10 years</SelectItem>
-                    <SelectItem value="10+">10+ years</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Select
-                  value={locationFilter}
-                  onValueChange={(value) => {
-                    setLocationFilter(value);
-                    setCurrentPage(1);
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Location" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All locations</SelectItem>
-                    {locations.map((loc) => (
-                      <SelectItem key={loc} value={loc}>
-                        {loc}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  <SlidersHorizontal className="h-4 w-4" />
+                  Filters
+                  {hasActiveFilters && (
+                    <Badge variant="secondary" className="ml-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
+                      {[experienceFilter !== 'all', countryFilter !== 'all', locationFilter, workTypeFilter !== 'all'].filter(Boolean).length}
+                    </Badge>
+                  )}
+                </Button>
               </div>
 
-              {(searchQuery || experienceFilter !== 'all' || locationFilter !== 'all') && (
-                <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
+              {/* Expandable filters */}
+              <Collapsible open={filtersExpanded} onOpenChange={setFiltersExpanded}>
+                <CollapsibleContent>
+                  <div className="px-4 pb-4 border-t border-border pt-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
+                          <Clock className="h-3 w-3" />
+                          Experience
+                        </label>
+                        <Select
+                          value={experienceFilter}
+                          onValueChange={(value) => {
+                            setExperienceFilter(value);
+                            setCurrentPage(1);
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="All levels" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All levels</SelectItem>
+                            <SelectItem value="0-3">0-3 years</SelectItem>
+                            <SelectItem value="3-7">3-7 years</SelectItem>
+                            <SelectItem value="7-10">7-10 years</SelectItem>
+                            <SelectItem value="10+">10+ years</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
+                          <Globe className="h-3 w-3" />
+                          Country
+                        </label>
+                        <Select
+                          value={countryFilter}
+                          onValueChange={(value) => {
+                            setCountryFilter(value);
+                            setCurrentPage(1);
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="All countries" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All countries</SelectItem>
+                            {countries.map((country) => (
+                              <SelectItem key={country} value={country}>
+                                {country}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
+                          <MapPin className="h-3 w-3" />
+                          City/Location
+                        </label>
+                        <Input
+                          placeholder="e.g. London, Dublin..."
+                          value={locationFilter}
+                          onChange={(e) => {
+                            setLocationFilter(e.target.value);
+                            setCurrentPage(1);
+                          }}
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
+                          <Building2 className="h-3 w-3" />
+                          Work Type
+                        </label>
+                        <Select
+                          value={workTypeFilter}
+                          onValueChange={(value) => {
+                            setWorkTypeFilter(value);
+                            setCurrentPage(1);
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="All types" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All types</SelectItem>
+                            {WORK_TYPE_OPTIONS.map((opt) => (
+                              <SelectItem key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+
+              {/* Results summary */}
+              {hasActiveFilters && (
+                <div className="flex items-center justify-between px-4 py-3 bg-muted/50 border-t border-border">
                   <p className="text-sm text-muted-foreground">
                     Showing {filteredJobs.length} of {activeJobs.length} jobs
                   </p>
@@ -295,12 +392,20 @@ export default function Careers() {
                           </h3>
                           <div className="flex flex-wrap gap-2">
                             <Badge variant="outline" className="gap-1.5">
+                              <Globe className="w-3 h-3" />
+                              {job.country}
+                            </Badge>
+                            <Badge variant="outline" className="gap-1.5">
                               <MapPin className="w-3 h-3" />
                               {job.location}
                             </Badge>
                             <Badge variant="outline" className="gap-1.5">
                               <Clock className="w-3 h-3" />
                               {getExperienceLabel(job.experience_required)}
+                            </Badge>
+                            <Badge className="gap-1.5 bg-accent/10 text-accent border-accent/20 hover:bg-accent/20">
+                              <Building2 className="w-3 h-3" />
+                              {WORK_TYPE_LABELS[job.work_type]}
                             </Badge>
                             {job.salary_range && (
                               <Badge variant="secondary" className="gap-1.5">

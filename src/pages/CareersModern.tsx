@@ -20,6 +20,11 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination';
 import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
+import {
   ArrowRight,
   MapPin,
   Clock,
@@ -34,8 +39,10 @@ import {
   ChevronUp,
   DollarSign,
   Filter,
+  Building2,
+  SlidersHorizontal,
 } from 'lucide-react';
-import { useJobPostingsStore, getExperienceLabel } from '@/stores/jobPostingsStore';
+import { useJobPostingsStore, getExperienceLabel, WORK_TYPE_LABELS, WORK_TYPE_OPTIONS } from '@/stores/jobPostingsStore';
 
 const benefits = [
   { icon: Rocket, text: 'Challenging and rewarding environment' },
@@ -52,14 +59,17 @@ export default function CareersModern() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [experienceFilter, setExperienceFilter] = useState<string>('all');
-  const [locationFilter, setLocationFilter] = useState<string>('all');
+  const [countryFilter, setCountryFilter] = useState<string>('all');
+  const [locationFilter, setLocationFilter] = useState('');
+  const [workTypeFilter, setWorkTypeFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedJobs, setExpandedJobs] = useState<Set<number>>(new Set());
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
 
-  // Get unique locations for filter
-  const locations = useMemo(() => {
-    const locs = new Set(activeJobs.map((job) => job.location));
-    return Array.from(locs).sort();
+  // Get unique countries for filter
+  const countries = useMemo(() => {
+    const ctrs = new Set(activeJobs.map((job) => job.country));
+    return Array.from(ctrs).sort();
   }, [activeJobs]);
 
   // Filter jobs
@@ -69,16 +79,24 @@ export default function CareersModern() {
         !searchQuery ||
         job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         job.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.location.toLowerCase().includes(searchQuery.toLowerCase());
+        job.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        job.country.toLowerCase().includes(searchQuery.toLowerCase());
 
       const matchesExperience =
         experienceFilter === 'all' || job.experience_required === experienceFilter;
 
-      const matchesLocation = locationFilter === 'all' || job.location === locationFilter;
+      const matchesCountry = countryFilter === 'all' || job.country === countryFilter;
 
-      return matchesSearch && matchesExperience && matchesLocation;
+      const matchesLocation =
+        !locationFilter || job.location.toLowerCase().includes(locationFilter.toLowerCase());
+
+      const matchesWorkType = workTypeFilter === 'all' || job.work_type === workTypeFilter;
+
+      return matchesSearch && matchesExperience && matchesCountry && matchesLocation && matchesWorkType;
     });
-  }, [activeJobs, searchQuery, experienceFilter, locationFilter]);
+  }, [activeJobs, searchQuery, experienceFilter, countryFilter, locationFilter, workTypeFilter]);
+
+  const hasActiveFilters = searchQuery || experienceFilter !== 'all' || countryFilter !== 'all' || locationFilter || workTypeFilter !== 'all';
 
   // Pagination
   const totalPages = Math.ceil(filteredJobs.length / JOBS_PER_PAGE);
@@ -110,7 +128,9 @@ export default function CareersModern() {
   const clearFilters = () => {
     setSearchQuery('');
     setExperienceFilter('all');
-    setLocationFilter('all');
+    setCountryFilter('all');
+    setLocationFilter('');
+    setWorkTypeFilter('all');
     setCurrentPage(1);
   };
 
@@ -210,12 +230,13 @@ export default function CareersModern() {
 
           {/* Filters */}
           <div className="max-w-4xl mx-auto mb-8">
-            <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="relative lg:col-span-2">
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+              {/* Main search row */}
+              <div className="p-4 flex flex-col sm:flex-row gap-4">
+                <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-qx-gray" />
                   <Input
-                    placeholder="Search jobs..."
+                    placeholder="Search jobs by title, description, or location..."
                     className="pl-10 border-gray-200 focus:border-qx-orange focus:ring-qx-orange"
                     value={searchQuery}
                     onChange={(e) => {
@@ -224,49 +245,126 @@ export default function CareersModern() {
                     }}
                   />
                 </div>
-
-                <Select
-                  value={experienceFilter}
-                  onValueChange={(value) => {
-                    setExperienceFilter(value);
-                    setCurrentPage(1);
-                  }}
+                <Button
+                  variant="outline"
+                  onClick={() => setFiltersExpanded(!filtersExpanded)}
+                  className="gap-2 border-gray-200"
                 >
-                  <SelectTrigger className="border-gray-200">
-                    <SelectValue placeholder="Experience" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All experience levels</SelectItem>
-                    <SelectItem value="0-3">0-3 years</SelectItem>
-                    <SelectItem value="3-7">3-7 years</SelectItem>
-                    <SelectItem value="7-10">7-10 years</SelectItem>
-                    <SelectItem value="10+">10+ years</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Select
-                  value={locationFilter}
-                  onValueChange={(value) => {
-                    setLocationFilter(value);
-                    setCurrentPage(1);
-                  }}
-                >
-                  <SelectTrigger className="border-gray-200">
-                    <SelectValue placeholder="Location" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All locations</SelectItem>
-                    {locations.map((loc) => (
-                      <SelectItem key={loc} value={loc}>
-                        {loc}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  <SlidersHorizontal className="h-4 w-4" />
+                  Filters
+                  {hasActiveFilters && (
+                    <span className="ml-1 h-5 w-5 rounded-full bg-qx-orange text-white text-xs flex items-center justify-center">
+                      {[experienceFilter !== 'all', countryFilter !== 'all', locationFilter, workTypeFilter !== 'all'].filter(Boolean).length}
+                    </span>
+                  )}
+                </Button>
               </div>
 
-              {(searchQuery || experienceFilter !== 'all' || locationFilter !== 'all') && (
-                <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+              {/* Expandable filters */}
+              <Collapsible open={filtersExpanded} onOpenChange={setFiltersExpanded}>
+                <CollapsibleContent>
+                  <div className="px-4 pb-4 border-t border-gray-100 pt-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                      <div>
+                        <label className="text-xs font-medium text-qx-gray mb-1.5 flex items-center gap-1.5">
+                          <Clock className="h-3 w-3" />
+                          Experience
+                        </label>
+                        <Select
+                          value={experienceFilter}
+                          onValueChange={(value) => {
+                            setExperienceFilter(value);
+                            setCurrentPage(1);
+                          }}
+                        >
+                          <SelectTrigger className="border-gray-200">
+                            <SelectValue placeholder="All levels" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All levels</SelectItem>
+                            <SelectItem value="0-3">0-3 years</SelectItem>
+                            <SelectItem value="3-7">3-7 years</SelectItem>
+                            <SelectItem value="7-10">7-10 years</SelectItem>
+                            <SelectItem value="10+">10+ years</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-medium text-qx-gray mb-1.5 flex items-center gap-1.5">
+                          <Globe className="h-3 w-3" />
+                          Country
+                        </label>
+                        <Select
+                          value={countryFilter}
+                          onValueChange={(value) => {
+                            setCountryFilter(value);
+                            setCurrentPage(1);
+                          }}
+                        >
+                          <SelectTrigger className="border-gray-200">
+                            <SelectValue placeholder="All countries" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All countries</SelectItem>
+                            {countries.map((country) => (
+                              <SelectItem key={country} value={country}>
+                                {country}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-medium text-qx-gray mb-1.5 flex items-center gap-1.5">
+                          <MapPin className="h-3 w-3" />
+                          City/Location
+                        </label>
+                        <Input
+                          placeholder="e.g. London, Dublin..."
+                          className="border-gray-200 focus:border-qx-orange focus:ring-qx-orange"
+                          value={locationFilter}
+                          onChange={(e) => {
+                            setLocationFilter(e.target.value);
+                            setCurrentPage(1);
+                          }}
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-medium text-qx-gray mb-1.5 flex items-center gap-1.5">
+                          <Building2 className="h-3 w-3" />
+                          Work Type
+                        </label>
+                        <Select
+                          value={workTypeFilter}
+                          onValueChange={(value) => {
+                            setWorkTypeFilter(value);
+                            setCurrentPage(1);
+                          }}
+                        >
+                          <SelectTrigger className="border-gray-200">
+                            <SelectValue placeholder="All types" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All types</SelectItem>
+                            {WORK_TYPE_OPTIONS.map((opt) => (
+                              <SelectItem key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+
+              {/* Results summary */}
+              {hasActiveFilters && (
+                <div className="flex items-center justify-between px-4 py-3 bg-qx-light-gray border-t border-gray-100">
                   <p className="text-sm text-qx-gray">
                     Showing {filteredJobs.length} of {activeJobs.length} jobs
                   </p>
@@ -310,6 +408,10 @@ export default function CareersModern() {
                           <h3 className="text-xl font-bold text-qx-blue mb-2">{job.title}</h3>
                           <div className="flex flex-wrap gap-2">
                             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-qx-light-gray text-xs text-qx-gray">
+                              <Globe className="w-3 h-3" />
+                              {job.country}
+                            </span>
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-qx-light-gray text-xs text-qx-gray">
                               <MapPin className="w-3 h-3" />
                               {job.location}
                             </span>
@@ -317,8 +419,12 @@ export default function CareersModern() {
                               <Clock className="w-3 h-3" />
                               {getExperienceLabel(job.experience_required)}
                             </span>
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-qx-orange/10 text-xs text-qx-orange font-medium">
+                              <Building2 className="w-3 h-3" />
+                              {WORK_TYPE_LABELS[job.work_type]}
+                            </span>
                             {job.salary_range && (
-                              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-qx-orange/10 text-xs text-qx-orange">
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-qx-blue/10 text-xs text-qx-blue">
                                 <DollarSign className="w-3 h-3" />
                                 {job.salary_range}
                               </span>
