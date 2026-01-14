@@ -14,10 +14,14 @@ export default {
     },
     extend: {
       fontFamily: {
-        serif: ['Playfair Display', 'Georgia', 'serif'],
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        montserrat: ['Montserrat', 'sans-serif'],
-        poppins: ['Poppins', 'sans-serif'],
+        // Primary fonts
+        heading: ['Space Grotesk', 'system-ui', 'sans-serif'],
+        body: ['DM Sans', 'system-ui', 'sans-serif'],
+        sans: ['DM Sans', 'system-ui', 'sans-serif'],
+        // Legacy fonts for compatibility
+        serif: ['Space Grotesk', 'system-ui', 'sans-serif'],
+        montserrat: ['Space Grotesk', 'sans-serif'],
+        poppins: ['DM Sans', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
