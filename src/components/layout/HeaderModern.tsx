@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ChevronDown, Globe } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import { cn } from "@/lib/utils";
 import {
@@ -9,18 +10,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-const navigation = [
-  { name: "Home", href: "/" },
-  { name: "About", href: "/about" },
-  { name: "Services", href: "/services" },
-  { name: "Blog", href: "/blog" },
-];
-
-const recruitmentLinks = [
-  { name: "Job Openings", href: "/careers", description: "Browse available positions" },
-  { name: "For Employers", href: "/employers", description: "Submit recruitment requests" },
-];
 
 const languages = [
   { code: "en", name: "English", flag: "🇺🇸" },
@@ -32,8 +21,26 @@ const languages = [
 export function HeaderModern() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [recruitmentOpen, setRecruitmentOpen] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState(languages[0]);
+  const { t, i18n } = useTranslation();
   const location = useLocation();
+
+  const currentLanguage = languages.find(l => l.code === i18n.language) || languages[0];
+
+  const handleLanguageChange = (langCode: string) => {
+    i18n.changeLanguage(langCode);
+  };
+
+  const navigation = [
+    { name: t('nav.home'), href: "/" },
+    { name: t('nav.about'), href: "/about" },
+    { name: t('nav.services'), href: "/services" },
+    { name: t('nav.blog'), href: "/blog" },
+  ];
+
+  const recruitmentLinks = [
+    { name: t('nav.jobOpenings'), href: "/careers", description: t('nav.jobOpeningsDesc') },
+    { name: t('nav.forEmployers'), href: "/employers", description: t('nav.forEmployersDesc') },
+  ];
 
   const isRecruitmentActive = recruitmentLinks.some(
     (link) => location.pathname === link.href
@@ -43,16 +50,16 @@ export function HeaderModern() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm">
       <nav className="container mx-auto px-4 lg:px-8">
         <div className="flex min-h-[100px] items-center justify-between">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-9 h-9 rounded-lg bg-qx-blue flex items-center justify-center">
-              <span className="text-base font-bold text-white font-sans">M</span>
+          {/* Logo - Made bigger */}
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-qx-blue to-qx-blue-dark flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
+              <span className="text-2xl font-bold text-white font-heading">M</span>
             </div>
             <div className="flex flex-col leading-tight">
-              <span className="text-lg font-bold text-qx-blue font-sans tracking-tight">
+              <span className="text-xl font-bold text-qx-blue font-heading tracking-tight">
                 Multiverse
               </span>
-              <span className="text-[10px] font-semibold text-qx-orange tracking-wider uppercase">
+              <span className="text-xs font-semibold text-qx-orange tracking-widest uppercase">
                 CPA
               </span>
             </div>
@@ -84,9 +91,9 @@ export function HeaderModern() {
                     isRecruitmentActive
                       ? "text-qx-orange"
                       : "text-qx-gray hover:text-qx-blue"
-                  )}
+                 )}
                 >
-                  Recruitment
+                  {t('nav.recruitment')}
                   <ChevronDown className="w-4 h-4" />
                 </button>
               </DropdownMenuTrigger>
@@ -113,11 +120,11 @@ export function HeaderModern() {
               className={cn(
                 "px-4 py-2 text-sm font-medium transition-colors duration-200",
                 location.pathname === "/contact"
-                  ? "text-qx-orange"
+               ? "text-qx-orange"
                   : "text-qx-gray hover:text-qx-blue"
               )}
             >
-              Contact
+              {t('nav.contact')}
             </Link>
           </div>
 
@@ -129,8 +136,8 @@ export function HeaderModern() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-qx-gray hover:text-qx-blue transition-colors rounded-full border border-gray-200 hover:border-qx-blue/30 bg-white">
-                  <span className="text-base">{selectedLanguage.flag}</span>
-                  <span>{selectedLanguage.code.toUpperCase()}</span>
+                  <span className="text-base">{currentLanguage.flag}</span>
+                  <span>{currentLanguage.code.toUpperCase()}</span>
                   <ChevronDown className="w-3 h-3" />
                 </button>
               </DropdownMenuTrigger>
@@ -138,10 +145,10 @@ export function HeaderModern() {
                 {languages.map((lang) => (
                   <DropdownMenuItem 
                     key={lang.code}
-                    onClick={() => setSelectedLanguage(lang)}
+                    onClick={() => handleLanguageChange(lang.code)}
                     className={cn(
                       "flex items-center gap-2 px-3 py-2 cursor-pointer",
-                      selectedLanguage.code === lang.code && "bg-qx-light-gray"
+                      currentLanguage.code === lang.code && "bg-qx-light-gray"
                     )}
                   >
                     <span className="text-base">{lang.flag}</span>
@@ -158,7 +165,7 @@ export function HeaderModern() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-1 px-2 py-1 text-sm text-qx-gray">
-                  <span>{selectedLanguage.flag}</span>
+                  <span>{currentLanguage.flag}</span>
                   <ChevronDown className="w-3 h-3" />
                 </button>
               </DropdownMenuTrigger>
@@ -166,10 +173,10 @@ export function HeaderModern() {
                 {languages.map((lang) => (
                   <DropdownMenuItem 
                     key={lang.code}
-                    onClick={() => setSelectedLanguage(lang)}
+                    onClick={() => handleLanguageChange(lang.code)}
                     className={cn(
                       "flex items-center gap-2 px-3 py-2 cursor-pointer",
-                      selectedLanguage.code === lang.code && "bg-qx-light-gray"
+                      currentLanguage.code === lang.code && "bg-qx-light-gray"
                     )}
                   >
                     <span>{lang.flag}</span>
@@ -225,7 +232,7 @@ export function HeaderModern() {
                       : "text-qx-gray"
                   )}
                 >
-                  Recruitment
+                  {t('nav.recruitment')}
                   <ChevronDown className={cn("w-4 h-4 transition-transform", recruitmentOpen && "rotate-180")} />
                 </button>
                 {recruitmentOpen && (
@@ -259,7 +266,7 @@ export function HeaderModern() {
                 )}
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Contact
+                {t('nav.contact')}
               </Link>
 
             </div>
