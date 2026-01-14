@@ -147,14 +147,14 @@ export default function CareersModern() {
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 mb-4">
               <Briefcase className="w-4 h-4 text-qx-orange" />
-              <span className="text-sm font-medium text-white">
+              <span className="text-filter-label text-white">
                 {activeJobs.length} Open Positions
               </span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-montserrat font-bold text-white mb-4">
+            <h1 className="text-hero-headline text-white mb-4">
               Join Our <span className="text-qx-orange">Global Team</span>
             </h1>
-            <p className="text-base text-white/80 leading-relaxed mb-6">
+            <p className="text-hero-subtext text-white/80 mb-6">
               We provide a challenging and rewarding environment and the chance for you to build
               your own knowledge and expertise.
             </p>
@@ -176,8 +176,8 @@ export default function CareersModern() {
         <section id="vacancies" className="py-14 md:py-16 bg-qx-light-gray">
           <div className="container mx-auto px-4 lg:px-8">
             <div className="text-center max-w-3xl mx-auto mb-10">
-              <h2 className="text-3xl md:text-4xl font-bold text-qx-blue mb-3">Open Positions</h2>
-              <p className="text-qx-gray">
+              <h2 className="text-section-title text-qx-blue mb-3">Open Positions</h2>
+              <p className="text-section-subtitle text-qx-gray">
                 Explore our current openings and find your next opportunity.
               </p>
             </div>
@@ -220,7 +220,7 @@ export default function CareersModern() {
                     <div className="px-4 pb-4 border-t border-gray-100 pt-4">
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div>
-                          <label className="text-xs font-medium text-qx-gray mb-1.5 flex items-center gap-1.5">
+                          <label className="text-form-label text-qx-gray mb-1.5 flex items-center gap-1.5">
                             <Clock className="h-3 w-3" />
                             Experience
                           </label>
@@ -245,7 +245,7 @@ export default function CareersModern() {
                         </div>
 
                         <div>
-                          <label className="text-xs font-medium text-qx-gray mb-1.5 flex items-center gap-1.5">
+                          <label className="text-form-label text-qx-gray mb-1.5 flex items-center gap-1.5">
                             <Globe className="h-3 w-3" />
                             Country
                           </label>
@@ -271,7 +271,7 @@ export default function CareersModern() {
                         </div>
 
                         <div>
-                          <label className="text-xs font-medium text-qx-gray mb-1.5 flex items-center gap-1.5">
+                          <label className="text-form-label text-qx-gray mb-1.5 flex items-center gap-1.5">
                             <MapPin className="h-3 w-3" />
                             City/Location
                           </label>
@@ -287,7 +287,7 @@ export default function CareersModern() {
                         </div>
 
                         <div>
-                          <label className="text-xs font-medium text-qx-gray mb-1.5 flex items-center gap-1.5">
+                          <label className="text-form-label text-qx-gray mb-1.5 flex items-center gap-1.5">
                             <Building2 className="h-3 w-3" />
                             Work Type
                           </label>
@@ -319,7 +319,7 @@ export default function CareersModern() {
                 {/* Results summary */}
                 {hasActiveFilters && (
                   <div className="flex items-center justify-between px-4 py-3 bg-qx-light-gray border-t border-gray-100">
-                    <p className="text-sm text-qx-gray">
+                    <p className="text-job-meta text-qx-gray">
                       Showing {filteredJobs.length} of {activeJobs.length} jobs
                     </p>
                     <Button variant="ghost" size="sm" onClick={clearFilters} className="text-qx-orange hover:text-qx-orange-dark">
@@ -335,8 +335,8 @@ export default function CareersModern() {
               {paginatedJobs.length === 0 ? (
                 <div className="bg-white rounded-2xl p-10 border border-gray-100 text-center">
                   <Briefcase className="w-10 h-10 text-qx-gray mx-auto mb-3" />
-                  <h3 className="text-lg font-semibold text-qx-blue mb-2">No jobs found</h3>
-                  <p className="text-qx-gray mb-4 text-sm">
+                  <h3 className="text-job-title text-qx-blue mb-2">No jobs found</h3>
+                  <p className="text-body-paragraph text-qx-gray mb-4">
                     Try adjusting your search or filters to find opportunities.
                   </p>
                   <Button
@@ -357,26 +357,26 @@ export default function CareersModern() {
                         <div className="p-5 sm:p-6">
                           <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
                             <div>
-                              <h3 className="text-lg font-bold text-qx-blue mb-2">{job.title}</h3>
+                              <h3 className="text-job-title text-qx-blue mb-2">{job.title}</h3>
                               <div className="flex flex-wrap gap-2">
-                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-qx-light-gray text-xs text-qx-gray">
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-qx-light-gray text-job-meta text-qx-gray">
                                   <Globe className="w-3 h-3" />
                                   {job.country}
                                 </span>
-                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-qx-light-gray text-xs text-qx-gray">
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-qx-light-gray text-job-meta text-qx-gray">
                                   <MapPin className="w-3 h-3" />
                                   {job.location}
                                 </span>
-                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-qx-light-gray text-xs text-qx-gray">
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-qx-light-gray text-job-meta text-qx-gray">
                                   <Clock className="w-3 h-3" />
                                   {getExperienceLabel(job.experience_required)}
                                 </span>
-                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-qx-orange/10 text-xs text-qx-orange font-medium">
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-qx-orange/10 text-job-meta text-qx-orange">
                                   <Building2 className="w-3 h-3" />
                                   {WORK_TYPE_LABELS[job.work_type]}
                                 </span>
                                 {job.salary_range && (
-                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-qx-blue/10 text-xs text-qx-blue">
+                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-qx-blue/10 text-job-salary text-qx-blue">
                                     <DollarSign className="w-3 h-3" />
                                     {job.salary_range}
                                   </span>
@@ -385,7 +385,7 @@ export default function CareersModern() {
                             </div>
                           </div>
 
-                          <p className="text-qx-gray text-sm mb-3 line-clamp-2">{job.description}</p>
+                          <p className="text-body-paragraph text-qx-gray mb-3 line-clamp-2">{job.description}</p>
 
                           <Button
                             variant="ghost"

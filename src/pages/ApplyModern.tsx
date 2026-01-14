@@ -29,15 +29,15 @@ export default function ApplyModern() {
                 <Briefcase className="w-6 h-6 text-qx-orange" />
               </div>
               {jobTitle && (
-                <span className="px-3 py-1 bg-qx-orange/20 text-qx-orange text-sm font-medium rounded-full">
+                <span className="px-3 py-1 bg-qx-orange/20 text-qx-orange text-filter-label rounded-full">
                   {jobTitle}
                 </span>
               )}
             </div>
-            <h1 className="text-3xl md:text-4xl font-montserrat font-bold text-white mb-4">
+            <h1 className="text-hero-headline text-white mb-4">
               Apply for a Position
             </h1>
-            <p className="text-white/80">
+            <p className="text-hero-subtext text-white/80">
               Complete the form below to submit your application. We accept Word documents (.docx)
               only for CVs and cover letters.
             </p>

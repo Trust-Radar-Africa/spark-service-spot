@@ -10,19 +10,19 @@ export default function EmployersModern() {
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
         <div className="container mx-auto px-4 relative">
           <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">
+            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full mb-6">
               <Building2 className="w-4 h-4" />
-              For Employers
+              <span className="text-filter-label">For Employers</span>
             </div>
-            <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 tracking-tight">
+            <h1 className="text-hero-headline text-foreground mb-6">
               Hire Top Accounting
               <span className="text-primary"> Professionals</span>
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed">
+            <p className="text-hero-subtext text-muted-foreground mb-8">
               Access our curated talent pool of qualified accountants, auditors, and finance 
               professionals ready to make an immediate impact on your team.
             </p>
-            <a href="#request-form" className="inline-flex items-center gap-2 text-primary font-medium hover:gap-3 transition-all">
+            <a href="#request-form" className="inline-flex items-center gap-2 text-primary text-job-company hover:gap-3 transition-all">
               Submit a request <ArrowRight className="w-4 h-4" />
             </a>
           </div>
@@ -37,8 +37,8 @@ export default function EmployersModern() {
               <div className="w-14 h-14 bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
                 <Users className="w-7 h-7 text-primary" />
               </div>
-              <h3 className="font-semibold text-lg mb-2">Pre-Screened Talent</h3>
-              <p className="text-muted-foreground">
+              <h3 className="text-job-title text-foreground mb-2">Pre-Screened Talent</h3>
+              <p className="text-body-paragraph text-muted-foreground">
                 Every candidate is thoroughly vetted for qualifications and experience
               </p>
             </div>
@@ -46,8 +46,8 @@ export default function EmployersModern() {
               <div className="w-14 h-14 bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
                 <Clock className="w-7 h-7 text-primary" />
               </div>
-              <h3 className="font-semibold text-lg mb-2">48-Hour Response</h3>
-              <p className="text-muted-foreground">
+              <h3 className="text-job-title text-foreground mb-2">48-Hour Response</h3>
+              <p className="text-body-paragraph text-muted-foreground">
                 Receive curated candidate profiles within 24-48 hours of submission
               </p>
             </div>
@@ -55,8 +55,8 @@ export default function EmployersModern() {
               <div className="w-14 h-14 bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
                 <Building2 className="w-7 h-7 text-primary" />
               </div>
-              <h3 className="font-semibold text-lg mb-2">Industry Focus</h3>
-              <p className="text-muted-foreground">
+              <h3 className="text-job-title text-foreground mb-2">Industry Focus</h3>
+              <p className="text-body-paragraph text-muted-foreground">
                 Specialized exclusively in accounting and finance recruitment
               </p>
             </div>
@@ -64,8 +64,8 @@ export default function EmployersModern() {
               <div className="w-14 h-14 bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
                 <CheckCircle className="w-7 h-7 text-primary" />
               </div>
-              <h3 className="font-semibold text-lg mb-2">Hiring Guarantee</h3>
-              <p className="text-muted-foreground">
+              <h3 className="text-job-title text-foreground mb-2">Hiring Guarantee</h3>
+              <p className="text-body-paragraph text-muted-foreground">
                 Free replacement if the placement doesn't meet expectations
               </p>
             </div>
@@ -78,10 +78,10 @@ export default function EmployersModern() {
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              <h2 className="text-section-title text-foreground mb-4">
                 Submit Your Hiring Request
               </h2>
-              <p className="text-lg text-muted-foreground">
+              <p className="text-section-subtitle text-muted-foreground">
                 Tell us about your ideal candidate and we'll do the matching
               </p>
             </div>
@@ -98,20 +98,20 @@ export default function EmployersModern() {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
-              <p className="text-4xl font-bold text-primary mb-2">500+</p>
-              <p className="text-muted-foreground">Placements Made</p>
+              <p className="text-job-salary text-4xl text-primary mb-2">500+</p>
+              <p className="text-job-meta text-muted-foreground">Placements Made</p>
             </div>
             <div>
-              <p className="text-4xl font-bold text-primary mb-2">150+</p>
-              <p className="text-muted-foreground">Client Companies</p>
+              <p className="text-job-salary text-4xl text-primary mb-2">150+</p>
+              <p className="text-job-meta text-muted-foreground">Client Companies</p>
             </div>
             <div>
-              <p className="text-4xl font-bold text-primary mb-2">95%</p>
-              <p className="text-muted-foreground">Success Rate</p>
+              <p className="text-job-salary text-4xl text-primary mb-2">95%</p>
+              <p className="text-job-meta text-muted-foreground">Success Rate</p>
             </div>
             <div>
-              <p className="text-4xl font-bold text-primary mb-2">48h</p>
-              <p className="text-muted-foreground">Avg. Response Time</p>
+              <p className="text-job-salary text-4xl text-primary mb-2">48h</p>
+              <p className="text-job-meta text-muted-foreground">Avg. Response Time</p>
             </div>
           </div>
         </div>
