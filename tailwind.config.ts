@@ -14,14 +14,14 @@ export default {
     },
     extend: {
       fontFamily: {
-        // Primary font - Inter self-paired
-        heading: ['Inter', 'system-ui', 'sans-serif'],
-        body: ['Inter', 'system-ui', 'sans-serif'],
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        // Primary fonts - Space Grotesk + IBM Plex Sans
+        heading: ['Space Grotesk', 'system-ui', 'sans-serif'],
+        body: ['IBM Plex Sans', 'system-ui', 'sans-serif'],
+        sans: ['IBM Plex Sans', 'system-ui', 'sans-serif'],
         // Legacy fonts for compatibility
-        serif: ['Inter', 'system-ui', 'sans-serif'],
-        montserrat: ['Inter', 'sans-serif'],
-        poppins: ['Inter', 'sans-serif'],
+        serif: ['Space Grotesk', 'system-ui', 'sans-serif'],
+        montserrat: ['Space Grotesk', 'sans-serif'],
+        poppins: ['IBM Plex Sans', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
