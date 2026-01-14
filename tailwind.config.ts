@@ -15,12 +15,12 @@ export default {
     extend: {
       fontFamily: {
         // Primary fonts
-        heading: ['Space Grotesk', 'system-ui', 'sans-serif'],
+        heading: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
         body: ['DM Sans', 'system-ui', 'sans-serif'],
         sans: ['DM Sans', 'system-ui', 'sans-serif'],
         // Legacy fonts for compatibility
-        serif: ['Space Grotesk', 'system-ui', 'sans-serif'],
-        montserrat: ['Space Grotesk', 'sans-serif'],
+        serif: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+        montserrat: ['Plus Jakarta Sans', 'sans-serif'],
         poppins: ['DM Sans', 'sans-serif'],
       },
       colors: {
