@@ -68,15 +68,15 @@ export default function ServicesModern() {
         <div className="relative container mx-auto px-4 lg:px-8">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 mb-4">
-              <span className="text-xs font-semibold text-qx-orange uppercase tracking-wider">
+              <span className="text-filter-label text-qx-orange uppercase tracking-wider">
                 Our Services
               </span>
             </div>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-montserrat font-bold text-white mb-4">
+            <h1 className="text-hero-headline text-white mb-4">
               Outsourcing Services for{" "}
               <span className="text-qx-orange">Accounting Firms</span>
             </h1>
-            <p className="text-lg text-white/80 leading-relaxed">
+            <p className="text-hero-subtext text-white/80">
               Comprehensive outsourced accounting solutions tailored to your firm's needs. We act as a one-stop shop for your company's financial requirements.
             </p>
           </div>
@@ -98,16 +98,16 @@ export default function ServicesModern() {
                     <div className="w-10 h-10 rounded-lg bg-qx-orange flex items-center justify-center">
                       <service.icon className="w-5 h-5 text-white" />
                     </div>
-                    <span className="text-sm font-semibold text-qx-orange uppercase tracking-wide">
+                    <span className="text-filter-label text-qx-orange uppercase tracking-wide">
                       {service.subtitle}
                     </span>
                   </div>
 
-                  <h2 className="text-2xl md:text-3xl font-bold text-qx-blue mb-4">
+                  <h2 className="text-section-title text-qx-blue mb-4">
                     {service.title}
                   </h2>
 
-                  <p className="text-qx-gray mb-6 leading-relaxed text-sm md:text-base">
+                  <p className="text-body-paragraph text-qx-gray mb-6">
                     {service.description}
                   </p>
 
@@ -115,7 +115,7 @@ export default function ServicesModern() {
                     {service.features.map((feature) => (
                       <li key={feature} className="flex items-start gap-3">
                         <CheckCircle2 className="w-4 h-4 text-qx-orange flex-shrink-0 mt-0.5" />
-                        <span className="text-qx-blue text-sm">{feature}</span>
+                        <span className="text-body-list text-qx-blue">{feature}</span>
                       </li>
                     ))}
                   </ul>
@@ -161,10 +161,10 @@ export default function ServicesModern() {
       <AnimatedSection>
         <section className="py-14 md:py-16 bg-qx-blue">
           <div className="container mx-auto px-4 lg:px-8 text-center">
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
+            <h2 className="text-section-title text-white mb-3">
               Ready to Partner With Us?
             </h2>
-            <p className="text-white/70 max-w-2xl mx-auto mb-8 text-sm md:text-base">
+            <p className="text-hero-subtext text-white/70 max-w-2xl mx-auto mb-8">
               Schedule a call to discuss further how we can contribute to the mission of your firm.
             </p>
             <Button 
