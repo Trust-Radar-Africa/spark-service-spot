@@ -15,22 +15,22 @@ import auditImg from "@/assets/audit-service.jpg";
 
 const slides = [
   {
-    tagline: "EXCEPTIONAL OUTSOURCED OFFSHORE ACCOUNTING SOLUTIONS",
+    tagline: "Exceptional Outsourced Offshore Accounting Solutions",
     subtitle: "Your premier destination for exceptional outsourced offshore accounting solutions.",
     image: heroBg,
   },
   {
-    tagline: "BLENDING NEW TECHNIQUES WITH TRADITIONAL VALUES",
+    tagline: "Blending New Techniques With Traditional Values",
     subtitle: "We combine modern technology with time-tested accounting principles.",
     image: teamImg,
   },
   {
-    tagline: "GLOBAL ASSIGNMENTS FROM US, CANADA, AUSTRALIA & EUROPE",
+    tagline: "Global Assignments From US, Canada, Australia & Europe",
     subtitle: "Serving clients across multiple continents with dedication and expertise.",
     image: auditImg,
   },
   {
-    tagline: "YOUR ONE-STOP SHOP FOR FINANCIAL NEEDS",
+    tagline: "Your One-Stop Shop for Financial Needs",
     subtitle: "Comprehensive accounting services tailored to your firm's requirements.",
     image: heroBg,
   },
@@ -103,11 +103,7 @@ export function HeroCarousel({ variant = "classic" }: HeroCarouselProps) {
                       </div>
 
                       <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-montserrat font-bold text-white mb-5 leading-[1.15]">
-                        {slide.tagline.split(' ').slice(0, 2).join(' ')}{' '}
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-qx-orange via-amber-400 to-qx-orange">
-                          {slide.tagline.split(' ').slice(2, 4).join(' ')}
-                        </span>{' '}
-                        {slide.tagline.split(' ').slice(4).join(' ')}
+                        {slide.tagline}
                       </h1>
 
                       <p className="text-lg md:text-xl text-white/80 mb-8 max-w-xl leading-relaxed">
@@ -193,7 +189,7 @@ export function HeroCarousel({ variant = "classic" }: HeroCarouselProps) {
                     </h1>
 
                     <div className="h-20 md:h-16 flex items-center justify-center mb-8">
-                      <p className="text-lg md:text-xl text-primary-foreground/80 font-medium tracking-wide">
+                      <p className="text-lg md:text-xl text-primary-foreground/80 font-medium">
                         {slide.tagline}
                       </p>
                     </div>

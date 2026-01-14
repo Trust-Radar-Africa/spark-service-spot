@@ -5,6 +5,7 @@ import { ArrowRight, CheckCircle2, FileSearch, Calculator, BarChart3 } from "luc
 import auditImg from "@/assets/audit-service.jpg";
 import bookkeepingImg from "@/assets/bookkeeping-service.jpg";
 import consultingImg from "@/assets/consulting-service.jpg";
+import { AnimatedSection } from "@/components/AnimatedSection";
 
 const services = [
   {
@@ -59,17 +60,17 @@ export default function Services() {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="relative py-24 bg-gradient-navy overflow-hidden">
+      <section className="relative py-16 md:py-20 bg-gradient-navy overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,hsl(38_92%_50%/0.1),transparent_70%)]" />
         </div>
 
         <div className="relative container mx-auto px-4 lg:px-8">
           <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-primary-foreground mb-6">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-primary-foreground mb-4">
               Our <span className="text-gradient-gold">Services</span>
             </h1>
-            <p className="text-xl text-primary-foreground/80 leading-relaxed">
+            <p className="text-lg text-primary-foreground/80 leading-relaxed">
               Comprehensive outsourced accounting solutions tailored to your
               firm's needs. We act as a one-stop shop for your company's
               financial requirements.
@@ -83,87 +84,93 @@ export default function Services() {
         <section
           key={service.id}
           id={service.id}
-          className={`py-24 ${index % 2 === 0 ? "bg-background" : "bg-muted"}`}
+          className={`py-14 md:py-16 ${index % 2 === 0 ? "bg-background" : "bg-muted"}`}
         >
           <div className="container mx-auto px-4 lg:px-8">
             <div
-              className={`grid lg:grid-cols-2 gap-16 items-center ${
+              className={`grid lg:grid-cols-2 gap-10 lg:gap-12 items-center ${
                 index % 2 === 1 ? "lg:flex-row-reverse" : ""
               }`}
             >
-              <div className={index % 2 === 1 ? "lg:order-2" : ""}>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center">
-                    <service.icon className="w-6 h-6 text-accent" />
+              <AnimatedSection animation={index % 2 === 0 ? "slide-left" : "slide-right"}>
+                <div className={index % 2 === 1 ? "lg:order-2" : ""}>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
+                      <service.icon className="w-5 h-5 text-accent" />
+                    </div>
+                    <span className="text-sm font-semibold text-accent uppercase tracking-wide">
+                      {service.subtitle}
+                    </span>
                   </div>
-                  <span className="text-sm font-semibold text-accent uppercase tracking-wide">
-                    {service.subtitle}
-                  </span>
+
+                  <h2 className="text-2xl md:text-3xl font-serif font-bold text-foreground mb-4">
+                    {service.title}
+                  </h2>
+
+                  <p className="text-muted-foreground mb-6 leading-relaxed text-sm md:text-base">
+                    {service.description}
+                  </p>
+
+                  <ul className="space-y-3 mb-6">
+                    {service.features.map((feature) => (
+                      <li key={feature} className="flex items-start gap-3">
+                        <CheckCircle2 className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
+                        <span className="text-foreground text-sm">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div className="flex flex-wrap gap-3">
+                    <Button variant="gold" size="default" asChild>
+                      <Link to="/contact">
+                        Schedule a Call
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Link>
+                    </Button>
+                    <Button variant="outline" size="default" asChild>
+                      <Link to="/careers">Send a Request</Link>
+                    </Button>
+                  </div>
                 </div>
+              </AnimatedSection>
 
-                <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground mb-6">
-                  {service.title}
-                </h2>
-
-                <p className="text-muted-foreground mb-8 leading-relaxed">
-                  {service.description}
-                </p>
-
-                <ul className="space-y-4 mb-8">
-                  {service.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-3">
-                      <CheckCircle2 className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
-                      <span className="text-foreground">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="flex flex-wrap gap-4">
-                  <Button variant="gold" size="lg" asChild>
-                    <Link to="/contact">
-                      Schedule a Call
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Link>
-                  </Button>
-                  <Button variant="outline" size="lg" asChild>
-                    <Link to="/careers">Send a Request</Link>
-                  </Button>
+              <AnimatedSection animation={index % 2 === 0 ? "slide-right" : "slide-left"}>
+                <div className={index % 2 === 1 ? "lg:order-1" : ""}>
+                  <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-xl">
+                    <img
+                      src={service.image}
+                      alt={service.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                 </div>
-              </div>
-
-              <div className={index % 2 === 1 ? "lg:order-1" : ""}>
-                <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-xl">
-                  <img
-                    src={service.image}
-                    alt={service.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </div>
+              </AnimatedSection>
             </div>
           </div>
         </section>
       ))}
 
       {/* CTA Section */}
-      <section className="py-24 bg-gradient-navy">
-        <div className="container mx-auto px-4 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-serif font-bold text-primary-foreground mb-4">
-            Ready to Partner With Us?
-          </h2>
-          <p className="text-primary-foreground/70 max-w-2xl mx-auto mb-10">
-            Schedule a call to discuss further how we can contribute to the
-            mission of your firm. Let us handle the complexities while you focus
-            on growth.
-          </p>
-          <Button variant="hero" size="xl" asChild>
-            <Link to="/contact">
-              Get Started Today
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-          </Button>
-        </div>
-      </section>
+      <AnimatedSection>
+        <section className="py-14 md:py-16 bg-gradient-navy">
+          <div className="container mx-auto px-4 lg:px-8 text-center">
+            <h2 className="text-2xl md:text-3xl font-serif font-bold text-primary-foreground mb-3">
+              Ready to Partner With Us?
+            </h2>
+            <p className="text-primary-foreground/70 max-w-2xl mx-auto mb-8 text-sm md:text-base">
+              Schedule a call to discuss further how we can contribute to the
+              mission of your firm. Let us handle the complexities while you focus
+              on growth.
+            </p>
+            <Button variant="hero" size="lg" asChild>
+              <Link to="/contact">
+                Get Started Today
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+          </div>
+        </section>
+      </AnimatedSection>
     </Layout>
   );
 }
