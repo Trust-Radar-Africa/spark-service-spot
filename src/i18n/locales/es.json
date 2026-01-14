@@ -3,12 +3,8 @@
     "home": "Inicio",
     "about": "Nosotros",
     "services": "Servicios",
+    "careers": "Carreras",
     "blog": "Blog",
-    "recruitment": "Reclutamiento",
-    "jobOpenings": "Vacantes",
-    "jobOpeningsDesc": "Explorar posiciones disponibles",
-    "forEmployers": "Para Empleadores",
-    "forEmployersDesc": "Enviar solicitudes de reclutamiento",
     "contact": "Contacto"
   },
   "hero": {

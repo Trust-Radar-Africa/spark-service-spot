@@ -20,7 +20,6 @@ const languages = [
 
 export function HeaderModern() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [recruitmentOpen, setRecruitmentOpen] = useState(false);
   const { t, i18n } = useTranslation();
   const location = useLocation();
 
@@ -34,23 +33,16 @@ export function HeaderModern() {
     { name: t('nav.home'), href: "/" },
     { name: t('nav.about'), href: "/about" },
     { name: t('nav.services'), href: "/services" },
+    { name: t('nav.careers'), href: "/careers" },
     { name: t('nav.blog'), href: "/blog" },
+    { name: t('nav.contact'), href: "/contact" },
   ];
-
-  const recruitmentLinks = [
-    { name: t('nav.jobOpenings'), href: "/careers", description: t('nav.jobOpeningsDesc') },
-    { name: t('nav.forEmployers'), href: "/employers", description: t('nav.forEmployersDesc') },
-  ];
-
-  const isRecruitmentActive = recruitmentLinks.some(
-    (link) => location.pathname === link.href
-  );
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm">
       <nav className="container mx-auto px-4 lg:px-8">
         <div className="flex min-h-[100px] items-center justify-between">
-          {/* Logo - Made bigger */}
+          {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
             <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-qx-blue to-qx-blue-dark flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
               <span className="text-2xl font-bold text-white font-heading">M</span>
@@ -81,51 +73,6 @@ export function HeaderModern() {
                 {item.name}
               </Link>
             ))}
-
-            {/* Recruitment Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button
-                  className={cn(
-                    "px-4 py-2 text-sm font-medium transition-colors duration-200 flex items-center gap-1",
-                    isRecruitmentActive
-                      ? "text-qx-orange"
-                      : "text-qx-gray hover:text-qx-blue"
-                 )}
-                >
-                  {t('nav.recruitment')}
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className="w-56 bg-white border border-gray-200 shadow-lg z-50">
-                {recruitmentLinks.map((item) => (
-                  <DropdownMenuItem key={item.name} asChild>
-                    <Link
-                      to={item.href}
-                      className={cn(
-                        "flex flex-col items-start gap-1 px-3 py-2 cursor-pointer",
-                        location.pathname === item.href && "bg-gray-50"
-                      )}
-                    >
-                      <span className="font-medium text-qx-blue">{item.name}</span>
-                      <span className="text-xs text-qx-gray">{item.description}</span>
-                    </Link>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            <Link
-              to="/contact"
-              className={cn(
-                "px-4 py-2 text-sm font-medium transition-colors duration-200",
-                location.pathname === "/contact"
-               ? "text-qx-orange"
-                  : "text-qx-gray hover:text-qx-blue"
-              )}
-            >
-              {t('nav.contact')}
-            </Link>
           </div>
 
           {/* Right side */}
@@ -220,55 +167,6 @@ export function HeaderModern() {
                   {item.name}
                 </Link>
               ))}
-
-              {/* Mobile Recruitment Section */}
-              <div className="px-4 py-2">
-                <button
-                  onClick={() => setRecruitmentOpen(!recruitmentOpen)}
-                  className={cn(
-                    "w-full flex items-center justify-between py-2 text-base font-medium rounded-lg transition-colors duration-200",
-                    isRecruitmentActive
-                      ? "text-qx-orange"
-                      : "text-qx-gray"
-                  )}
-                >
-                  {t('nav.recruitment')}
-                  <ChevronDown className={cn("w-4 h-4 transition-transform", recruitmentOpen && "rotate-180")} />
-                </button>
-                {recruitmentOpen && (
-                  <div className="mt-2 ml-4 space-y-1 border-l-2 border-gray-200 pl-4">
-                    {recruitmentLinks.map((item) => (
-                      <Link
-                        key={item.name}
-                        to={item.href}
-                        className={cn(
-                          "block py-2 text-sm font-medium transition-colors",
-                          location.pathname === item.href
-                            ? "text-qx-orange"
-                            : "text-qx-gray hover:text-qx-blue"
-                        )}
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        {item.name}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <Link
-                to="/contact"
-                className={cn(
-                  "px-4 py-3 text-base font-medium rounded-lg transition-colors duration-200",
-                  location.pathname === "/contact"
-                    ? "text-qx-orange bg-qx-orange/5"
-                    : "text-qx-gray hover:text-qx-blue hover:bg-gray-50"
-                )}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {t('nav.contact')}
-              </Link>
-
             </div>
           </div>
         )}
