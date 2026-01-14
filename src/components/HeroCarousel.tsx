@@ -77,7 +77,7 @@ export function HeroCarousel({ variant = "classic" }: HeroCarouselProps) {
 
   if (variant === "modern") {
     return (
-      <section className="relative min-h-[85vh] md:min-h-[90vh] overflow-hidden">
+      <section className="relative min-h-[55vh] md:min-h-[60vh] overflow-hidden">
         <Carousel
           setApi={setApi}
           opts={{ loop: true }}
@@ -87,7 +87,7 @@ export function HeroCarousel({ variant = "classic" }: HeroCarouselProps) {
           <CarouselContent className="-ml-0">
             {slides.map((slide, index) => (
               <CarouselItem key={index} className="pl-0">
-                <div className="relative min-h-[85vh] md:min-h-[90vh] flex items-center">
+                <div className="relative min-h-[55vh] md:min-h-[60vh] flex items-center">
                   <div
                     className="absolute inset-0 bg-cover bg-center bg-no-repeat"
                     style={{ backgroundImage: `url(${slide.image})` }}
@@ -103,16 +103,16 @@ export function HeroCarousel({ variant = "classic" }: HeroCarouselProps) {
                     <div className="absolute bottom-10 left-10 w-48 h-48 md:w-64 md:h-64 bg-cyan-400 rounded-full blur-[80px] opacity-10 animate-float" style={{ animationDelay: '2s' }} />
                   </div>
 
-                  <div className="container mx-auto px-4 lg:px-8 relative z-10 py-12">
+                  <div className="container mx-auto px-4 lg:px-8 relative z-10 py-8">
                     <div className="max-w-3xl">
-                      <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 mb-5 backdrop-blur-sm">
-                        <Sparkles className="w-3.5 h-3.5 text-qx-orange" />
-                        <span className="text-filter-label text-white/90 uppercase tracking-wider">
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 mb-4 backdrop-blur-sm">
+                        <Sparkles className="w-3 h-3 text-qx-orange" />
+                        <span className="text-xs text-white/90 uppercase tracking-wider">
                           IFAC Affiliate Member
                         </span>
                       </div>
 
-                      <h1 className="text-hero-headline text-white mb-5">
+                      <h1 className="text-2xl md:text-3xl lg:text-4xl font-heading font-bold text-white mb-4 leading-tight">
                         {slide.tagline.split(slide.highlight || '').map((part, i, arr) => (
                           i < arr.length - 1 ? (
                             <span key={i}>
@@ -124,23 +124,23 @@ export function HeroCarousel({ variant = "classic" }: HeroCarouselProps) {
                         {!slide.tagline.includes(slide.highlight || '') && slide.tagline}
                       </h1>
 
-                      <p className="text-hero-subtext text-white/80 mb-8 max-w-xl">
+                      <p className="text-base md:text-lg text-white/80 mb-6 max-w-xl">
                         {slide.subtitle}
                       </p>
 
                       <div className="flex flex-col sm:flex-row gap-3">
                         <Button
-                          className="bg-gradient-to-r from-qx-orange to-amber-500 hover:from-qx-orange-dark hover:to-amber-600 text-white rounded-full px-8 py-6 text-base font-semibold shadow-lg shadow-qx-orange/30 hover:shadow-xl hover:shadow-qx-orange/40 transition-all duration-300 hover:-translate-y-1"
+                          className="bg-gradient-to-r from-qx-orange to-amber-500 hover:from-qx-orange-dark hover:to-amber-600 text-white rounded-full px-6 py-2.5 text-sm font-semibold shadow-lg shadow-qx-orange/30 hover:shadow-xl hover:shadow-qx-orange/40 transition-all duration-300 hover:-translate-y-1"
                           asChild
                         >
                           <Link to="/contact">
                             Book a Free Consultation
-                            <ArrowRight className="ml-2 h-5 w-5" />
+                            <ArrowRight className="ml-2 h-4 w-4" />
                           </Link>
                         </Button>
                         <Button
                           variant="outline"
-                          className="border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50 rounded-full px-8 py-6 text-base font-semibold backdrop-blur-sm transition-all duration-300"
+                          className="border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50 rounded-full px-6 py-2.5 text-sm font-semibold backdrop-blur-sm transition-all duration-300"
                           asChild
                         >
                           <Link to="/services">Explore Services</Link>
@@ -175,7 +175,7 @@ export function HeroCarousel({ variant = "classic" }: HeroCarouselProps) {
 
   // Classic variant
   return (
-    <section className="relative min-h-[90vh] overflow-hidden">
+    <section className="relative min-h-[55vh] md:min-h-[60vh] overflow-hidden">
       <Carousel
         setApi={setApi}
         opts={{ loop: true }}
@@ -185,7 +185,7 @@ export function HeroCarousel({ variant = "classic" }: HeroCarouselProps) {
         <CarouselContent className="-ml-0">
           {slides.map((slide, index) => (
             <CarouselItem key={index} className="pl-0">
-              <div className="relative min-h-[90vh] flex items-center justify-center">
+              <div className="relative min-h-[55vh] md:min-h-[60vh] flex items-center justify-center">
                 <div
                   className="absolute inset-0 bg-cover bg-center bg-no-repeat"
                   style={{ backgroundImage: `url(${slide.image})` }}
@@ -201,18 +201,18 @@ export function HeroCarousel({ variant = "classic" }: HeroCarouselProps) {
                       </span>
                     </div>
 
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-primary-foreground mb-6 leading-tight">
+                    <h1 className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-primary-foreground mb-4 leading-tight">
                       Welcome to{" "}
                       <span className="text-gradient-gold">Multiverse CPA</span>
                     </h1>
 
-                    <div className="h-20 md:h-16 flex items-center justify-center mb-8">
-                      <p className="text-lg md:text-xl text-primary-foreground/80 font-medium">
+                    <div className="h-14 md:h-12 flex items-center justify-center mb-6">
+                      <p className="text-base md:text-lg text-primary-foreground/80 font-medium">
                         {slide.tagline}
                       </p>
                     </div>
 
-                    <p className="text-base md:text-lg text-primary-foreground/70 max-w-2xl mx-auto mb-10 leading-relaxed">
+                    <p className="text-sm md:text-base text-primary-foreground/70 max-w-2xl mx-auto mb-6 leading-relaxed">
                       {slide.subtitle}
                     </p>
 
