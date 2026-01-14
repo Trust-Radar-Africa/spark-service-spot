@@ -8,6 +8,9 @@ import bookkeepingImg from "@/assets/bookkeeping-service.jpg";
 import consultingImg from "@/assets/consulting-service.jpg";
 import { HeroCarousel } from "@/components/HeroCarousel";
 import { TestimonialsCarousel } from "@/components/TestimonialsCarousel";
+import { ScrollIndicator } from "@/components/ScrollIndicator";
+import { AnimatedSection } from "@/components/AnimatedSection";
+
 const services = [
   {
     title: "Bookkeeping",
@@ -64,59 +67,60 @@ export default function Index() {
     <Layout>
       {/* Hero Carousel */}
       <HeroCarousel variant="classic" />
+      
+      {/* Scroll Indicator */}
+      <ScrollIndicator variant="classic" />
 
       {/* Stats Section */}
-      <section className="py-12 md:py-14 bg-secondary">
-        <div className="container mx-auto px-4 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {stats.map((stat, index) => (
-              <div
-                key={stat.label}
-                className="text-center"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <div className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-accent mb-1">
-                  {stat.value}
+      <AnimatedSection>
+        <section className="py-12 md:py-14 bg-secondary">
+          <div className="container mx-auto px-4 lg:px-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {stats.map((stat) => (
+                <div key={stat.label} className="text-center">
+                  <div className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-accent mb-1">
+                    {stat.value}
+                  </div>
+                  <div className="text-xs md:text-sm text-muted-foreground font-medium uppercase tracking-wide">
+                    {stat.label}
+                  </div>
                 </div>
-                <div className="text-xs md:text-sm text-muted-foreground font-medium uppercase tracking-wide">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </AnimatedSection>
 
       {/* Features Section */}
       <section className="py-14 md:py-16 bg-background">
         <div className="container mx-auto px-4 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-10">
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-foreground mb-3">
-              Why Choose <span className="text-accent">Multiverse CPA</span>?
-            </h2>
-            <p className="text-muted-foreground text-sm md:text-base">
-              We handle your back office tasks at a fraction of the cost without
-              compromising on quality.
-            </p>
-          </div>
+          <AnimatedSection>
+            <div className="text-center max-w-2xl mx-auto mb-10">
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-foreground mb-3">
+                Why Choose <span className="text-accent">Multiverse CPA</span>?
+              </h2>
+              <p className="text-muted-foreground text-sm md:text-base">
+                We handle your back office tasks at a fraction of the cost without
+                compromising on quality.
+              </p>
+            </div>
+          </AnimatedSection>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             {features.map((feature, index) => (
-              <div
-                key={feature.title}
-                className="p-4 md:p-5 rounded-xl bg-card border border-border hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-accent/10 flex items-center justify-center mb-3">
-                  <feature.icon className="w-5 h-5 md:w-6 md:h-6 text-accent" />
+              <AnimatedSection key={feature.title} delay={index * 100}>
+                <div className="p-4 md:p-5 rounded-xl bg-card border border-border hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1 h-full">
+                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-accent/10 flex items-center justify-center mb-3">
+                    <feature.icon className="w-5 h-5 md:w-6 md:h-6 text-accent" />
+                  </div>
+                  <h3 className="font-serif text-base md:text-lg font-semibold text-foreground mb-1.5">
+                    {feature.title}
+                  </h3>
+                  <p className="text-muted-foreground text-xs md:text-sm leading-relaxed">
+                    {feature.description}
+                  </p>
                 </div>
-                <h3 className="font-serif text-base md:text-lg font-semibold text-foreground mb-1.5">
-                  {feature.title}
-                </h3>
-                <p className="text-muted-foreground text-xs md:text-sm leading-relaxed">
-                  {feature.description}
-                </p>
-              </div>
+              </AnimatedSection>
             ))}
           </div>
         </div>
@@ -125,44 +129,46 @@ export default function Index() {
       {/* Services Section */}
       <section className="py-14 md:py-16 bg-muted">
         <div className="container mx-auto px-4 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-10">
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-foreground mb-3">
-              Our <span className="text-accent">Services</span>
-            </h2>
-            <p className="text-muted-foreground text-sm md:text-base">
-              We act as a one-stop shop for your company's financial needs, reducing the need to communicate with multiple accounting outsourcing companies.
-            </p>
-          </div>
+          <AnimatedSection>
+            <div className="text-center max-w-2xl mx-auto mb-10">
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-foreground mb-3">
+                Our <span className="text-accent">Services</span>
+              </h2>
+              <p className="text-muted-foreground text-sm md:text-base">
+                We act as a one-stop shop for your company's financial needs, reducing the need to communicate with multiple accounting outsourcing companies.
+              </p>
+            </div>
+          </AnimatedSection>
 
           <div className="grid md:grid-cols-3 gap-4 md:gap-6">
             {services.map((service, index) => (
-              <Link
-                key={service.title}
-                to={service.href}
-                className="group relative overflow-hidden rounded-xl bg-card shadow-card hover:shadow-card-hover transition-all duration-500"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <div className="aspect-[4/3] overflow-hidden">
-                  <img
-                    src={service.image}
-                    alt={service.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-navy-deep via-navy-deep/50 to-transparent opacity-80" />
-                <div className="absolute bottom-0 left-0 right-0 p-5">
-                  <h3 className="font-serif text-xl font-bold text-primary-foreground mb-1.5 group-hover:text-gold transition-colors">
-                    {service.title}
-                  </h3>
-                  <p className="text-primary-foreground/70 text-sm mb-3 line-clamp-2">
-                    {service.description}
-                  </p>
-                  <span className="inline-flex items-center gap-2 text-gold text-sm font-semibold">
-                    Learn More
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </span>
-                </div>
-              </Link>
+              <AnimatedSection key={service.title} delay={index * 100}>
+                <Link
+                  to={service.href}
+                  className="group relative overflow-hidden rounded-xl bg-card shadow-card hover:shadow-card-hover transition-all duration-500 block"
+                >
+                  <div className="aspect-[4/3] overflow-hidden">
+                    <img
+                      src={service.image}
+                      alt={service.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-navy-deep via-navy-deep/50 to-transparent opacity-80" />
+                  <div className="absolute bottom-0 left-0 right-0 p-5">
+                    <h3 className="font-serif text-xl font-bold text-primary-foreground mb-1.5 group-hover:text-gold transition-colors">
+                      {service.title}
+                    </h3>
+                    <p className="text-primary-foreground/70 text-sm mb-3 line-clamp-2">
+                      {service.description}
+                    </p>
+                    <span className="inline-flex items-center gap-2 text-gold text-sm font-semibold">
+                      Learn More
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </span>
+                  </div>
+                </Link>
+              </AnimatedSection>
             ))}
           </div>
         </div>
@@ -175,81 +181,87 @@ export default function Index() {
       <section className="py-14 md:py-16 bg-background">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-12 items-center">
-            <div className="relative">
-              <div className="aspect-square rounded-xl overflow-hidden shadow-lg">
-                <img
-                  src={teamImg}
-                  alt="Multiverse CPA Team"
-                  className="w-full h-full object-cover"
-                />
+            <AnimatedSection animation="slide-left">
+              <div className="relative">
+                <div className="aspect-square rounded-xl overflow-hidden shadow-lg">
+                  <img
+                    src={teamImg}
+                    alt="Multiverse CPA Team"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="absolute -bottom-4 -right-4 bg-accent text-accent-foreground p-4 rounded-lg shadow-gold">
+                  <div className="text-2xl font-serif font-bold">10+</div>
+                  <div className="text-xs font-medium">Years of Excellence</div>
+                </div>
               </div>
-              <div className="absolute -bottom-4 -right-4 bg-accent text-accent-foreground p-4 rounded-lg shadow-gold">
-                <div className="text-2xl font-serif font-bold">10+</div>
-                <div className="text-xs font-medium">Years of Excellence</div>
+            </AnimatedSection>
+
+            <AnimatedSection animation="slide-right">
+              <div>
+                <h2 className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-foreground mb-4">
+                  Your Trusted Partner in{" "}
+                  <span className="text-accent">Accounting Excellence</span>
+                </h2>
+                <p className="text-muted-foreground mb-5 text-sm md:text-base leading-relaxed">
+                  Multiverse CPA is a firm of Certified Public Accountants
+                  handling exclusively outsourced assignments from firms of
+                  accountants in the USA, Canada, Europe and Australia. Our team comprises
+                  CPAs and Chartered Accountants from diverse nationalities and
+                  backgrounds who have been vetted, tried and tested.
+                </p>
+
+                <ul className="space-y-2.5 mb-6">
+                  {[
+                    "IFAC Affiliate Member",
+                    "Fully vetted and certified professionals",
+                    "Experience across multiple jurisdictions",
+                    "Full operational control remains with you",
+                  ].map((item) => (
+                    <li key={item} className="flex items-center gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-accent flex-shrink-0" />
+                      <span className="text-foreground text-sm">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <Button variant="gold" size="lg" asChild>
+                  <Link to="/about">
+                    Learn More About Us
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
               </div>
-            </div>
-
-            <div>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-foreground mb-4">
-                Your Trusted Partner in{" "}
-                <span className="text-accent">Accounting Excellence</span>
-              </h2>
-              <p className="text-muted-foreground mb-5 text-sm md:text-base leading-relaxed">
-                Multiverse CPA is a firm of Certified Public Accountants
-                handling exclusively outsourced assignments from firms of
-                accountants in the USA, Canada, Europe and Australia. Our team comprises
-                CPAs and Chartered Accountants from diverse nationalities and
-                backgrounds who have been vetted, tried and tested.
-              </p>
-
-              <ul className="space-y-2.5 mb-6">
-                {[
-                  "IFAC Affiliate Member",
-                  "Fully vetted and certified professionals",
-                  "Experience across multiple jurisdictions",
-                  "Full operational control remains with you",
-                ].map((item) => (
-                  <li key={item} className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-accent flex-shrink-0" />
-                    <span className="text-foreground text-sm">{item}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <Button variant="gold" size="lg" asChild>
-                <Link to="/about">
-                  Learn More About Us
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
+            </AnimatedSection>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-14 md:py-16 bg-gradient-navy">
-        <div className="container mx-auto px-4 lg:px-8 text-center">
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-primary-foreground mb-3">
-            Ready to Transform Your Accounting Operations?
-          </h2>
-          <p className="text-primary-foreground/70 max-w-xl mx-auto mb-8 text-sm md:text-base">
-            Schedule a call to discuss how we can contribute to the mission of
-            your firm. Let us handle the back office while you focus on growth.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Button variant="hero" size="xl" asChild>
-              <Link to="/contact">
-                Schedule a Meeting
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-            <Button variant="heroOutline" size="xl" asChild>
-              <Link to="/careers">Join Our Team</Link>
-            </Button>
+      <AnimatedSection>
+        <section className="py-14 md:py-16 bg-gradient-navy">
+          <div className="container mx-auto px-4 lg:px-8 text-center">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-primary-foreground mb-3">
+              Ready to Transform Your Accounting Operations?
+            </h2>
+            <p className="text-primary-foreground/70 max-w-xl mx-auto mb-8 text-sm md:text-base">
+              Schedule a call to discuss how we can contribute to the mission of
+              your firm. Let us handle the back office while you focus on growth.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button variant="hero" size="xl" asChild>
+                <Link to="/contact">
+                  Schedule a Meeting
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+              <Button variant="heroOutline" size="xl" asChild>
+                <Link to="/careers">Join Our Team</Link>
+              </Button>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </AnimatedSection>
     </Layout>
   );
 }
