@@ -360,8 +360,7 @@ export default function IndexModern() {
                   Join our team of dedicated professionals and be part of a leading outsource accounting firm. Explore our current openings.
                 </p>
                 <Button 
-                  variant="outline"
-                  className="border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50 rounded-full px-8 py-6 text-base font-semibold transition-all duration-300"
+                  className="bg-white hover:bg-white/90 text-qx-blue rounded-full px-8 py-6 text-base font-semibold shadow-lg transition-all duration-300 hover:-translate-y-1"
                   asChild
                 >
                   <Link to="/careers">
