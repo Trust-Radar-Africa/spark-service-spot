@@ -15,24 +15,34 @@ import auditImg from "@/assets/audit-service.jpg";
 
 const slides = [
   {
-    tagline: "Exceptional Outsourced Offshore Accounting Solutions",
-    subtitle: "Your premier destination for exceptional outsourced offshore accounting solutions.",
+    tagline: "Your Premier Outsourced Accounting Partner",
+    subtitle: "Exceptional offshore accounting solutions trusted by firms across the US, Canada, Australia and Europe.",
+    highlight: "Multiverse CPA",
     image: heroBg,
   },
   {
-    tagline: "Blending New Techniques With Traditional Values",
-    subtitle: "We combine modern technology with time-tested accounting principles.",
+    tagline: "Professional Bookkeeping Services",
+    subtitle: "Expert bookkeeping using Xero, QuickBooks, Sage, and more. Accurate, timely, and cost-effective.",
+    highlight: "Bookkeeping",
     image: teamImg,
   },
   {
-    tagline: "Global Assignments From US, Canada, Australia & Europe",
-    subtitle: "Serving clients across multiple continents with dedication and expertise.",
+    tagline: "Expert Tax Preparation & Compliance",
+    subtitle: "Comprehensive tax preparation ensuring full compliance and strategic optimization for your clients.",
+    highlight: "Tax Preparation",
     image: auditImg,
   },
   {
-    tagline: "Your One-Stop Shop for Financial Needs",
-    subtitle: "Comprehensive accounting services tailored to your firm's requirements.",
+    tagline: "Audit, Review & Financial Analysis",
+    subtitle: "Thorough audit, review and compilation of financial statements with in-depth analysis.",
+    highlight: "Audit & Review",
     image: heroBg,
+  },
+  {
+    tagline: "One-Stop Shop for Financial Needs",
+    subtitle: "Reduce complexity with a single partner for all your accounting outsourcing requirements.",
+    highlight: "Full-Service",
+    image: teamImg,
   },
 ];
 
@@ -103,7 +113,15 @@ export function HeroCarousel({ variant = "classic" }: HeroCarouselProps) {
                       </div>
 
                       <h1 className="text-hero-headline text-white mb-5">
-                        {slide.tagline}
+                        {slide.tagline.split(slide.highlight || '').map((part, i, arr) => (
+                          i < arr.length - 1 ? (
+                            <span key={i}>
+                              {part}
+                              <span className="text-qx-orange">{slide.highlight}</span>
+                            </span>
+                          ) : part
+                        ))}
+                        {!slide.tagline.includes(slide.highlight || '') && slide.tagline}
                       </h1>
 
                       <p className="text-hero-subtext text-white/80 mb-8 max-w-xl">
