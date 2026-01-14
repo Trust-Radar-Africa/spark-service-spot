@@ -35,15 +35,15 @@ export default function BlogPostModern() {
             Back to Blog
           </Link>
 
-          <span className="inline-block px-3 py-1 bg-qx-orange/20 text-qx-orange text-sm font-medium rounded-full mb-4">
+          <span className="inline-block px-3 py-1 bg-qx-orange/20 text-qx-orange text-filter-label rounded-full mb-4">
             {post.category}
           </span>
 
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-montserrat font-bold text-white mb-6 max-w-4xl">
+          <h1 className="text-hero-headline text-white mb-6 max-w-4xl">
             {post.title}
           </h1>
 
-          <div className="flex flex-wrap items-center gap-4 text-sm text-white/70">
+          <div className="flex flex-wrap items-center gap-4 text-job-meta text-white/70">
             <span className="flex items-center gap-1">
               <User className="w-4 h-4" />
               {post.author.name}
@@ -83,7 +83,7 @@ export default function BlogPostModern() {
               {/* Share Section */}
               <div className="mt-12 pt-8 border-t border-gray-100">
                 <div className="flex items-center gap-4">
-                  <span className="flex items-center gap-2 text-qx-gray">
+                  <span className="flex items-center gap-2 text-job-meta text-qx-gray">
                     <Share2 className="w-4 h-4" />
                     Share this article:
                   </span>
@@ -106,7 +106,7 @@ export default function BlogPostModern() {
             <aside className="lg:col-span-4">
               {/* Author Bio */}
               <div className="bg-qx-light-gray rounded-xl p-6 mb-8">
-                <h3 className="font-montserrat text-lg font-bold text-qx-blue mb-4">
+                <h3 className="text-job-title text-qx-blue mb-4">
                   About the Author
                 </h3>
                 <div className="flex items-start gap-4">
@@ -118,17 +118,17 @@ export default function BlogPostModern() {
                     />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-qx-blue">{post.author.name}</h4>
-                    <p className="text-sm text-qx-orange mb-2">{post.author.role}</p>
+                    <h4 className="text-job-company text-qx-blue">{post.author.name}</h4>
+                    <p className="text-job-meta text-qx-orange mb-2">{post.author.role}</p>
                   </div>
                 </div>
-                <p className="text-sm text-qx-gray mt-4 leading-relaxed">{post.author.bio}</p>
+                <p className="text-body-paragraph text-qx-gray mt-4">{post.author.bio}</p>
               </div>
 
               {/* Newsletter Signup */}
               <div className="bg-qx-blue rounded-xl p-6 mb-8">
-                <h3 className="font-montserrat text-lg font-bold text-white mb-2">Stay Updated</h3>
-                <p className="text-sm text-white/70 mb-4">
+                <h3 className="text-job-title text-white mb-2">Stay Updated</h3>
+                <p className="text-body-paragraph text-white/70 mb-4">
                   Get the latest insights delivered to your inbox.
                 </p>
                 <input
@@ -149,7 +149,7 @@ export default function BlogPostModern() {
       {relatedPosts.length > 0 && (
         <section className="py-16 bg-qx-light-gray">
           <div className="container mx-auto px-4 lg:px-8">
-            <h3 className="text-2xl font-montserrat font-bold text-qx-blue mb-8">
+            <h3 className="text-section-title text-qx-blue mb-8">
               Related Articles
             </h3>
             <div className="grid md:grid-cols-3 gap-8">
@@ -167,13 +167,13 @@ export default function BlogPostModern() {
                     />
                   </div>
                   <div className="p-6">
-                    <span className="inline-block px-2 py-1 bg-qx-orange/10 text-qx-orange text-xs font-medium rounded mb-3">
+                    <span className="inline-block px-2 py-1 bg-qx-orange/10 text-qx-orange text-filter-label rounded mb-3">
                       {relatedPost.category}
                     </span>
-                    <h4 className="font-montserrat text-lg font-bold text-qx-blue mb-2 group-hover:text-qx-orange transition-colors line-clamp-2">
+                    <h4 className="text-job-title text-qx-blue mb-2 group-hover:text-qx-orange transition-colors line-clamp-2">
                       {relatedPost.title}
                     </h4>
-                    <div className="flex items-center text-xs text-qx-gray">
+                    <div className="flex items-center text-job-meta text-qx-gray">
                       <Calendar className="w-3 h-3 mr-1" />
                       {relatedPost.date}
                     </div>
@@ -188,10 +188,10 @@ export default function BlogPostModern() {
       {/* CTA Section */}
       <section className="py-16 bg-qx-blue">
         <div className="container mx-auto px-4 lg:px-8 text-center">
-          <h3 className="text-2xl md:text-3xl font-montserrat font-bold text-white mb-4">
+          <h3 className="text-section-title text-white mb-4">
             Ready to Transform Your Practice?
           </h3>
-          <p className="text-white/70 max-w-xl mx-auto mb-8">
+          <p className="text-hero-subtext text-white/70 max-w-xl mx-auto mb-8">
             Discover how our offshore accounting services can help you grow while reducing costs.
           </p>
           <Button
