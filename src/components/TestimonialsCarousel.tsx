@@ -7,7 +7,7 @@ import {
   CarouselNext,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import { Quote } from "lucide-react";
+import { Quote, Star, Sparkles } from "lucide-react";
 import Autoplay from "embla-carousel-autoplay";
 
 const testimonials = [
@@ -17,6 +17,7 @@ const testimonials = [
     role: "Managing Partner",
     company: "Mitchell & Associates CPA",
     location: "California, USA",
+    rating: 5,
   },
   {
     quote: "The quality of work and attention to detail is outstanding. We've reduced our operational costs by 40% while improving turnaround times. Highly recommend their services.",
@@ -24,6 +25,7 @@ const testimonials = [
     role: "Director",
     company: "Crawford Accounting Group",
     location: "Toronto, Canada",
+    rating: 5,
   },
   {
     quote: "Working with Multiverse CPA feels like having an extension of our own team. Their professionals understand our workflows and consistently deliver beyond expectations.",
@@ -31,6 +33,7 @@ const testimonials = [
     role: "Senior Partner",
     company: "Richardson & Co Chartered Accountants",
     location: "London, UK",
+    rating: 5,
   },
   {
     quote: "Their tax preparation team is incredibly knowledgeable about US regulations. The four-eyed review process ensures we never have to worry about quality or compliance.",
@@ -38,6 +41,7 @@ const testimonials = [
     role: "Founder",
     company: "Zhang Financial Services",
     location: "Sydney, Australia",
+    rating: 5,
   },
   {
     quote: "Exceptional service from day one. The onboarding was smooth, communication is seamless, and the cost savings have been remarkable for our growing firm.",
@@ -45,6 +49,7 @@ const testimonials = [
     role: "Principal",
     company: "Foster & Partners Accounting",
     location: "New York, USA",
+    rating: 5,
   },
 ];
 
@@ -72,18 +77,26 @@ export function TestimonialsCarousel({ variant = "classic" }: TestimonialsCarous
 
   if (variant === "modern") {
     return (
-      <section className="py-20 bg-qx-light-gray">
-        <div className="container mx-auto px-4 lg:px-8">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-montserrat font-bold text-qx-blue mb-4">
-              What Our Clients Say
+      <section className="py-24 bg-gradient-to-b from-qx-light-gray to-white relative overflow-hidden">
+        {/* Background decorations */}
+        <div className="absolute top-0 left-0 w-96 h-96 bg-qx-orange/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-qx-blue/5 rounded-full blur-3xl" />
+        
+        <div className="container mx-auto px-4 lg:px-8 relative z-10">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-qx-orange/10 border border-qx-orange/20 mb-4">
+              <Sparkles className="w-4 h-4 text-qx-orange" />
+              <span className="text-sm font-semibold text-qx-orange">Client Success Stories</span>
+            </div>
+            <h2 className="text-3xl md:text-5xl font-montserrat font-bold text-qx-blue mb-4">
+              What Our <span className="text-qx-orange">Clients</span> Say
             </h2>
-            <p className="text-qx-gray max-w-2xl mx-auto">
+            <p className="text-qx-gray max-w-2xl mx-auto text-lg">
               Trusted by accounting firms worldwide to deliver exceptional results.
             </p>
           </div>
 
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-5xl mx-auto">
             <Carousel
               setApi={setApi}
               opts={{ loop: true, align: "center" }}
@@ -93,25 +106,32 @@ export function TestimonialsCarousel({ variant = "classic" }: TestimonialsCarous
               <CarouselContent>
                 {testimonials.map((testimonial, index) => (
                   <CarouselItem key={index}>
-                    <div className="bg-white rounded-2xl p-8 md:p-12 shadow-lg border border-gray-100">
-                      <div className="flex justify-center mb-6">
-                        <div className="w-14 h-14 rounded-full bg-qx-orange/10 flex items-center justify-center">
-                          <Quote className="w-7 h-7 text-qx-orange" />
+                    <div className="glass-card rounded-3xl p-10 md:p-14 shadow-xl border border-gray-100 hover-lift mx-2">
+                      {/* Rating stars */}
+                      <div className="flex justify-center gap-1 mb-6">
+                        {[...Array(testimonial.rating)].map((_, i) => (
+                          <Star key={i} className="w-5 h-5 fill-qx-orange text-qx-orange" />
+                        ))}
+                      </div>
+                      
+                      <div className="flex justify-center mb-8">
+                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-qx-orange to-amber-400 flex items-center justify-center shadow-lg shadow-qx-orange/30">
+                          <Quote className="w-8 h-8 text-white" />
                         </div>
                       </div>
                       
-                      <blockquote className="text-lg md:text-xl text-qx-blue text-center leading-relaxed mb-8">
+                      <blockquote className="text-xl md:text-2xl text-qx-blue text-center leading-relaxed mb-10 font-medium">
                         "{testimonial.quote}"
                       </blockquote>
                       
                       <div className="text-center">
-                        <div className="font-montserrat font-bold text-qx-blue text-lg">
+                        <div className="font-montserrat font-bold text-qx-blue text-xl mb-1">
                           {testimonial.author}
                         </div>
-                        <div className="text-qx-orange font-medium">
+                        <div className="text-qx-orange font-semibold text-lg">
                           {testimonial.role}
                         </div>
-                        <div className="text-qx-gray text-sm mt-1">
+                        <div className="text-qx-gray mt-2">
                           {testimonial.company} • {testimonial.location}
                         </div>
                       </div>
@@ -119,20 +139,20 @@ export function TestimonialsCarousel({ variant = "classic" }: TestimonialsCarous
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              <CarouselPrevious className="hidden md:flex -left-12 bg-white border-gray-200 hover:bg-qx-orange hover:text-white hover:border-qx-orange" />
-              <CarouselNext className="hidden md:flex -right-12 bg-white border-gray-200 hover:bg-qx-orange hover:text-white hover:border-qx-orange" />
+              <CarouselPrevious className="hidden md:flex -left-14 w-14 h-14 bg-white border-gray-200 hover:bg-gradient-to-r hover:from-qx-orange hover:to-amber-500 hover:text-white hover:border-transparent shadow-lg transition-all duration-300" />
+              <CarouselNext className="hidden md:flex -right-14 w-14 h-14 bg-white border-gray-200 hover:bg-gradient-to-r hover:from-qx-orange hover:to-amber-500 hover:text-white hover:border-transparent shadow-lg transition-all duration-300" />
             </Carousel>
 
-            {/* Indicators */}
-            <div className="flex justify-center gap-2 mt-8">
+            {/* Enhanced Indicators */}
+            <div className="flex justify-center gap-2 mt-10">
               {testimonials.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => api?.scrollTo(index)}
-                  className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                  className={`h-3 rounded-full transition-all duration-500 ${
                     current === index
-                      ? "bg-qx-orange w-6"
-                      : "bg-qx-blue/20 hover:bg-qx-blue/40"
+                      ? "bg-gradient-to-r from-qx-orange to-amber-400 w-10 shadow-lg shadow-qx-orange/30"
+                      : "bg-qx-blue/20 hover:bg-qx-blue/40 w-3"
                   }`}
                   aria-label={`Go to testimonial ${index + 1}`}
                 />
