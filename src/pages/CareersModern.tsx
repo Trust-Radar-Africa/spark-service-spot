@@ -152,18 +152,21 @@ export default function CareersModern() {
               </span>
             </div>
             <h1 className="text-hero-headline text-white mb-4">
-              Join Our <span className="text-qx-orange">Global Team</span>
+              Build Your Career at{" "}
+              <span className="text-qx-orange">Multiverse CPA</span>
             </h1>
-            <p className="text-hero-subtext text-white/80 mb-6">
-              We provide a challenging and rewarding environment and the chance for you to build
-              your own knowledge and expertise.
+            <p className="text-hero-subtext text-white/80 mb-4">
+              At Multiverse CPA, we provide a challenging and rewarding environment and the chance for you to build your own knowledge and expertise.
+            </p>
+            <p className="text-body-paragraph text-white/70 mb-6">
+              Our dedication to providing outstanding levels of client service means we are always on the lookout for bright and ambitious individuals to join our team of professionals.
             </p>
             <Button
               className="bg-qx-orange hover:bg-qx-orange-dark text-white rounded-full px-8"
               asChild
             >
               <a href="#vacancies">
-                Browse Opportunities
+                View Available Vacancies
                 <ArrowRight className="ml-2 h-4 w-4" />
               </a>
             </Button>
@@ -498,17 +501,19 @@ export default function CareersModern() {
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <AnimatedSection animation="slide-left">
                 <div>
-                  <h2 className="text-3xl md:text-4xl font-montserrat font-bold text-qx-blue mb-4">
-                    Why Work With Us?
+                  <h2 className="text-section-title text-qx-blue mb-4">
+                    Why Work With <span className="text-qx-orange">Multiverse CPA</span>?
                   </h2>
-                  <p className="text-qx-gray mb-6 leading-relaxed text-sm">
-                    Our dedication to providing outstanding levels of client service means we are always
-                    on the lookout for bright and ambitious individuals. When you join our team, you
-                    will be assigned to work remotely with one of the firms with which we have a
-                    contractual relationship.
-                  </p>
+                  <div className="space-y-4 text-body-paragraph text-qx-gray leading-relaxed">
+                    <p>
+                      We provide extensive training and development to help you achieve your best. At Multiverse CPA, you will be <span className="font-semibold text-qx-blue">valued as an individual</span>, mentored as a future leader, and recognized for your accomplishments and potential.
+                    </p>
+                    <p>
+                      When you join our team, you will be assigned to work remotely with one of the firms of accountants with which we have a contractual relationship.
+                    </p>
+                  </div>
 
-                  <div className="grid sm:grid-cols-2 gap-3">
+                  <div className="grid sm:grid-cols-2 gap-3 mt-6">
                     {benefits.map((benefit, index) => (
                       <AnimatedSection key={benefit.text} animation="fade-up" delay={index * 50}>
                         <div className="flex items-start gap-3 p-3 rounded-xl bg-qx-light-gray">
@@ -524,16 +529,14 @@ export default function CareersModern() {
               </AnimatedSection>
 
               <AnimatedSection animation="slide-right">
-                <div className="bg-qx-light-gray rounded-2xl p-6 border border-gray-100">
-                  <h3 className="text-lg font-bold text-qx-blue mb-3">Career Growth</h3>
-                  <p className="text-qx-gray mb-5 text-sm">
-                    We provide extensive training and development to help you achieve your best. At
-                    Multiverse CPA, you will be valued as an individual, mentored as a future leader,
-                    and recognized for your accomplishments and potential.
+                <div className="bg-gradient-to-br from-qx-light-gray to-white rounded-2xl p-6 border border-gray-100">
+                  <h3 className="text-job-title text-qx-blue mb-3">Ready to Get Started?</h3>
+                  <p className="text-body-paragraph text-qx-gray mb-5">
+                    Visit our available vacancies to apply for current openings and take the next step in your career journey.
                   </p>
-                  <Button className="bg-qx-orange hover:bg-qx-orange-dark text-white rounded-full" asChild>
+                  <Button className="bg-gradient-to-r from-qx-orange to-amber-500 hover:from-qx-orange-dark hover:to-amber-600 text-white rounded-full" asChild>
                     <a href="#vacancies">
-                      View Open Positions
+                      View Available Vacancies
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </a>
                   </Button>
