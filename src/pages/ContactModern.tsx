@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Mail, Calendar, Send, CheckCircle2, Phone, MapPin } from "lucide-react";
+import { Mail, Calendar, Send, CheckCircle2, Phone, MapPin, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { AnimatedSection } from "@/components/AnimatedSection";
 
@@ -53,131 +53,112 @@ export default function ContactModern() {
       <section className="relative py-16 md:py-20 bg-gradient-to-br from-qx-blue to-qx-blue-dark overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-10 right-10 w-72 h-72 bg-qx-orange rounded-full blur-3xl" />
+          <div className="absolute bottom-10 left-10 w-48 h-48 bg-cyan-400 rounded-full blur-3xl" />
         </div>
 
         <div className="relative container mx-auto px-4 lg:px-8">
-          <div className="max-w-3xl">
+          <div className="max-w-3xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 mb-4">
-              <span className="text-filter-label text-qx-orange uppercase tracking-wider">
+              <MessageCircle className="w-4 h-4 text-qx-orange" />
+              <span className="text-filter-label text-white uppercase tracking-wider">
                 Contact Us
               </span>
             </div>
             <h1 className="text-hero-headline text-white mb-4">
-              Book a{" "}
-              <span className="text-qx-orange">Free Consultation</span>
+              Let's Have a{" "}
+              <span className="text-qx-orange">Chat!</span>
             </h1>
-            <p className="text-hero-subtext text-white/80">
-              We strongly recommend that you schedule a call to discuss how we can contribute to the mission of your firm.
+            <p className="text-hero-subtext text-white/80 max-w-xl mx-auto">
+              We'd love to hear from you. Schedule a meeting, give us a call, or send us an email.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Contact Section */}
-      <section className="py-14 md:py-16 bg-white">
+      {/* Quick Contact Cards */}
+      <section className="py-10 bg-white border-b">
         <div className="container mx-auto px-4 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-12">
-            {/* Contact Info */}
-            <AnimatedSection animation="slide-left">
-              <div>
-                <h2 className="text-section-title text-qx-blue mb-4">
-                  Get in Touch
-                </h2>
-                <p className="text-body-paragraph text-qx-gray mb-8">
-                  Whether you're looking to outsource accounting tasks, need a candidate referral, or have questions about our services, we're here to help.
+          <div className="grid md:grid-cols-3 gap-4 max-w-4xl mx-auto -mt-20 relative z-10">
+            {/* Schedule Meeting */}
+            <AnimatedSection delay={0}>
+              <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 text-center hover:shadow-2xl transition-shadow duration-300">
+                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-qx-orange to-amber-400 flex items-center justify-center mx-auto mb-4 shadow-lg">
+                  <Calendar className="w-7 h-7 text-white" />
+                </div>
+                <h3 className="text-job-title text-qx-blue mb-2">Schedule a Meeting</h3>
+                <p className="text-body-paragraph text-qx-gray text-sm mb-4">
+                  Book a time to discuss your outsourcing needs
                 </p>
-
-                <div className="space-y-4">
-                  {/* Phone */}
-                  <div className="flex items-start gap-4 p-4 rounded-xl bg-qx-light-gray border border-gray-100">
-                    <div className="w-10 h-10 rounded-lg bg-qx-orange flex items-center justify-center flex-shrink-0">
-                      <Phone className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-job-company text-qx-blue mb-1">Call Us</h3>
-                      <a
-                        href="tel:+18885566382"
-                        className="text-job-meta text-qx-orange hover:underline"
-                      >
-                        +1 888 556 6382
-                      </a>
-                    </div>
-                  </div>
-
-                  {/* Email */}
-                  <div className="flex items-start gap-4 p-4 rounded-xl bg-qx-light-gray border border-gray-100">
-                    <div className="w-10 h-10 rounded-lg bg-qx-orange flex items-center justify-center flex-shrink-0">
-                      <Mail className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-job-company text-qx-blue mb-1">Email Us</h3>
-                      <a
-                        href="mailto:info@multiversecpa.com"
-                        className="text-job-meta text-qx-orange hover:underline"
-                      >
-                        info@multiversecpa.com
-                      </a>
-                    </div>
-                  </div>
-
-                  {/* Address */}
-                  <div className="flex items-start gap-4 p-4 rounded-xl bg-qx-light-gray border border-gray-100">
-                    <div className="w-10 h-10 rounded-lg bg-qx-orange flex items-center justify-center flex-shrink-0">
-                      <MapPin className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-job-company text-qx-blue mb-1">Our Address</h3>
-                      <p className="text-job-meta text-qx-gray">
-                        500 Westover Dr #31297<br />
-                        Sanford, NC 27330
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Schedule Meeting */}
-                  <div className="flex items-start gap-4 p-4 rounded-xl bg-qx-light-gray border border-gray-100">
-                    <div className="w-10 h-10 rounded-lg bg-qx-orange flex items-center justify-center flex-shrink-0">
-                      <Calendar className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-job-company text-qx-blue mb-1">Book a Meeting</h3>
-                      <p className="text-job-meta text-qx-gray">
-                        Schedule a time to discuss your outsourcing needs.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* What We Can Help With */}
-                <div className="mt-8">
-                  <h3 className="text-job-title text-qx-blue mb-3">
-                    How Can We Help?
-                  </h3>
-                  <ul className="space-y-2">
-                    {[
-                      "Discuss outsourced accounting services",
-                      "Request a candidate referral",
-                      "Learn about our audit support",
-                      "Explore bookkeeping solutions",
-                      "Inquire about consulting services",
-                      "Submit your resume for careers",
-                    ].map((item) => (
-                      <li key={item} className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-qx-orange flex-shrink-0" />
-                        <span className="text-body-paragraph text-qx-gray">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                <Button 
+                  className="bg-gradient-to-r from-qx-orange to-amber-500 hover:from-qx-orange-dark hover:to-amber-600 text-white rounded-full w-full"
+                >
+                  Book Now
+                </Button>
               </div>
             </AnimatedSection>
 
+            {/* Call Us */}
+            <AnimatedSection delay={100}>
+              <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 text-center hover:shadow-2xl transition-shadow duration-300">
+                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-qx-blue to-qx-blue-dark flex items-center justify-center mx-auto mb-4 shadow-lg">
+                  <Phone className="w-7 h-7 text-white" />
+                </div>
+                <h3 className="text-job-title text-qx-blue mb-2">Call Us</h3>
+                <a
+                  href="tel:+18885566382"
+                  className="text-job-salary text-xl text-qx-orange hover:underline block mb-4"
+                >
+                  +1 888 556 6382
+                </a>
+                <Button 
+                  variant="outline"
+                  className="border-qx-blue text-qx-blue hover:bg-qx-blue hover:text-white rounded-full w-full"
+                  asChild
+                >
+                  <a href="tel:+18885566382">Call Now</a>
+                </Button>
+              </div>
+            </AnimatedSection>
+
+            {/* Email Us */}
+            <AnimatedSection delay={200}>
+              <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 text-center hover:shadow-2xl transition-shadow duration-300">
+                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-qx-blue to-qx-blue-dark flex items-center justify-center mx-auto mb-4 shadow-lg">
+                  <Mail className="w-7 h-7 text-white" />
+                </div>
+                <h3 className="text-job-title text-qx-blue mb-2">Email Us</h3>
+                <a
+                  href="mailto:info@multiversecpa.com"
+                  className="text-body-paragraph text-qx-orange hover:underline block mb-4"
+                >
+                  info@multiversecpa.com
+                </a>
+                <Button 
+                  variant="outline"
+                  className="border-qx-blue text-qx-blue hover:bg-qx-blue hover:text-white rounded-full w-full"
+                  asChild
+                >
+                  <a href="mailto:info@multiversecpa.com">Send Email</a>
+                </Button>
+              </div>
+            </AnimatedSection>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Form & Address Section */}
+      <section className="py-14 md:py-16 bg-qx-light-gray">
+        <div className="container mx-auto px-4 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-12">
             {/* Contact Form */}
-            <AnimatedSection animation="slide-right">
-              <div className="bg-qx-light-gray rounded-2xl p-6 md:p-8 border border-gray-100">
-                <h3 className="text-job-title text-qx-blue mb-5">
+            <AnimatedSection animation="slide-left">
+              <div className="bg-white rounded-2xl p-6 md:p-8 border border-gray-100 shadow-sm">
+                <h3 className="text-section-title text-qx-blue mb-2">
                   Send Us a Message
                 </h3>
+                <p className="text-body-paragraph text-qx-gray mb-6">
+                  Have a question or want to learn more? Fill out the form below and we'll get back to you promptly.
+                </p>
 
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div className="grid sm:grid-cols-2 gap-5">
@@ -190,7 +171,7 @@ export default function ContactModern() {
                         value={formData.name}
                         onChange={handleChange}
                         required
-                        className="bg-white border-gray-200 focus:border-qx-orange focus:ring-qx-orange"
+                        className="bg-qx-light-gray border-gray-200 focus:border-qx-orange focus:ring-qx-orange"
                       />
                     </div>
                     <div className="space-y-2">
@@ -203,7 +184,7 @@ export default function ContactModern() {
                         value={formData.email}
                         onChange={handleChange}
                         required
-                        className="bg-white border-gray-200 focus:border-qx-orange focus:ring-qx-orange"
+                        className="bg-qx-light-gray border-gray-200 focus:border-qx-orange focus:ring-qx-orange"
                       />
                     </div>
                   </div>
@@ -217,7 +198,7 @@ export default function ContactModern() {
                         placeholder="Your Company"
                         value={formData.company}
                         onChange={handleChange}
-                        className="bg-white border-gray-200 focus:border-qx-orange focus:ring-qx-orange"
+                        className="bg-qx-light-gray border-gray-200 focus:border-qx-orange focus:ring-qx-orange"
                       />
                     </div>
                     <div className="space-y-2">
@@ -229,7 +210,7 @@ export default function ContactModern() {
                         value={formData.subject}
                         onChange={handleChange}
                         required
-                        className="bg-white border-gray-200 focus:border-qx-orange focus:ring-qx-orange"
+                        className="bg-qx-light-gray border-gray-200 focus:border-qx-orange focus:ring-qx-orange"
                       />
                     </div>
                   </div>
@@ -244,13 +225,13 @@ export default function ContactModern() {
                       value={formData.message}
                       onChange={handleChange}
                       required
-                      className="bg-white border-gray-200 focus:border-qx-orange focus:ring-qx-orange"
+                      className="bg-qx-light-gray border-gray-200 focus:border-qx-orange focus:ring-qx-orange"
                     />
                   </div>
 
                   <Button
                     type="submit"
-                    className="w-full bg-qx-orange hover:bg-qx-orange-dark text-white rounded-full py-6"
+                    className="w-full bg-gradient-to-r from-qx-orange to-amber-500 hover:from-qx-orange-dark hover:to-amber-600 text-white rounded-full py-6"
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? (
@@ -265,34 +246,73 @@ export default function ContactModern() {
                 </form>
               </div>
             </AnimatedSection>
+
+            {/* Address & Info */}
+            <AnimatedSection animation="slide-right">
+              <div className="space-y-6">
+                {/* Address Card */}
+                <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-qx-blue to-qx-blue-dark flex items-center justify-center flex-shrink-0">
+                      <MapPin className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-job-title text-qx-blue mb-2">Multiverse CPA</h3>
+                      <p className="text-body-paragraph text-qx-gray leading-relaxed">
+                        500 Westover Dr #31297<br />
+                        Sanford, NC 27330<br />
+                        United States
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* How We Can Help */}
+                <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                  <h3 className="text-job-title text-qx-blue mb-4">
+                    How Can We Help?
+                  </h3>
+                  <ul className="space-y-3">
+                    {[
+                      "Discuss outsourced accounting services",
+                      "Request a candidate referral",
+                      "Learn about our audit support",
+                      "Explore bookkeeping solutions",
+                      "Inquire about consulting services",
+                      "Submit your resume for careers",
+                    ].map((item) => (
+                      <li key={item} className="flex items-center gap-3">
+                        <CheckCircle2 className="w-4 h-4 text-qx-orange flex-shrink-0" />
+                        <span className="text-body-paragraph text-qx-gray">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Global Presence */}
+                <div className="bg-gradient-to-br from-qx-blue to-qx-blue-dark rounded-2xl p-6 text-white">
+                  <h3 className="text-job-title text-white mb-3">
+                    Serving Clients Globally
+                  </h3>
+                  <p className="text-body-paragraph text-white/80 mb-4">
+                    Our team handles diverse assignments from clients across multiple continents.
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {["United States", "Canada", "Europe", "Australia"].map((region) => (
+                      <div
+                        key={region}
+                        className="px-3 py-2 rounded-lg bg-white/10 border border-white/20 text-center"
+                      >
+                        <span className="text-sm font-medium">{region}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </AnimatedSection>
           </div>
         </div>
       </section>
-
-      {/* Global Section */}
-      <AnimatedSection>
-        <section className="py-14 md:py-16 bg-qx-light-gray">
-          <div className="container mx-auto px-4 lg:px-8 text-center">
-            <h2 className="text-section-title text-qx-blue mb-3">
-              Serving Clients Globally
-            </h2>
-            <p className="text-section-subtitle text-qx-gray max-w-2xl mx-auto mb-8">
-              Our team handles diverse assignments from clients across the USA, Canada, Australia, and Europe.
-            </p>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {["United States", "Canada", "Europe", "Australia"].map((region) => (
-                <div
-                  key={region}
-                  className="p-4 rounded-xl bg-white border border-gray-100"
-                >
-                  <div className="text-job-company text-qx-blue">{region}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      </AnimatedSection>
     </LayoutModern>
   );
 }
