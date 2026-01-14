@@ -46,12 +46,12 @@ export default function BlogModern() {
   return (
     <LayoutModern>
       {/* Hero Section */}
-      <section className="pt-28 pb-16 bg-qx-blue">
+      <section className="pt-20 pb-10 bg-qx-blue">
         <div className="container mx-auto px-4 lg:px-8 text-center">
-          <h1 className="text-hero-headline text-white mb-4">
+          <h1 className="text-2xl md:text-3xl font-heading font-bold text-white mb-3">
             Insights & <span className="text-qx-orange">Resources</span>
           </h1>
-          <p className="text-hero-subtext text-white/70 max-w-2xl mx-auto mb-8">
+          <p className="text-sm md:text-base text-white/70 max-w-2xl mx-auto mb-6">
             Expert perspectives on accounting, outsourcing best practices, and industry trends.
           </p>
           <BlogSearch onSearch={setSearchQuery} isLoading={isLoading} variant="modern" />
@@ -81,10 +81,10 @@ export default function BlogModern() {
 
       {/* Featured Post */}
       {featuredPost && (
-        <section className="py-16 bg-white">
+        <section className="py-10 md:py-12 bg-white">
           <div className="container mx-auto px-4 lg:px-8">
-            <div className="grid lg:grid-cols-2 gap-8 items-center">
-              <div className="aspect-[16/10] rounded-2xl overflow-hidden shadow-xl">
+            <div className="grid lg:grid-cols-2 gap-6 items-center">
+              <div className="aspect-[16/10] rounded-xl overflow-hidden shadow-lg">
                 <img
                   src={featuredPost.image}
                   alt={featuredPost.title}
@@ -92,10 +92,10 @@ export default function BlogModern() {
                 />
               </div>
               <div>
-                <span className="inline-block px-3 py-1 bg-qx-orange/10 text-qx-orange text-filter-label rounded-full mb-4">
+                <span className="inline-block px-2 py-1 bg-qx-orange/10 text-qx-orange text-xs rounded-full mb-3">
                   {featuredPost.category}
                 </span>
-                <h2 className="text-section-title text-qx-blue mb-4">
+                <h2 className="text-xl md:text-2xl font-heading font-bold text-qx-blue mb-3">
                   {featuredPost.title}
                 </h2>
                 <p className="text-body-paragraph text-qx-gray mb-6">{featuredPost.excerpt}</p>
@@ -129,9 +129,9 @@ export default function BlogModern() {
       )}
 
       {/* Posts Grid */}
-      <section className="py-16 bg-qx-light-gray">
+      <section className="py-10 md:py-12 bg-qx-light-gray">
         <div className="container mx-auto px-4 lg:px-8">
-          <h3 className="text-section-title text-qx-blue mb-2">
+          <h3 className="text-xl md:text-2xl font-heading font-bold text-qx-blue mb-2">
             {filteredPosts.length === 0 ? "No articles found" : "Latest Articles"}
           </h3>
           
@@ -268,12 +268,12 @@ export default function BlogModern() {
       </section>
 
       {/* Newsletter CTA */}
-      <section className="py-16 bg-qx-blue">
+      <section className="py-10 md:py-12 bg-qx-blue">
         <div className="container mx-auto px-4 lg:px-8 text-center">
-          <h3 className="text-section-title text-white mb-4">
+          <h3 className="text-xl md:text-2xl font-heading font-bold text-white mb-3">
             Stay Updated
           </h3>
-          <p className="text-hero-subtext text-white/70 max-w-xl mx-auto mb-8">
+          <p className="text-sm text-white/70 max-w-xl mx-auto mb-6">
             Subscribe to our newsletter for the latest insights on accounting outsourcing and
             industry trends.
           </p>
