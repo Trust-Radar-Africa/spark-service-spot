@@ -13,7 +13,10 @@ import {
   BarChart3,
   Sparkles,
   Zap,
-  TrendingUp
+  TrendingUp,
+  Globe,
+  Award,
+  Briefcase
 } from "lucide-react";
 import auditImg from "@/assets/audit-service.jpg";
 import bookkeepingImg from "@/assets/bookkeeping-service.jpg";
@@ -77,10 +80,17 @@ const services = [
     href: "/services#tax",
   },
   {
-    title: "Audit & Review",
-    description: "Audit, review and compilation of financial statements.",
-    icon: BarChart3,
+    title: "Financial Analysis",
+    description: "In-depth financial analysis to drive informed business decisions.",
+    icon: TrendingUp,
     image: consultingImg,
+    href: "/services#analysis",
+  },
+  {
+    title: "Audit, Review & Compilation",
+    description: "Comprehensive audit, review and compilation of financial statements.",
+    icon: BarChart3,
+    image: auditImg,
     href: "/services#audit",
   },
 ];
@@ -237,10 +247,91 @@ export default function IndexModern() {
         </div>
       </section>
 
+      {/* About Multiverse CPA Section */}
+      <section className="py-14 md:py-16 bg-white relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-1/3 h-full bg-gradient-to-r from-qx-light-gray/30 to-transparent" />
+        
+        <div className="container mx-auto px-4 lg:px-8 relative z-10">
+          <AnimatedSection>
+            <div className="text-center mb-10">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-qx-blue/10 border border-qx-blue/20 mb-3">
+                <Globe className="w-3.5 h-3.5 text-qx-blue" />
+                <span className="text-filter-label text-qx-blue">About Us</span>
+              </div>
+              <h2 className="text-section-title text-qx-blue mb-2">
+                Welcome to <span className="text-qx-orange">Multiverse CPA</span>
+              </h2>
+              <p className="text-section-subtitle text-qx-gray max-w-3xl mx-auto">
+                Your premier destination for exceptional outsourced offshore accounting solutions.
+              </p>
+            </div>
+          </AnimatedSection>
+
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            <AnimatedSection delay={100}>
+              <div className="space-y-6">
+                <p className="text-body-paragraph text-qx-gray">
+                  As one of the standout outsource offshore accounting firms in the world, our team has handled diverse assignments from the <span className="font-semibold text-qx-blue">US, Canada, Australia and Europe</span>.
+                </p>
+                
+                <div className="flex items-start gap-4 p-4 bg-gradient-to-r from-qx-blue/5 to-qx-orange/5 rounded-xl border border-qx-blue/10">
+                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-qx-blue to-qx-blue-dark flex items-center justify-center flex-shrink-0">
+                    <Award className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="text-job-title text-qx-blue mb-1">IFAC Affiliated</h4>
+                    <p className="text-body-paragraph text-qx-gray">
+                      Multiverse CPA is affiliated to the International Federation of Accountants. Our firm is thus bound by international ethics and professional standards.
+                    </p>
+                  </div>
+                </div>
+
+                <p className="text-body-paragraph text-qx-gray">
+                  We have built our reputation on the robust pillars of <span className="font-semibold text-qx-blue">integrity, competence, and dedication</span>. Our mission is to streamline your business operations with impeccable accounting solutions, providing you with a clear financial roadmap to success.
+                </p>
+
+                <p className="text-body-paragraph text-qx-gray">
+                  By working with us, you are not only selecting an outsource offshore accounting firm; you are also partnering with an experienced team that blends new techniques and traditional values to provide the best accounting experience possible.
+                </p>
+              </div>
+            </AnimatedSection>
+
+            <AnimatedSection delay={200}>
+              <div className="space-y-6">
+                <div className="p-6 bg-gradient-to-br from-qx-light-gray to-white rounded-2xl border border-gray-100">
+                  <h4 className="text-job-title text-qx-blue mb-4 flex items-center gap-2">
+                    <Briefcase className="w-5 h-5 text-qx-orange" />
+                    Our Range of Services
+                  </h4>
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {["Bookkeeping", "Tax Preparation", "Financial Analysis", "Audit, Review & Compilation"].map((service) => (
+                      <li key={service} className="flex items-center gap-2 text-body-paragraph text-qx-gray">
+                        <CheckCircle2 className="w-4 h-4 text-qx-orange flex-shrink-0" />
+                        {service}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <p className="text-body-paragraph text-qx-gray">
+                  We are a team of Professionals who deliver the best-in-class results. We act as a <span className="font-semibold text-qx-blue">one-stop shop</span> for your company's financial needs, reducing the need to communicate with multiple accounting outsourcing companies.
+                </p>
+
+                <div className="p-4 bg-gradient-to-r from-qx-orange/10 to-amber-100/50 rounded-xl border border-qx-orange/20">
+                  <p className="text-body-paragraph text-qx-blue-dark font-medium italic">
+                    "At Multiverse CPA, we do not see your success as an option, but a commitment. Embrace the future of accounting with Multiverse CPA, leading outsource accounting firm."
+                  </p>
+                </div>
+              </div>
+            </AnimatedSection>
+          </div>
+        </div>
+      </section>
+
       {/* Testimonials Section */}
       <TestimonialsCarousel variant="modern" />
 
-      {/* CTA Section */}
+      {/* Dual CTA Section */}
       <AnimatedSection>
         <section className="py-14 md:py-16 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-qx-blue via-qx-blue-dark to-qx-blue" />
@@ -250,35 +341,54 @@ export default function IndexModern() {
             <div className="absolute bottom-6 right-6 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
           </div>
           
-          <div className="container mx-auto px-4 lg:px-8 text-center relative z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 mb-4">
-              <Sparkles className="w-3.5 h-3.5 text-qx-orange" />
-              <span className="text-filter-label text-white/90">Get Started Today</span>
-            </div>
-            
-            <h2 className="text-section-title text-white mb-3">
-              Ready to Scale Your <span className="text-qx-orange">Accounting Firm</span>?
-            </h2>
-            <p className="text-hero-subtext text-white/70 max-w-xl mx-auto mb-8">
-              Schedule a free consultation to discover how our People, Process & Platforms approach can transform your operations.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button 
-                className="bg-gradient-to-r from-qx-orange to-amber-500 hover:from-qx-orange-dark hover:to-amber-600 text-white rounded-full px-8 py-6 text-base font-semibold shadow-lg shadow-qx-orange/30 hover:shadow-xl hover:shadow-qx-orange/40 transition-all duration-300 hover:-translate-y-1"
-                asChild
-              >
-                <Link to="/contact">
-                  Book a Free Consultation
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-              <Button 
-                variant="outline"
-                className="border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50 rounded-full px-8 py-6 text-base font-semibold transition-all duration-300"
-                asChild
-              >
-                <Link to="/careers">View Open Positions</Link>
-              </Button>
+          <div className="container mx-auto px-4 lg:px-8 relative z-10">
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* For Employers */}
+              <div className="text-center md:text-left p-6 md:p-8 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-qx-orange/20 border border-qx-orange/30 mb-4">
+                  <Users className="w-3.5 h-3.5 text-qx-orange" />
+                  <span className="text-filter-label text-white/90">For Employers</span>
+                </div>
+                <h3 className="text-job-title text-2xl text-white mb-3">
+                  Seeking Potential <span className="text-qx-orange">Candidates</span>?
+                </h3>
+                <p className="text-body-paragraph text-white/70 mb-6">
+                  Let us help you find the perfect accounting professionals for your firm. Send us your requirements and we'll match you with top talent.
+                </p>
+                <Button 
+                  className="bg-gradient-to-r from-qx-orange to-amber-500 hover:from-qx-orange-dark hover:to-amber-600 text-white rounded-full px-8 py-6 text-base font-semibold shadow-lg shadow-qx-orange/30 hover:shadow-xl hover:shadow-qx-orange/40 transition-all duration-300 hover:-translate-y-1"
+                  asChild
+                >
+                  <Link to="/employers">
+                    Send Us Your Request
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+              </div>
+
+              {/* For Candidates */}
+              <div className="text-center md:text-left p-6 md:p-8 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/20 border border-white/30 mb-4">
+                  <Briefcase className="w-3.5 h-3.5 text-white" />
+                  <span className="text-filter-label text-white/90">For Candidates</span>
+                </div>
+                <h3 className="text-job-title text-2xl text-white mb-3">
+                  Looking for Your Next <span className="text-qx-orange">Opportunity</span>?
+                </h3>
+                <p className="text-body-paragraph text-white/70 mb-6">
+                  Join our team of dedicated professionals and be part of a leading outsource accounting firm. Explore our current openings.
+                </p>
+                <Button 
+                  variant="outline"
+                  className="border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50 rounded-full px-8 py-6 text-base font-semibold transition-all duration-300"
+                  asChild
+                >
+                  <Link to="/careers">
+                    View Current Careers
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+              </div>
             </div>
           </div>
         </section>
