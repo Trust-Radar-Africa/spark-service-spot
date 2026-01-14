@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Mail, Globe, Building2, ArrowRight, Linkedin, Twitter, Facebook, Instagram, Youtube, ExternalLink } from "lucide-react";
+import { Mail, Globe, Building2, ArrowRight, Linkedin, Twitter, Facebook, Instagram, Youtube, ExternalLink, Phone, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSettingsStore } from "@/stores/settingsStore";
 
@@ -21,8 +21,9 @@ const getSocialIcon = (iconName: string) => {
 };
 
 const services = [
-  { name: "Outsourced Audit", href: "/services#audit" },
   { name: "Bookkeeping", href: "/services#bookkeeping" },
+  { name: "Tax Preparation", href: "/services#tax" },
+  { name: "Audit & Review", href: "/services#audit" },
   { name: "Consulting", href: "/services#consulting" },
 ];
 
@@ -30,28 +31,29 @@ const company = [
   { name: "About Us", href: "/about" },
   { name: "Careers", href: "/careers" },
   { name: "For Employers", href: "/employers" },
+  { name: "Blog", href: "/blog" },
   { name: "Contact", href: "/contact" },
 ];
 
 export function FooterModern() {
-  const { socialLinks, branding } = useSettingsStore();
+  const { socialLinks } = useSettingsStore();
   const enabledLinks = socialLinks.filter((link) => link.enabled);
 
   return (
     <footer className="bg-qx-blue text-white">
       {/* CTA Strip */}
-      <div className="bg-qx-orange py-8">
+      <div className="bg-gradient-to-r from-qx-orange to-amber-500 py-8">
         <div className="container mx-auto px-4 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <div>
             <h3 className="text-xl font-bold text-white mb-1">
-              Ready to Scale Your Accounting Firm?
+              Ready to Partner With Multiverse CPA?
             </h3>
-            <p className="text-white/80 text-sm">
-              Get a free consultation and discover how we can help.
+            <p className="text-white/90 text-sm">
+              Schedule a call to discuss how we can contribute to your firm's mission.
             </p>
           </div>
           <Button 
-            className="bg-white text-qx-orange hover:bg-gray-100 rounded-full px-8"
+            className="bg-white text-qx-orange hover:bg-gray-100 rounded-full px-8 shadow-lg"
             asChild
           >
             <Link to="/contact">
@@ -65,7 +67,7 @@ export function FooterModern() {
       {/* Main Footer */}
       <div className="container mx-auto px-4 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
-          {/* Brand */}
+          {/* Brand & Contact Info */}
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center gap-2 mb-4">
               <div className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center">
@@ -80,9 +82,13 @@ export function FooterModern() {
                 </span>
               </div>
             </Link>
-            <p className="text-white/60 text-sm leading-relaxed">
-              Global leaders in accounting outsourcing. Helping accountants grow their firm's capacity and profitability.
+            <p className="text-white/60 text-sm leading-relaxed mb-4">
+              A firm of Certified Public Accountants handling exclusively outsourced assignments from firms in the USA, Canada, Europe and Australia.
             </p>
+            <div className="flex items-center gap-2 text-sm text-white/60">
+              <Building2 className="w-4 h-4 text-qx-orange flex-shrink-0" />
+              <span>IFAC Affiliate Member</span>
+            </div>
           </div>
 
           {/* Services */}
@@ -123,14 +129,23 @@ export function FooterModern() {
             </ul>
           </div>
 
-          {/* Contact */}
+          {/* Contact Info */}
           <div>
             <h3 className="text-sm font-bold uppercase tracking-wider text-qx-orange mb-4">
-              Contact
+              Contact Us
             </h3>
             <ul className="space-y-3">
-              <li className="flex items-center gap-2 text-sm">
-                <Mail className="w-4 h-4 text-qx-orange" />
+              <li className="flex items-start gap-2 text-sm">
+                <Phone className="w-4 h-4 text-qx-orange flex-shrink-0 mt-0.5" />
+                <a
+                  href="tel:+18885566382"
+                  className="text-white/60 hover:text-qx-orange transition-colors"
+                >
+                  +1 888 556 6382
+                </a>
+              </li>
+              <li className="flex items-start gap-2 text-sm">
+                <Mail className="w-4 h-4 text-qx-orange flex-shrink-0 mt-0.5" />
                 <a
                   href="mailto:info@multiversecpa.com"
                   className="text-white/60 hover:text-qx-orange transition-colors"
@@ -138,16 +153,17 @@ export function FooterModern() {
                   info@multiversecpa.com
                 </a>
               </li>
-              <li className="flex items-center gap-2 text-sm">
-                <Globe className="w-4 h-4 text-qx-orange" />
+              <li className="flex items-start gap-2 text-sm">
+                <MapPin className="w-4 h-4 text-qx-orange flex-shrink-0 mt-0.5" />
                 <span className="text-white/60">
-                  USA, Canada, Europe, Australia
+                  500 Westover Dr #31297<br />
+                  Sanford, NC 27330
                 </span>
               </li>
-              <li className="flex items-center gap-2 text-sm">
-                <Building2 className="w-4 h-4 text-qx-orange" />
+              <li className="flex items-start gap-2 text-sm">
+                <Globe className="w-4 h-4 text-qx-orange flex-shrink-0 mt-0.5" />
                 <span className="text-white/60">
-                  IFAC Affiliate Member
+                  USA, Canada, Europe, Australia
                 </span>
               </li>
             </ul>
@@ -181,7 +197,7 @@ export function FooterModern() {
               </div>
             )}
             <span className="text-white/40 text-xs">
-              People • Process • Platforms
+              Integrity • Competence • Dedication
             </span>
           </div>
         </div>
