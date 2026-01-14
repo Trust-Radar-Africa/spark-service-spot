@@ -50,25 +50,25 @@ export default function ContactModern() {
   return (
     <LayoutModern>
       {/* Hero Section */}
-      <section className="relative py-16 md:py-20 bg-gradient-to-br from-qx-blue to-qx-blue-dark overflow-hidden">
+      <section className="relative py-10 md:py-12 bg-gradient-to-br from-qx-blue to-qx-blue-dark overflow-hidden">
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 right-10 w-72 h-72 bg-qx-orange rounded-full blur-3xl" />
-          <div className="absolute bottom-10 left-10 w-48 h-48 bg-cyan-400 rounded-full blur-3xl" />
+          <div className="absolute top-10 right-10 w-48 h-48 bg-qx-orange rounded-full blur-3xl" />
+          <div className="absolute bottom-10 left-10 w-36 h-36 bg-cyan-400 rounded-full blur-3xl" />
         </div>
 
         <div className="relative container mx-auto px-4 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 mb-4">
-              <MessageCircle className="w-4 h-4 text-qx-orange" />
-              <span className="text-filter-label text-white uppercase tracking-wider">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 mb-3">
+              <MessageCircle className="w-3 h-3 text-qx-orange" />
+              <span className="text-xs text-white uppercase tracking-wider">
                 Contact Us
               </span>
             </div>
-            <h1 className="text-hero-headline text-white mb-4">
+            <h1 className="text-2xl md:text-3xl font-heading font-bold text-white mb-3">
               Let's Have a{" "}
               <span className="text-qx-orange">Chat!</span>
             </h1>
-            <p className="text-hero-subtext text-white/80 max-w-xl mx-auto">
+            <p className="text-sm md:text-base text-white/80 max-w-xl mx-auto">
               We'd love to hear from you. Schedule a meeting, give us a call, or send us an email.
             </p>
           </div>
@@ -76,7 +76,7 @@ export default function ContactModern() {
       </section>
 
       {/* Quick Contact Cards */}
-      <section className="py-10 bg-white border-b">
+      <section className="py-8 bg-white border-b">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="grid md:grid-cols-3 gap-4 max-w-4xl mx-auto -mt-20 relative z-10">
             {/* Schedule Meeting */}
@@ -147,13 +147,13 @@ export default function ContactModern() {
       </section>
 
       {/* Contact Form & Address Section */}
-      <section className="py-14 md:py-16 bg-qx-light-gray">
+      <section className="py-10 md:py-12 bg-qx-light-gray">
         <div className="container mx-auto px-4 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-12">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-10">
             {/* Contact Form */}
             <AnimatedSection animation="slide-left">
-              <div className="bg-white rounded-2xl p-6 md:p-8 border border-gray-100 shadow-sm">
-                <h3 className="text-section-title text-qx-blue mb-2">
+              <div className="bg-white rounded-xl p-5 md:p-6 border border-gray-100 shadow-sm">
+                <h3 className="text-lg font-heading font-bold text-qx-blue mb-1.5">
                   Send Us a Message
                 </h3>
                 <p className="text-body-paragraph text-qx-gray mb-6">

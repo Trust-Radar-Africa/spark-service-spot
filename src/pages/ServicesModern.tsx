@@ -117,24 +117,24 @@ export default function ServicesModern() {
   return (
     <LayoutModern>
       {/* Hero Section */}
-      <section className="relative py-16 md:py-20 bg-gradient-to-br from-qx-blue to-qx-blue-dark overflow-hidden">
+      <section className="relative py-10 md:py-12 bg-gradient-to-br from-qx-blue to-qx-blue-dark overflow-hidden">
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 right-10 w-72 h-72 bg-qx-orange rounded-full blur-3xl" />
+          <div className="absolute top-10 right-10 w-48 h-48 bg-qx-orange rounded-full blur-3xl" />
         </div>
 
         <div className="relative container mx-auto px-4 lg:px-8">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 mb-4">
-              <Briefcase className="w-4 h-4 text-qx-orange" />
-              <span className="text-filter-label text-qx-orange uppercase tracking-wider">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 mb-3">
+              <Briefcase className="w-3 h-3 text-qx-orange" />
+              <span className="text-xs text-qx-orange uppercase tracking-wider">
                 Our Services
               </span>
             </div>
-            <h1 className="text-hero-headline text-white mb-4">
+            <h1 className="text-2xl md:text-3xl font-heading font-bold text-white mb-3">
               Outsourcing Services for{" "}
               <span className="text-qx-orange">Accounting Firms</span>
             </h1>
-            <p className="text-hero-subtext text-white/80">
+            <p className="text-sm md:text-base text-white/80">
               Comprehensive outsourced accounting solutions tailored to your firm's needs. We act as a one-stop shop for your company's financial requirements.
             </p>
           </div>
@@ -164,7 +164,7 @@ export default function ServicesModern() {
         <section
           key={service.id}
           id={service.id}
-          className={`py-14 md:py-16 ${index % 2 === 0 ? "bg-white" : "bg-qx-light-gray"}`}
+          className={`py-10 md:py-12 ${index % 2 === 0 ? "bg-white" : "bg-qx-light-gray"}`}
         >
           <div className="container mx-auto px-4 lg:px-8">
             <div className="max-w-4xl mx-auto">
@@ -219,17 +219,17 @@ export default function ServicesModern() {
 
       {/* Final CTA Section */}
       <AnimatedSection>
-        <section className="py-14 md:py-16 bg-gradient-to-br from-qx-blue via-qx-blue-dark to-qx-blue relative overflow-hidden">
+        <section className="py-10 md:py-12 bg-gradient-to-br from-qx-blue via-qx-blue-dark to-qx-blue relative overflow-hidden">
           <div className="absolute inset-0 opacity-15">
-            <div className="absolute top-10 right-10 w-64 h-64 bg-qx-orange rounded-full blur-3xl animate-float" />
-            <div className="absolute bottom-10 left-10 w-48 h-48 bg-cyan-400 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+            <div className="absolute top-10 right-10 w-48 h-48 bg-qx-orange rounded-full blur-3xl animate-float" />
+            <div className="absolute bottom-10 left-10 w-36 h-36 bg-cyan-400 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
           </div>
 
           <div className="container mx-auto px-4 lg:px-8 text-center relative z-10">
-            <h2 className="text-section-title text-white mb-3">
+            <h2 className="text-xl md:text-2xl font-heading font-bold text-white mb-2">
               Ready to <span className="text-qx-orange">Partner</span> With Us?
             </h2>
-            <p className="text-hero-subtext text-white/70 max-w-2xl mx-auto mb-8">
+            <p className="text-sm text-white/70 max-w-2xl mx-auto mb-6">
               Schedule a call to discuss further how we can contribute to the mission of your firm.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
