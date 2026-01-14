@@ -104,37 +104,99 @@ export default function IndexModern() {
       {/* Scroll Indicator */}
       <ScrollIndicator variant="modern" />
 
-      {/* Stats Section */}
-      <AnimatedSection>
-        <section className="py-12 md:py-16 bg-gradient-to-b from-white to-qx-light-gray relative overflow-hidden">
-          <div className="absolute top-0 left-1/4 w-48 h-48 bg-qx-orange/5 rounded-full blur-3xl animate-pulse-soft" />
-          <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-qx-blue/5 rounded-full blur-3xl animate-pulse-soft" style={{ animationDelay: '1.5s' }} />
-          
-          <div className="container mx-auto px-4 lg:px-8 relative z-10">
-            <div className="text-center mb-8 md:mb-10">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-qx-orange/10 border border-qx-orange/20 mb-3">
-                <Sparkles className="w-3.5 h-3.5 text-qx-orange" />
-                <span className="text-filter-label text-qx-orange">Industry Leaders</span>
+      {/* Welcome to Multiverse CPA Section - Right after carousel */}
+      <section className="py-14 md:py-16 bg-gradient-to-b from-white to-qx-light-gray relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-1/3 h-full bg-gradient-to-r from-qx-blue/5 to-transparent" />
+        <div className="absolute bottom-0 right-0 w-1/4 h-1/2 bg-gradient-to-tl from-qx-orange/5 to-transparent" />
+        
+        <div className="container mx-auto px-4 lg:px-8 relative z-10">
+          <AnimatedSection>
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-qx-blue/10 border border-qx-blue/20 mb-3">
+                <Globe className="w-3.5 h-3.5 text-qx-blue" />
+                <span className="text-filter-label text-qx-blue">About Us</span>
               </div>
               <h2 className="text-section-title text-qx-blue mb-2">
-                Market Leaders in <span className="text-gradient-vibrant">Accounting Outsourcing</span>
+                Welcome to <span className="text-qx-orange">Multiverse CPA</span>
               </h2>
-              <p className="text-section-subtitle text-qx-gray max-w-xl mx-auto">
-                Trusted by future-focused accountancy firms to deliver speed, accuracy, and massive cost savings.
+              <p className="text-section-subtitle text-qx-gray max-w-2xl mx-auto">
+                Your premier destination for exceptional outsourced offshore accounting solutions.
               </p>
             </div>
+          </AnimatedSection>
 
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-10 items-start">
+            <AnimatedSection delay={100}>
+              <div className="space-y-5">
+                <p className="text-body-paragraph text-qx-gray leading-relaxed">
+                  As one of the standout outsource offshore accounting firms in the world, our team has handled diverse assignments from the <span className="font-semibold text-qx-blue">US, Canada, Australia and Europe</span>.
+                </p>
+                
+                <div className="flex items-start gap-4 p-4 bg-white rounded-xl border border-qx-blue/10 shadow-sm">
+                  <div className="w-11 h-11 rounded-lg bg-gradient-to-br from-qx-blue to-qx-blue-dark flex items-center justify-center flex-shrink-0">
+                    <Award className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="text-job-title text-qx-blue mb-1">IFAC Affiliated</h4>
+                    <p className="text-body-paragraph text-qx-gray text-sm leading-relaxed">
+                      Affiliated to the International Federation of Accountants, bound by international ethics and professional standards.
+                    </p>
+                  </div>
+                </div>
+
+                <p className="text-body-paragraph text-qx-gray leading-relaxed">
+                  We have built our reputation on the robust pillars of <span className="font-semibold text-qx-blue">integrity, competence, and dedication</span>. Our mission is to streamline your business operations with impeccable accounting solutions.
+                </p>
+              </div>
+            </AnimatedSection>
+
+            <AnimatedSection delay={200}>
+              <div className="space-y-5">
+                <div className="p-5 bg-white rounded-xl border border-gray-100 shadow-sm">
+                  <h4 className="text-job-title text-qx-blue mb-3 flex items-center gap-2">
+                    <Briefcase className="w-5 h-5 text-qx-orange" />
+                    Our Range of Services
+                  </h4>
+                  <ul className="grid grid-cols-2 gap-2.5">
+                    {["Bookkeeping", "Tax Preparation", "Financial Analysis", "Audit & Review"].map((service) => (
+                      <li key={service} className="flex items-center gap-2 text-body-paragraph text-qx-gray text-sm">
+                        <CheckCircle2 className="w-4 h-4 text-qx-orange flex-shrink-0" />
+                        {service}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <p className="text-body-paragraph text-qx-gray leading-relaxed">
+                  We act as a <span className="font-semibold text-qx-blue">one-stop shop</span> for your company's financial needs, reducing the need to communicate with multiple accounting outsourcing companies.
+                </p>
+
+                <div className="p-4 bg-gradient-to-r from-qx-orange/10 to-amber-50 rounded-xl border border-qx-orange/20">
+                  <p className="text-body-paragraph text-qx-blue-dark font-medium italic text-sm leading-relaxed">
+                    "At Multiverse CPA, we do not see your success as an option, but a commitment."
+                  </p>
+                </div>
+              </div>
+            </AnimatedSection>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <AnimatedSection>
+        <section className="py-12 md:py-14 bg-qx-light-gray relative overflow-hidden">
+          <div className="container mx-auto px-4 lg:px-8 relative z-10">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6">
               {stats.map((stat, index) => (
                 <AnimatedSection key={stat.label} delay={index * 100}>
-                  <div className="hover-lift glass-card rounded-xl p-4 md:p-5 text-center group">
+                  <div className="hover-lift glass-card rounded-xl p-4 md:p-5 text-center group bg-white">
                     <div className={`w-12 h-12 md:w-14 md:h-14 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
                       <stat.icon className="w-6 h-6 md:w-7 md:h-7 text-white" />
                     </div>
                     <div className="text-job-salary text-3xl md:text-4xl bg-gradient-to-r from-qx-blue to-qx-blue-dark bg-clip-text text-transparent mb-1">
                       {stat.value}
                     </div>
-                    <div className="text-job-meta text-qx-gray">
+                    <div className="text-job-meta text-qx-gray text-sm">
                       {stat.label}
                     </div>
                   </div>
@@ -145,56 +207,13 @@ export default function IndexModern() {
         </section>
       </AnimatedSection>
 
-      {/* Why Choose Section */}
-      <section className="py-14 md:py-16 bg-gradient-to-br from-qx-blue via-qx-blue-dark to-qx-blue relative overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-10 right-10 w-64 h-64 bg-qx-orange rounded-full blur-3xl animate-float" />
-          <div className="absolute bottom-10 left-10 w-48 h-48 bg-qx-light-blue rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
-        </div>
-        
-        <div className="container mx-auto px-4 lg:px-8 relative z-10">
-          <AnimatedSection>
-            <div className="text-center mb-10">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 mb-3">
-                <Zap className="w-3.5 h-3.5 text-qx-orange" />
-                <span className="text-filter-label text-white/90">Why Choose Us</span>
-              </div>
-              <h2 className="text-section-title text-white mb-2">
-                Why Choose <span className="text-qx-orange">Multiverse CPA</span>
-              </h2>
-              <p className="text-section-subtitle text-white/70 max-w-xl mx-auto">
-                We align with your firm's goals and help achieve strategic growth through bespoke talent and tech support.
-              </p>
-            </div>
-          </AnimatedSection>
-
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-            {whyChoose.map((item, index) => (
-              <AnimatedSection key={item.title} delay={index * 100}>
-                <div className="group bg-white/10 backdrop-blur-sm rounded-xl p-4 md:p-5 border border-white/10 hover:bg-white/20 hover:border-qx-orange/30 transition-all duration-300 hover:-translate-y-1 h-full">
-                  <div className={`w-10 h-10 md:w-12 md:h-12 rounded-lg bg-gradient-to-br ${item.gradient} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300`}>
-                    <item.icon className={`w-5 h-5 md:w-6 md:h-6 ${item.iconColor}`} />
-                  </div>
-                  <h3 className="text-job-title text-white mb-1.5 group-hover:text-qx-orange transition-colors">
-                    {item.title}
-                  </h3>
-                  <p className="text-body-paragraph text-white/70 line-clamp-3">
-                    {item.description}
-                  </p>
-                </div>
-              </AnimatedSection>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Services Section */}
       <section className="py-14 md:py-16 bg-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-1/4 h-full bg-gradient-to-l from-qx-light-gray/50 to-transparent" />
         
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
           <AnimatedSection>
-            <div className="text-center mb-10">
+            <div className="text-center mb-8">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-qx-blue/10 border border-qx-blue/20 mb-3">
                 <TrendingUp className="w-3.5 h-3.5 text-qx-blue" />
                 <span className="text-filter-label text-qx-blue">Our Services</span>
@@ -203,19 +222,19 @@ export default function IndexModern() {
                 Our <span className="text-qx-orange">Outsourcing</span> Services
               </h2>
               <p className="text-section-subtitle text-qx-gray max-w-xl mx-auto">
-                Comprehensive solutions designed to help your firm scale efficiently and profitably.
+                Comprehensive solutions to help your firm scale efficiently.
               </p>
             </div>
           </AnimatedSection>
 
-          <div className="grid md:grid-cols-3 gap-4 md:gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {services.map((service, index) => (
               <AnimatedSection key={service.title} delay={index * 100}>
                 <Link
                   to={service.href}
-                  className="group relative bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 block"
+                  className="group relative bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 block"
                 >
-                  <div className="aspect-[16/9] overflow-hidden relative">
+                  <div className="aspect-[16/10] overflow-hidden relative">
                     <img
                       src={service.image}
                       alt={service.title}
@@ -223,21 +242,21 @@ export default function IndexModern() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-qx-blue/90 via-qx-blue/40 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
                   </div>
-                  <div className="p-5 md:p-6">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-qx-orange to-amber-400 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
-                        <service.icon className="w-5 h-5 text-white" />
+                  <div className="p-4">
+                    <div className="flex items-center gap-2.5 mb-2">
+                      <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-qx-orange to-amber-400 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300">
+                        <service.icon className="w-4 h-4 text-white" />
                       </div>
-                      <h3 className="text-job-title text-qx-blue group-hover:text-qx-orange transition-colors duration-300">
+                      <h3 className="text-job-title text-sm text-qx-blue group-hover:text-qx-orange transition-colors duration-300">
                         {service.title}
                       </h3>
                     </div>
-                    <p className="text-body-paragraph text-qx-gray mb-4 line-clamp-2">
+                    <p className="text-body-paragraph text-qx-gray text-sm mb-3 line-clamp-2">
                       {service.description}
                     </p>
-                    <span className="inline-flex items-center gap-2 text-qx-orange text-job-company group-hover:gap-3 transition-all duration-300">
+                    <span className="inline-flex items-center gap-1.5 text-qx-orange text-xs font-medium group-hover:gap-2 transition-all duration-300">
                       Learn More
-                      <ArrowRight className="w-4 h-4" />
+                      <ArrowRight className="w-3.5 h-3.5" />
                     </span>
                   </div>
                 </Link>
@@ -247,83 +266,45 @@ export default function IndexModern() {
         </div>
       </section>
 
-      {/* About Multiverse CPA Section */}
-      <section className="py-14 md:py-16 bg-white relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-1/3 h-full bg-gradient-to-r from-qx-light-gray/30 to-transparent" />
+      {/* Why Choose Section */}
+      <section className="py-14 md:py-16 bg-gradient-to-br from-qx-blue via-qx-blue-dark to-qx-blue relative overflow-hidden">
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-10 right-10 w-64 h-64 bg-qx-orange rounded-full blur-3xl animate-float" />
+          <div className="absolute bottom-10 left-10 w-48 h-48 bg-qx-light-blue rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+        </div>
         
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
           <AnimatedSection>
-            <div className="text-center mb-10">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-qx-blue/10 border border-qx-blue/20 mb-3">
-                <Globe className="w-3.5 h-3.5 text-qx-blue" />
-                <span className="text-filter-label text-qx-blue">About Us</span>
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 mb-3">
+                <Zap className="w-3.5 h-3.5 text-qx-orange" />
+                <span className="text-filter-label text-white/90">Why Choose Us</span>
               </div>
-              <h2 className="text-section-title text-qx-blue mb-2">
-                Welcome to <span className="text-qx-orange">Multiverse CPA</span>
+              <h2 className="text-section-title text-white mb-2">
+                Why Choose <span className="text-qx-orange">Multiverse CPA</span>
               </h2>
-              <p className="text-section-subtitle text-qx-gray max-w-3xl mx-auto">
-                Your premier destination for exceptional outsourced offshore accounting solutions.
+              <p className="text-section-subtitle text-white/70 max-w-xl mx-auto">
+                Strategic growth through bespoke talent and tech support.
               </p>
             </div>
           </AnimatedSection>
 
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            <AnimatedSection delay={100}>
-              <div className="space-y-6">
-                <p className="text-body-paragraph text-qx-gray">
-                  As one of the standout outsource offshore accounting firms in the world, our team has handled diverse assignments from the <span className="font-semibold text-qx-blue">US, Canada, Australia and Europe</span>.
-                </p>
-                
-                <div className="flex items-start gap-4 p-4 bg-gradient-to-r from-qx-blue/5 to-qx-orange/5 rounded-xl border border-qx-blue/10">
-                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-qx-blue to-qx-blue-dark flex items-center justify-center flex-shrink-0">
-                    <Award className="w-6 h-6 text-white" />
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+            {whyChoose.map((item, index) => (
+              <AnimatedSection key={item.title} delay={index * 100}>
+                <div className="group bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10 hover:bg-white/20 hover:border-qx-orange/30 transition-all duration-300 hover:-translate-y-1 h-full">
+                  <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${item.gradient} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300`}>
+                    <item.icon className={`w-5 h-5 ${item.iconColor}`} />
                   </div>
-                  <div>
-                    <h4 className="text-job-title text-qx-blue mb-1">IFAC Affiliated</h4>
-                    <p className="text-body-paragraph text-qx-gray">
-                      Multiverse CPA is affiliated to the International Federation of Accountants. Our firm is thus bound by international ethics and professional standards.
-                    </p>
-                  </div>
-                </div>
-
-                <p className="text-body-paragraph text-qx-gray">
-                  We have built our reputation on the robust pillars of <span className="font-semibold text-qx-blue">integrity, competence, and dedication</span>. Our mission is to streamline your business operations with impeccable accounting solutions, providing you with a clear financial roadmap to success.
-                </p>
-
-                <p className="text-body-paragraph text-qx-gray">
-                  By working with us, you are not only selecting an outsource offshore accounting firm; you are also partnering with an experienced team that blends new techniques and traditional values to provide the best accounting experience possible.
-                </p>
-              </div>
-            </AnimatedSection>
-
-            <AnimatedSection delay={200}>
-              <div className="space-y-6">
-                <div className="p-6 bg-gradient-to-br from-qx-light-gray to-white rounded-2xl border border-gray-100">
-                  <h4 className="text-job-title text-qx-blue mb-4 flex items-center gap-2">
-                    <Briefcase className="w-5 h-5 text-qx-orange" />
-                    Our Range of Services
-                  </h4>
-                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {["Bookkeeping", "Tax Preparation", "Financial Analysis", "Audit, Review & Compilation"].map((service) => (
-                      <li key={service} className="flex items-center gap-2 text-body-paragraph text-qx-gray">
-                        <CheckCircle2 className="w-4 h-4 text-qx-orange flex-shrink-0" />
-                        {service}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <p className="text-body-paragraph text-qx-gray">
-                  We are a team of Professionals who deliver the best-in-class results. We act as a <span className="font-semibold text-qx-blue">one-stop shop</span> for your company's financial needs, reducing the need to communicate with multiple accounting outsourcing companies.
-                </p>
-
-                <div className="p-4 bg-gradient-to-r from-qx-orange/10 to-amber-100/50 rounded-xl border border-qx-orange/20">
-                  <p className="text-body-paragraph text-qx-blue-dark font-medium italic">
-                    "At Multiverse CPA, we do not see your success as an option, but a commitment. Embrace the future of accounting with Multiverse CPA, leading outsource accounting firm."
+                  <h3 className="text-job-title text-sm text-white mb-1.5 group-hover:text-qx-orange transition-colors">
+                    {item.title}
+                  </h3>
+                  <p className="text-body-paragraph text-white/70 text-sm line-clamp-3">
+                    {item.description}
                   </p>
                 </div>
-              </div>
-            </AnimatedSection>
+              </AnimatedSection>
+            ))}
           </div>
         </div>
       </section>
