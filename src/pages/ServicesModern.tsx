@@ -243,8 +243,7 @@ export default function ServicesModern() {
                 </Link>
               </Button>
               <Button 
-                variant="outline"
-                className="border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50 rounded-full px-8 py-6 text-base"
+                className="bg-white hover:bg-white/90 text-qx-blue rounded-full px-8 py-6 text-base"
                 asChild
               >
                 <Link to="/employers">

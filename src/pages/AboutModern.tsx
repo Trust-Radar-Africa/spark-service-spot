@@ -171,8 +171,7 @@ export default function AboutModern() {
                     Need a candidate meeting certain specifications? Send us your request.
                   </p>
                   <Button 
-                    variant="outline"
-                    className="border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50 rounded-full w-full"
+                    className="bg-white hover:bg-white/90 text-qx-blue rounded-full w-full"
                     asChild
                   >
                     <Link to="/employers">
@@ -194,8 +193,7 @@ export default function AboutModern() {
                     Have enquiries or need clarifications? We're here to help.
                   </p>
                   <Button 
-                    variant="outline"
-                    className="border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50 rounded-full w-full"
+                    className="bg-white hover:bg-white/90 text-qx-blue rounded-full w-full"
                     asChild
                   >
                     <Link to="/contact">
