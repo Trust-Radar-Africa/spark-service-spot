@@ -1,60 +1,49 @@
 import { Link } from "react-router-dom";
 import { LayoutModern } from "@/components/layout/LayoutModern";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CheckCircle2, FileSearch, Calculator, BarChart3 } from "lucide-react";
+import { ArrowRight, Phone, Send, FileSearch, Calculator, BarChart3, FileText, Briefcase } from "lucide-react";
 import auditImg from "@/assets/audit-service.jpg";
 import bookkeepingImg from "@/assets/bookkeeping-service.jpg";
 import consultingImg from "@/assets/consulting-service.jpg";
 import { AnimatedSection } from "@/components/AnimatedSection";
 
-const services = [
-  {
-    id: "audit",
-    icon: FileSearch,
-    title: "Outsourced Audit Support",
-    subtitle: "Expert Audit & Assurance Services",
-    description:
-      "Multiverse CPA Audit Division provides outsourced audit services remotely to other firms of accountants. We also provide review and compilation of financial statements.",
-    image: auditImg,
-    features: [
-      "Qualified experienced accountants in good standing",
-      "Engagements under US GAAP, Canada GAAP, FRS 102, FRS 105, IFRS",
-      "Experience with Caseware, Voyager Auditmate, Myworkingpapers, Audit Assistant",
-      "Review and compilation of financial statements",
-    ],
-  },
-  {
-    id: "bookkeeping",
-    icon: Calculator,
-    title: "Outsourced Bookkeeping",
-    subtitle: "Professional Bookkeeping Services",
-    description:
-      "Accountants often hesitate to offer bookkeeping services due to their low margins and time-consuming nature. At Multiverse CPA, we make the process simple and hassle-free for your firm.",
-    image: bookkeepingImg,
-    features: [
-      "Skilled and experienced bookkeepers handling routine tasks",
-      "Transform bookkeeping into a profitable service",
-      "Experience with Xero, QuickBooks, Sage, Hubdoc and Dext",
-      "Full-time or part-time staff based on your needs",
-    ],
-  },
-  {
-    id: "consulting",
-    icon: BarChart3,
-    title: "Outsourced Consulting Services",
-    subtitle: "Strategic Financial Consulting",
-    description:
-      "Our consulting division handles diverse assignments based on the terms of reference of clients. We bring superior expertise to your most complex financial challenges.",
-    image: consultingImg,
-    features: [
-      "Financial analysis and reporting",
-      "Budget plans for government contracting work",
-      "Financial statement preparation",
-      "Engagement Quality Control Reviews",
-      "Advanced Excel skills with Vlookup, Pivot Tables, complex formulas",
-    ],
-  },
-];
+interface ServiceCTAProps {
+  candidateText?: string;
+}
+
+function ServiceCTA({ candidateText = "join your team" }: ServiceCTAProps) {
+  return (
+    <div className="mt-8 p-5 bg-gradient-to-r from-qx-light-gray to-white rounded-xl border border-gray-100">
+      <div className="space-y-4">
+        <div className="flex flex-wrap gap-3">
+          <Button 
+            className="bg-gradient-to-r from-qx-orange to-amber-500 hover:from-qx-orange-dark hover:to-amber-600 text-white rounded-full"
+            asChild
+          >
+            <Link to="/contact">
+              <Phone className="mr-2 h-4 w-4" />
+              Schedule a Call
+            </Link>
+          </Button>
+          <Button 
+            variant="outline"
+            className="border-qx-blue text-qx-blue hover:bg-qx-blue hover:text-white rounded-full"
+            asChild
+          >
+            <Link to="/employers">
+              <Send className="mr-2 h-4 w-4" />
+              Request a Candidate
+            </Link>
+          </Button>
+        </div>
+        <p className="text-body-paragraph text-qx-gray text-sm">
+          Feel free to <Link to="/contact" className="text-qx-orange hover:underline font-medium">schedule a call</Link> to discuss further on how we can partner together. 
+          If you would like us to refer a candidate to {candidateText}, <Link to="/employers" className="text-qx-orange hover:underline font-medium">send us your request</Link>.
+        </p>
+      </div>
+    </div>
+  );
+}
 
 export default function ServicesModern() {
   return (
@@ -68,6 +57,7 @@ export default function ServicesModern() {
         <div className="relative container mx-auto px-4 lg:px-8">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 mb-4">
+              <Briefcase className="w-4 h-4 text-qx-orange" />
               <span className="text-filter-label text-qx-orange uppercase tracking-wider">
                 Our Services
               </span>
@@ -83,99 +73,254 @@ export default function ServicesModern() {
         </div>
       </section>
 
-      {/* Services List */}
-      {services.map((service, index) => (
-        <section
-          key={service.id}
-          id={service.id}
-          className={`py-14 md:py-16 ${index % 2 === 0 ? "bg-white" : "bg-qx-light-gray"}`}
-        >
-          <div className="container mx-auto px-4 lg:px-8">
-            <div className="grid lg:grid-cols-2 gap-10 lg:gap-12 items-center">
-              <AnimatedSection animation={index % 2 === 0 ? "slide-left" : "slide-right"}>
-                <div className={index % 2 === 1 ? "lg:order-2" : ""}>
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-lg bg-qx-orange flex items-center justify-center">
-                      <service.icon className="w-5 h-5 text-white" />
-                    </div>
-                    <span className="text-filter-label text-qx-orange uppercase tracking-wide">
-                      {service.subtitle}
-                    </span>
+      {/* Bookkeeping Service */}
+      <section id="bookkeeping" className="py-14 md:py-16 bg-white">
+        <div className="container mx-auto px-4 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-12 items-start">
+            <AnimatedSection animation="slide-left">
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-lg bg-qx-orange flex items-center justify-center">
+                    <Calculator className="w-5 h-5 text-white" />
                   </div>
+                  <span className="text-filter-label text-qx-orange uppercase tracking-wide">
+                    Bookkeeping Services
+                  </span>
+                </div>
 
-                  <h2 className="text-section-title text-qx-blue mb-4">
-                    {service.title}
-                  </h2>
+                <h2 className="text-section-title text-qx-blue mb-4">
+                  Tackle Staff Shortages & Grow Your Practice with{" "}
+                  <span className="text-qx-orange">Tailored Bookkeeping</span>
+                </h2>
 
-                  <p className="text-body-paragraph text-qx-gray mb-6">
-                    {service.description}
+                <div className="space-y-4 text-body-paragraph text-qx-gray leading-relaxed">
+                  <p>
+                    Accountants often hesitate to offer bookkeeping services due to their low margins and time-consuming nature. At Multiverse CPA, we understand these challenges and make the process simple and hassle-free for your firm.
                   </p>
-
-                  <ul className="space-y-3 mb-6">
-                    {service.features.map((feature) => (
-                      <li key={feature} className="flex items-start gap-3">
-                        <CheckCircle2 className="w-4 h-4 text-qx-orange flex-shrink-0 mt-0.5" />
-                        <span className="text-body-list text-qx-blue">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <div className="flex flex-wrap gap-3">
-                    <Button 
-                      className="bg-qx-orange hover:bg-qx-orange-dark text-white rounded-full px-6"
-                      asChild
-                    >
-                      <Link to="/contact">
-                        Get Started
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Link>
-                    </Button>
-                    <Button 
-                      variant="outline"
-                      className="border-qx-blue text-qx-blue hover:bg-qx-blue hover:text-white rounded-full px-6"
-                      asChild
-                    >
-                      <Link to="/contact">Request More Info</Link>
-                    </Button>
-                  </div>
+                  <p>
+                    Our team of skilled and experienced bookkeepers handles the routine tasks, allowing you and your team to focus on strategic objectives. This transforms bookkeeping into a profitable service, boosting your firm's revenue and productivity. We strive to take the weight off your shoulders and <Link to="/careers" className="text-qx-orange hover:underline font-medium">provide you</Link> with an experience that is seamless, efficient, and valuable.
+                  </p>
+                  <p>
+                    We have professionals with solid experience in the use of bookkeeping software such as <span className="font-semibold text-qx-blue">Xero, QuickBooks, Sage, Hubdoc and Dext</span>. We are continually updating our skills to ensure that we stay on top of the latest advancements in the industry.
+                  </p>
+                  <p>
+                    We will assign a full time or part time staff member to your firm depending on your needs. The assigned staff will work exclusively under the directions of your firm.
+                  </p>
                 </div>
-              </AnimatedSection>
 
-              <AnimatedSection animation={index % 2 === 0 ? "slide-right" : "slide-left"}>
-                <div className={index % 2 === 1 ? "lg:order-1" : ""}>
-                  <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-xl">
-                    <img
-                      src={service.image}
-                      alt={service.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                </div>
-              </AnimatedSection>
-            </div>
+                <ServiceCTA candidateText="join your bookkeeping team" />
+              </div>
+            </AnimatedSection>
+
+            <AnimatedSection animation="slide-right">
+              <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-xl sticky top-24">
+                <img
+                  src={bookkeepingImg}
+                  alt="Bookkeeping Services"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </AnimatedSection>
           </div>
-        </section>
-      ))}
+        </div>
+      </section>
 
-      {/* CTA Section */}
+      {/* Tax Preparation Service */}
+      <section id="tax" className="py-14 md:py-16 bg-qx-light-gray">
+        <div className="container mx-auto px-4 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-12 items-start">
+            <AnimatedSection animation="slide-right">
+              <div className="lg:order-2">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-lg bg-qx-orange flex items-center justify-center">
+                    <FileText className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="text-filter-label text-qx-orange uppercase tracking-wide">
+                    Tax Preparation
+                  </span>
+                </div>
+
+                <h2 className="text-section-title text-qx-blue mb-4">
+                  Tax Preparation Outsourcing for{" "}
+                  <span className="text-qx-orange">Accounting Firms</span>
+                </h2>
+
+                <div className="space-y-4 text-body-paragraph text-qx-gray leading-relaxed">
+                  <p>
+                    Tax preparation is high volume work demanding accuracy and attention to detail. Our skilled professional team handles the tax returns on behalf of clients of other firms of accountants. We eliminate the seasonal rush and reduce internal pressure.
+                  </p>
+                  <p>
+                    Our <Link to="/careers" className="text-qx-orange hover:underline font-medium">professionals</Link> have experience in the use of diverse tax preparation software and have successfully handled tax preparation engagements for firms of accountants in the <span className="font-semibold text-qx-blue">USA, Ireland, UK</span> among other jurisdictions.
+                  </p>
+                  <p>
+                    Our tax preparation outsourcing services for CPA Firms can help you deal with the compressing tax season by building a team of professionals and keeping your accounts, records, reports, and more as per the taxation legislation and compliances. We provide year-round and year-end outsourced tax preparation services to meet your tailored need for accounting and taxation resources.
+                  </p>
+                  <p>
+                    Our highly experienced tax preparers help you achieve high tax benefits without stretching out your budget. Our tax preparation services eliminate complexity and resources otherwise engaged in matching tax details and preparing returns for clients.
+                  </p>
+                  <p>
+                    Thus, outsourcing tax preparation to Multiverse CPA helps accounting firms to concentrate on onboarding more revenue-generating clients and providing them value-added services.
+                  </p>
+                </div>
+
+                <ServiceCTA candidateText="join your team" />
+              </div>
+            </AnimatedSection>
+
+            <AnimatedSection animation="slide-left">
+              <div className="lg:order-1 aspect-[4/3] rounded-2xl overflow-hidden shadow-xl sticky top-24">
+                <img
+                  src={auditImg}
+                  alt="Tax Preparation Services"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </AnimatedSection>
+          </div>
+        </div>
+      </section>
+
+      {/* Audit Service */}
+      <section id="audit" className="py-14 md:py-16 bg-white">
+        <div className="container mx-auto px-4 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-12 items-start">
+            <AnimatedSection animation="slide-left">
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-lg bg-qx-orange flex items-center justify-center">
+                    <FileSearch className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="text-filter-label text-qx-orange uppercase tracking-wide">
+                    Audit & Review
+                  </span>
+                </div>
+
+                <h2 className="text-section-title text-qx-blue mb-4">
+                  Outsourced Audit Service{" "}
+                  <span className="text-qx-orange">Tailored for Your Business</span>
+                </h2>
+
+                <div className="space-y-4 text-body-paragraph text-qx-gray leading-relaxed">
+                  <p>
+                    Multiverse CPA Audit Division provides outsourced audit services remotely to other firms of accountants. We also provide review and compilation of financial statements.
+                  </p>
+                  <p>
+                    Our team comprises qualified and vetted experienced accountants who are <Link to="/careers" className="text-qx-orange hover:underline font-medium">members in good standing</Link> of their respective professional bodies.
+                  </p>
+                  <p>
+                    We have handled engagements under <span className="font-semibold text-qx-blue">US GAAP, Canada GAAP, FRS 102, FRS 105, IFRS</span> among other financial reporting frameworks.
+                  </p>
+                  <p>
+                    Our team has experience in the use of diverse audit tools such as CaseWare, Voyager Auditmate, Myworkingpapers, Audit Assistant among others. We handle all the stages of the audit process from planning, execution and finalization.
+                  </p>
+                </div>
+
+                <ServiceCTA candidateText="join your audit team" />
+              </div>
+            </AnimatedSection>
+
+            <AnimatedSection animation="slide-right">
+              <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-xl sticky top-24">
+                <img
+                  src={auditImg}
+                  alt="Audit Services"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </AnimatedSection>
+          </div>
+        </div>
+      </section>
+
+      {/* Consulting Service */}
+      <section id="consulting" className="py-14 md:py-16 bg-qx-light-gray">
+        <div className="container mx-auto px-4 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-12 items-start">
+            <AnimatedSection animation="slide-right">
+              <div className="lg:order-2">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-lg bg-qx-orange flex items-center justify-center">
+                    <BarChart3 className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="text-filter-label text-qx-orange uppercase tracking-wide">
+                    Consulting Services
+                  </span>
+                </div>
+
+                <h2 className="text-section-title text-qx-blue mb-4">
+                  Outsourced Consulting Services for{" "}
+                  <span className="text-qx-orange">Strategic Growth</span>
+                </h2>
+
+                <div className="space-y-4 text-body-paragraph text-qx-gray leading-relaxed">
+                  <p>
+                    Over the last few years, the business landscape has become a lot more complex and cut-throat, forcing companies to adapt a more forward-looking approach. Businesses that leverage data to identify risks & opportunities, predict trends & patterns, and facilitate strategic decision-making are more likely to drive efficiencies and increase sales.
+                  </p>
+                  <p>
+                    Our consulting division handles diverse assignments based on the terms of reference of clients. We have handled <span className="font-semibold text-qx-blue">financial analysis, preparation of budget plans to aid in government contracting work, financial statement preparation, Payroll services, Engagement Quality Control Reviews</span> etc.
+                  </p>
+                  <p className="font-medium text-qx-blue">How does it work?</p>
+                  <p>
+                    A typical scenario is a USA based CPA firm which has been contracted to offer payroll services for one of its clients. We assign one of our team members to work for the CPA firm either full time or part time depending on the demands of the role.
+                  </p>
+                  <p>
+                    Our team comprises professionals with superior excel skills utilizing such tools as <span className="font-semibold text-qx-blue">Vlookup, Pivot Tables and other complex formulae</span>. We are also agile enough to learn new software and other financial tools. <Link to="/careers" className="text-qx-orange hover:underline font-medium">View our current vacancies</Link>.
+                  </p>
+                </div>
+
+                <ServiceCTA candidateText="join your team" />
+              </div>
+            </AnimatedSection>
+
+            <AnimatedSection animation="slide-left">
+              <div className="lg:order-1 aspect-[4/3] rounded-2xl overflow-hidden shadow-xl sticky top-24">
+                <img
+                  src={consultingImg}
+                  alt="Consulting Services"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </AnimatedSection>
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA Section */}
       <AnimatedSection>
-        <section className="py-14 md:py-16 bg-qx-blue">
-          <div className="container mx-auto px-4 lg:px-8 text-center">
+        <section className="py-14 md:py-16 bg-gradient-to-br from-qx-blue via-qx-blue-dark to-qx-blue relative overflow-hidden">
+          <div className="absolute inset-0 opacity-15">
+            <div className="absolute top-10 right-10 w-64 h-64 bg-qx-orange rounded-full blur-3xl animate-float" />
+            <div className="absolute bottom-10 left-10 w-48 h-48 bg-cyan-400 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+          </div>
+
+          <div className="container mx-auto px-4 lg:px-8 text-center relative z-10">
             <h2 className="text-section-title text-white mb-3">
-              Ready to Partner With Us?
+              Ready to <span className="text-qx-orange">Partner</span> With Us?
             </h2>
             <p className="text-hero-subtext text-white/70 max-w-2xl mx-auto mb-8">
               Schedule a call to discuss further how we can contribute to the mission of your firm.
             </p>
-            <Button 
-              className="bg-qx-orange hover:bg-qx-orange-dark text-white rounded-full px-8 py-6 text-base"
-              asChild
-            >
-              <Link to="/contact">
-                Book a Free Consultation
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button 
+                className="bg-gradient-to-r from-qx-orange to-amber-500 hover:from-qx-orange-dark hover:to-amber-600 text-white rounded-full px-8 py-6 text-base"
+                asChild
+              >
+                <Link to="/contact">
+                  <Phone className="mr-2 h-5 w-5" />
+                  Book a Free Consultation
+                </Link>
+              </Button>
+              <Button 
+                variant="outline"
+                className="border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50 rounded-full px-8 py-6 text-base"
+                asChild
+              >
+                <Link to="/employers">
+                  <Send className="mr-2 h-5 w-5" />
+                  Request a Candidate
+                </Link>
+              </Button>
+            </div>
           </div>
         </section>
       </AnimatedSection>
