@@ -10,7 +10,10 @@ import {
   Handshake,
   FileSearch,
   Calculator,
-  BarChart3
+  BarChart3,
+  Sparkles,
+  Zap,
+  TrendingUp
 } from "lucide-react";
 import auditImg from "@/assets/audit-service.jpg";
 import bookkeepingImg from "@/assets/bookkeeping-service.jpg";
@@ -19,10 +22,10 @@ import { HeroCarousel } from "@/components/HeroCarousel";
 import { TestimonialsCarousel } from "@/components/TestimonialsCarousel";
 
 const stats = [
-  { icon: Handshake, value: "100+", label: "Accounting Firms Served" },
-  { icon: Users, value: "50+", label: "Dedicated Accountants" },
-  { icon: Star, value: "98%", label: "CSAT Score" },
-  { icon: Shield, value: "0", label: "Data Breaches in 10 Years" },
+  { icon: Handshake, value: "100+", label: "Accounting Firms Served", color: "from-orange-500 to-amber-400" },
+  { icon: Users, value: "50+", label: "Dedicated Accountants", color: "from-blue-500 to-cyan-400" },
+  { icon: Star, value: "98%", label: "CSAT Score", color: "from-purple-500 to-pink-400" },
+  { icon: Shield, value: "0", label: "Data Breaches in 10 Years", color: "from-emerald-500 to-teal-400" },
 ];
 
 const whyChoose = [
@@ -30,21 +33,29 @@ const whyChoose = [
     title: "Customised Engagement Models",
     description: "Flexible engagement models with dedicated experts tailored to your firm's unique requirements.",
     icon: FileSearch,
+    gradient: "from-blue-500/20 to-cyan-500/20",
+    iconColor: "text-blue-500",
   },
   {
     title: "Certified Professionals",
     description: "CPAs and Chartered Accountants highly skilled in US GAAP, IFRS, and local accounting standards.",
     icon: Users,
+    gradient: "from-purple-500/20 to-pink-500/20",
+    iconColor: "text-purple-500",
   },
   {
     title: "Four-Eyed Review",
     description: "Every piece of work undergoes detailed review before reaching you, ensuring consistent quality.",
     icon: CheckCircle2,
+    gradient: "from-emerald-500/20 to-teal-500/20",
+    iconColor: "text-emerald-500",
   },
   {
     title: "Security & Compliance",
     description: "GDPR-compliant with ISO 27001 security and ISO 9001 quality management certifications.",
     icon: Shield,
+    gradient: "from-orange-500/20 to-amber-500/20",
+    iconColor: "text-orange-500",
   },
 ];
 
@@ -55,6 +66,7 @@ const services = [
     icon: Calculator,
     image: bookkeepingImg,
     href: "/services#bookkeeping",
+    accent: "group-hover:from-blue-600 group-hover:to-cyan-500",
   },
   {
     title: "Tax Preparation",
@@ -62,6 +74,7 @@ const services = [
     icon: FileSearch,
     image: auditImg,
     href: "/services#tax",
+    accent: "group-hover:from-purple-600 group-hover:to-pink-500",
   },
   {
     title: "Audit & Review",
@@ -69,6 +82,7 @@ const services = [
     icon: BarChart3,
     image: consultingImg,
     href: "/services#audit",
+    accent: "group-hover:from-emerald-600 group-hover:to-teal-500",
   },
 ];
 
@@ -78,28 +92,40 @@ export default function IndexModern() {
       {/* Hero Carousel */}
       <HeroCarousel variant="modern" />
 
-      {/* Stats Section */}
-      <section className="py-16 bg-white border-b">
-        <div className="container mx-auto px-4 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl md:text-3xl font-montserrat font-bold text-qx-blue mb-4">
-              Market Leaders in Accounting Outsourcing
+      {/* Stats Section - Enhanced with gradients */}
+      <section className="py-20 bg-gradient-to-b from-white to-qx-light-gray relative overflow-hidden">
+        {/* Background decorative elements */}
+        <div className="absolute top-0 left-1/4 w-72 h-72 bg-qx-orange/5 rounded-full blur-3xl animate-pulse-soft" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-qx-blue/5 rounded-full blur-3xl animate-pulse-soft" style={{ animationDelay: '1.5s' }} />
+        
+        <div className="container mx-auto px-4 lg:px-8 relative z-10">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-qx-orange/10 border border-qx-orange/20 mb-4">
+              <Sparkles className="w-4 h-4 text-qx-orange" />
+              <span className="text-sm font-semibold text-qx-orange">Industry Leaders</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-montserrat font-bold text-qx-blue mb-4">
+              Market Leaders in <span className="text-gradient-vibrant">Accounting Outsourcing</span>
             </h2>
-            <p className="text-qx-gray max-w-2xl mx-auto">
+            <p className="text-qx-gray max-w-2xl mx-auto text-lg">
               Trusted by future-focused accountancy firms to deliver speed, accuracy, and massive cost savings.
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat) => (
-              <div key={stat.label} className="text-center">
-                <div className="w-14 h-14 rounded-xl bg-qx-blue/5 flex items-center justify-center mx-auto mb-4">
-                  <stat.icon className="w-7 h-7 text-qx-orange" />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8">
+            {stats.map((stat, index) => (
+              <div 
+                key={stat.label} 
+                className="hover-lift glass-card rounded-2xl p-6 text-center group"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                  <stat.icon className="w-8 h-8 text-white" />
                 </div>
-                <div className="text-3xl md:text-4xl font-bold text-qx-blue mb-1">
+                <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-qx-blue to-qx-blue-dark bg-clip-text text-transparent mb-2">
                   {stat.value}
                 </div>
-                <div className="text-sm text-qx-gray">
+                <div className="text-sm text-qx-gray font-medium">
                   {stat.label}
                 </div>
               </div>
@@ -108,31 +134,43 @@ export default function IndexModern() {
         </div>
       </section>
 
-      {/* Why Choose Section */}
-      <section className="py-20 bg-qx-light-gray">
-        <div className="container mx-auto px-4 lg:px-8">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-montserrat font-bold text-qx-blue mb-4">
-              Why Choose Multiverse CPA
+      {/* Why Choose Section - Enhanced with vibrant cards */}
+      <section className="py-24 bg-gradient-to-br from-qx-blue via-qx-blue-dark to-qx-blue relative overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-20 right-20 w-96 h-96 bg-qx-orange rounded-full blur-3xl animate-float" />
+          <div className="absolute bottom-20 left-20 w-72 h-72 bg-qx-light-blue rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-500 rounded-full blur-3xl opacity-30 animate-pulse-soft" />
+        </div>
+        
+        <div className="container mx-auto px-4 lg:px-8 relative z-10">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 mb-4">
+              <Zap className="w-4 h-4 text-qx-orange" />
+              <span className="text-sm font-semibold text-white/90">Why Choose Us</span>
+            </div>
+            <h2 className="text-3xl md:text-5xl font-montserrat font-bold text-white mb-4">
+              Why Choose <span className="text-qx-orange">Multiverse CPA</span>
             </h2>
-            <p className="text-qx-gray max-w-2xl mx-auto">
+            <p className="text-white/70 max-w-2xl mx-auto text-lg">
               We understand and align with your firm's goals and help achieve strategic growth through bespoke talent and tech support.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {whyChoose.map((item) => (
+            {whyChoose.map((item, index) => (
               <div
                 key={item.title}
-                className="bg-white rounded-xl p-6 border border-gray-100 hover:shadow-lg hover:border-qx-orange/20 transition-all duration-300 group"
+                className="group bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:bg-white/20 hover:border-qx-orange/30 transition-all duration-500 hover:-translate-y-2"
+                style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className="w-12 h-12 rounded-lg bg-qx-orange/10 flex items-center justify-center mb-4 group-hover:bg-qx-orange group-hover:text-white transition-colors">
-                  <item.icon className="w-6 h-6 text-qx-orange group-hover:text-white" />
+                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${item.gradient} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300`}>
+                  <item.icon className={`w-7 h-7 ${item.iconColor}`} />
                 </div>
-                <h3 className="text-lg font-montserrat font-bold text-qx-blue mb-2">
+                <h3 className="text-xl font-montserrat font-bold text-white mb-3 group-hover:text-qx-orange transition-colors">
                   {item.title}
                 </h3>
-                <p className="text-sm text-qx-gray leading-relaxed">
+                <p className="text-white/70 leading-relaxed">
                   {item.description}
                 </p>
               </div>
@@ -141,47 +179,56 @@ export default function IndexModern() {
         </div>
       </section>
 
-      {/* Services Section */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4 lg:px-8">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-montserrat font-bold text-qx-blue mb-4">
-              Our Outsourcing Services
+      {/* Services Section - Enhanced with overlays */}
+      <section className="py-24 bg-white relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-qx-light-gray to-transparent" />
+        
+        <div className="container mx-auto px-4 lg:px-8 relative z-10">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-qx-blue/10 border border-qx-blue/20 mb-4">
+              <TrendingUp className="w-4 h-4 text-qx-blue" />
+              <span className="text-sm font-semibold text-qx-blue">Our Services</span>
+            </div>
+            <h2 className="text-3xl md:text-5xl font-montserrat font-bold text-qx-blue mb-4">
+              Our <span className="text-qx-orange">Outsourcing</span> Services
             </h2>
-            <p className="text-qx-gray max-w-2xl mx-auto">
+            <p className="text-qx-gray max-w-2xl mx-auto text-lg">
               Comprehensive solutions designed to help your firm scale efficiently and profitably.
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {services.map((service) => (
+            {services.map((service, index) => (
               <Link
                 key={service.title}
                 to={service.href}
-                className="group bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300"
+                className="group relative bg-white rounded-3xl border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-3"
+                style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className="aspect-[16/10] overflow-hidden">
+                <div className="aspect-[16/10] overflow-hidden relative">
                   <img
                     src={service.image}
                     alt={service.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
+                  <div className={`absolute inset-0 bg-gradient-to-t from-qx-blue/90 via-qx-blue/40 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300`} />
+                  <div className={`absolute inset-0 bg-gradient-to-br from-transparent to-transparent ${service.accent} opacity-0 group-hover:opacity-40 transition-opacity duration-500`} />
                 </div>
-                <div className="p-6">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-lg bg-qx-orange/10 flex items-center justify-center">
-                      <service.icon className="w-5 h-5 text-qx-orange" />
+                <div className="p-8">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-qx-orange to-amber-400 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                      <service.icon className="w-6 h-6 text-white" />
                     </div>
-                    <h3 className="text-lg font-montserrat font-bold text-qx-blue group-hover:text-qx-orange transition-colors">
+                    <h3 className="text-xl font-montserrat font-bold text-qx-blue group-hover:text-qx-orange transition-colors duration-300">
                       {service.title}
                     </h3>
                   </div>
-                  <p className="text-sm text-qx-gray mb-4">
+                  <p className="text-qx-gray mb-6 leading-relaxed">
                     {service.description}
                   </p>
-                  <span className="inline-flex items-center gap-2 text-qx-orange text-sm font-semibold">
+                  <span className="inline-flex items-center gap-2 text-qx-orange text-sm font-bold group-hover:gap-4 transition-all duration-300">
                     Learn More
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight className="w-4 h-4" />
                   </span>
                 </div>
               </Link>
@@ -193,18 +240,33 @@ export default function IndexModern() {
       {/* Testimonials Section */}
       <TestimonialsCarousel variant="modern" />
 
-      {/* CTA Section */}
-      <section className="py-20 bg-qx-blue">
-        <div className="container mx-auto px-4 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-montserrat font-bold text-white mb-4">
-            Ready to Scale Your Accounting Firm?
+      {/* CTA Section - Enhanced with vibrant gradient */}
+      <section className="py-24 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-qx-blue via-qx-blue-dark to-qx-blue" />
+        
+        {/* Animated background elements */}
+        <div className="absolute inset-0">
+          <div className="absolute top-10 left-10 w-32 h-32 bg-qx-orange/30 rounded-full blur-2xl animate-float" />
+          <div className="absolute bottom-10 right-10 w-48 h-48 bg-purple-500/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
+          <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-cyan-400/20 rounded-full blur-2xl animate-pulse-soft" />
+          <div className="absolute bottom-1/3 right-1/3 w-36 h-36 bg-qx-orange/20 rounded-full blur-3xl animate-pulse-soft" style={{ animationDelay: '2s' }} />
+        </div>
+        
+        <div className="container mx-auto px-4 lg:px-8 text-center relative z-10">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 mb-6">
+            <Sparkles className="w-4 h-4 text-qx-orange" />
+            <span className="text-sm font-semibold text-white/90">Get Started Today</span>
+          </div>
+          
+          <h2 className="text-3xl md:text-5xl font-montserrat font-bold text-white mb-6">
+            Ready to Scale Your <span className="text-qx-orange">Accounting Firm</span>?
           </h2>
-          <p className="text-white/70 max-w-2xl mx-auto mb-10">
+          <p className="text-white/70 max-w-2xl mx-auto mb-12 text-lg">
             Schedule a free consultation to discover how our People, Process & Platforms approach can transform your operations.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
-              className="bg-qx-orange hover:bg-qx-orange-dark text-white rounded-full px-8 py-6 text-base"
+              className="bg-gradient-to-r from-qx-orange to-amber-500 hover:from-qx-orange-dark hover:to-amber-600 text-white rounded-full px-10 py-7 text-lg font-semibold shadow-lg shadow-qx-orange/30 hover:shadow-xl hover:shadow-qx-orange/40 transition-all duration-300 hover:-translate-y-1"
               asChild
             >
               <Link to="/contact">
@@ -214,7 +276,7 @@ export default function IndexModern() {
             </Button>
             <Button 
               variant="outline"
-              className="border-white/30 text-white hover:bg-white/10 rounded-full px-8 py-6 text-base"
+              className="border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50 rounded-full px-10 py-7 text-lg font-semibold transition-all duration-300"
               asChild
             >
               <Link to="/careers">View Open Positions</Link>
