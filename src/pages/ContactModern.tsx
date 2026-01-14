@@ -58,15 +58,15 @@ export default function ContactModern() {
         <div className="relative container mx-auto px-4 lg:px-8">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 mb-4">
-              <span className="text-xs font-semibold text-qx-orange uppercase tracking-wider">
+              <span className="text-filter-label text-qx-orange uppercase tracking-wider">
                 Contact Us
               </span>
             </div>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-montserrat font-bold text-white mb-4">
+            <h1 className="text-hero-headline text-white mb-4">
               Book a{" "}
               <span className="text-qx-orange">Free Consultation</span>
             </h1>
-            <p className="text-lg text-white/80 leading-relaxed">
+            <p className="text-hero-subtext text-white/80">
               We strongly recommend that you schedule a call to discuss how we can contribute to the mission of your firm.
             </p>
           </div>
@@ -80,10 +80,10 @@ export default function ContactModern() {
             {/* Contact Info */}
             <AnimatedSection animation="slide-left">
               <div>
-                <h2 className="text-2xl md:text-3xl font-montserrat font-bold text-qx-blue mb-4">
+                <h2 className="text-section-title text-qx-blue mb-4">
                   Get in Touch
                 </h2>
-                <p className="text-qx-gray mb-8 leading-relaxed text-sm md:text-base">
+                <p className="text-body-paragraph text-qx-gray mb-8">
                   Whether you're looking to outsource accounting tasks, need a candidate referral, or have questions about our services, we're here to help.
                 </p>
 
@@ -94,10 +94,10 @@ export default function ContactModern() {
                       <Phone className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-qx-blue mb-1 text-sm">Call Us</h3>
+                      <h3 className="text-job-company text-qx-blue mb-1">Call Us</h3>
                       <a
                         href="tel:+18885566382"
-                        className="text-qx-orange hover:underline text-sm"
+                        className="text-job-meta text-qx-orange hover:underline"
                       >
                         +1 888 556 6382
                       </a>
@@ -110,10 +110,10 @@ export default function ContactModern() {
                       <Mail className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-qx-blue mb-1 text-sm">Email Us</h3>
+                      <h3 className="text-job-company text-qx-blue mb-1">Email Us</h3>
                       <a
                         href="mailto:info@multiversecpa.com"
-                        className="text-qx-orange hover:underline text-sm"
+                        className="text-job-meta text-qx-orange hover:underline"
                       >
                         info@multiversecpa.com
                       </a>
@@ -126,8 +126,8 @@ export default function ContactModern() {
                       <MapPin className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-qx-blue mb-1 text-sm">Our Address</h3>
-                      <p className="text-xs text-qx-gray">
+                      <h3 className="text-job-company text-qx-blue mb-1">Our Address</h3>
+                      <p className="text-job-meta text-qx-gray">
                         500 Westover Dr #31297<br />
                         Sanford, NC 27330
                       </p>
@@ -140,8 +140,8 @@ export default function ContactModern() {
                       <Calendar className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-qx-blue mb-1 text-sm">Book a Meeting</h3>
-                      <p className="text-xs text-qx-gray">
+                      <h3 className="text-job-company text-qx-blue mb-1">Book a Meeting</h3>
+                      <p className="text-job-meta text-qx-gray">
                         Schedule a time to discuss your outsourcing needs.
                       </p>
                     </div>
@@ -150,7 +150,7 @@ export default function ContactModern() {
 
                 {/* What We Can Help With */}
                 <div className="mt-8">
-                  <h3 className="text-lg font-bold text-qx-blue mb-3">
+                  <h3 className="text-job-title text-qx-blue mb-3">
                     How Can We Help?
                   </h3>
                   <ul className="space-y-2">
@@ -164,7 +164,7 @@ export default function ContactModern() {
                     ].map((item) => (
                       <li key={item} className="flex items-center gap-2">
                         <CheckCircle2 className="w-4 h-4 text-qx-orange flex-shrink-0" />
-                        <span className="text-sm text-qx-gray">{item}</span>
+                        <span className="text-body-paragraph text-qx-gray">{item}</span>
                       </li>
                     ))}
                   </ul>
@@ -175,14 +175,14 @@ export default function ContactModern() {
             {/* Contact Form */}
             <AnimatedSection animation="slide-right">
               <div className="bg-qx-light-gray rounded-2xl p-6 md:p-8 border border-gray-100">
-                <h3 className="text-xl font-bold text-qx-blue mb-5">
+                <h3 className="text-job-title text-qx-blue mb-5">
                   Send Us a Message
                 </h3>
 
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div className="grid sm:grid-cols-2 gap-5">
                     <div className="space-y-2">
-                      <Label htmlFor="name" className="text-qx-blue">Full Name</Label>
+                      <Label htmlFor="name" className="text-form-label text-qx-blue">Full Name</Label>
                       <Input
                         id="name"
                         name="name"
@@ -194,7 +194,7 @@ export default function ContactModern() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="email" className="text-qx-blue">Email Address</Label>
+                      <Label htmlFor="email" className="text-form-label text-qx-blue">Email Address</Label>
                       <Input
                         id="email"
                         name="email"
@@ -210,7 +210,7 @@ export default function ContactModern() {
 
                   <div className="grid sm:grid-cols-2 gap-5">
                     <div className="space-y-2">
-                      <Label htmlFor="company" className="text-qx-blue">Company / Firm</Label>
+                      <Label htmlFor="company" className="text-form-label text-qx-blue">Company / Firm</Label>
                       <Input
                         id="company"
                         name="company"
@@ -221,7 +221,7 @@ export default function ContactModern() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="subject" className="text-qx-blue">Subject</Label>
+                      <Label htmlFor="subject" className="text-form-label text-qx-blue">Subject</Label>
                       <Input
                         id="subject"
                         name="subject"
@@ -235,7 +235,7 @@ export default function ContactModern() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="message" className="text-qx-blue">Message</Label>
+                    <Label htmlFor="message" className="text-form-label text-qx-blue">Message</Label>
                     <Textarea
                       id="message"
                       name="message"
@@ -273,10 +273,10 @@ export default function ContactModern() {
       <AnimatedSection>
         <section className="py-14 md:py-16 bg-qx-light-gray">
           <div className="container mx-auto px-4 lg:px-8 text-center">
-            <h2 className="text-2xl md:text-3xl font-bold text-qx-blue mb-3">
+            <h2 className="text-section-title text-qx-blue mb-3">
               Serving Clients Globally
             </h2>
-            <p className="text-qx-gray max-w-2xl mx-auto mb-8 text-sm md:text-base">
+            <p className="text-section-subtitle text-qx-gray max-w-2xl mx-auto mb-8">
               Our team handles diverse assignments from clients across the USA, Canada, Australia, and Europe.
             </p>
 
@@ -286,7 +286,7 @@ export default function ContactModern() {
                   key={region}
                   className="p-4 rounded-xl bg-white border border-gray-100"
                 >
-                  <div className="font-bold text-qx-blue">{region}</div>
+                  <div className="text-job-company text-qx-blue">{region}</div>
                 </div>
               ))}
             </div>

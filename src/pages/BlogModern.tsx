@@ -48,10 +48,10 @@ export default function BlogModern() {
       {/* Hero Section */}
       <section className="pt-28 pb-16 bg-qx-blue">
         <div className="container mx-auto px-4 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-montserrat font-bold text-white mb-4">
+          <h1 className="text-hero-headline text-white mb-4">
             Insights & <span className="text-qx-orange">Resources</span>
           </h1>
-          <p className="text-white/70 max-w-2xl mx-auto text-lg mb-8">
+          <p className="text-hero-subtext text-white/70 max-w-2xl mx-auto mb-8">
             Expert perspectives on accounting, outsourcing best practices, and industry trends.
           </p>
           <BlogSearch onSearch={setSearchQuery} isLoading={isLoading} variant="modern" />
@@ -66,10 +66,10 @@ export default function BlogModern() {
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-full transition-colors ${
                   category === selectedCategory
-                    ? "bg-qx-orange text-white"
-                    : "bg-qx-light-gray text-qx-gray hover:bg-qx-blue/10 hover:text-qx-blue"
+                    ? "bg-qx-orange text-white text-filter-selected"
+                    : "bg-qx-light-gray text-filter-value text-qx-gray hover:bg-qx-blue/10 hover:text-qx-blue"
                 }`}
               >
                 {category}
@@ -92,14 +92,14 @@ export default function BlogModern() {
                 />
               </div>
               <div>
-                <span className="inline-block px-3 py-1 bg-qx-orange/10 text-qx-orange text-sm font-medium rounded-full mb-4">
+                <span className="inline-block px-3 py-1 bg-qx-orange/10 text-qx-orange text-filter-label rounded-full mb-4">
                   {featuredPost.category}
                 </span>
-                <h2 className="text-3xl md:text-4xl font-montserrat font-bold text-qx-blue mb-4">
+                <h2 className="text-section-title text-qx-blue mb-4">
                   {featuredPost.title}
                 </h2>
-                <p className="text-qx-gray mb-6 leading-relaxed">{featuredPost.excerpt}</p>
-                <div className="flex flex-wrap items-center gap-4 text-sm text-qx-gray mb-6">
+                <p className="text-body-paragraph text-qx-gray mb-6">{featuredPost.excerpt}</p>
+                <div className="flex flex-wrap items-center gap-4 text-job-meta text-qx-gray mb-6">
                   <span className="flex items-center gap-1">
                     <User className="w-4 h-4" />
                     {featuredPost.author.name}
@@ -131,12 +131,12 @@ export default function BlogModern() {
       {/* Posts Grid */}
       <section className="py-16 bg-qx-light-gray">
         <div className="container mx-auto px-4 lg:px-8">
-          <h3 className="text-2xl font-montserrat font-bold text-qx-blue mb-2">
+          <h3 className="text-section-title text-qx-blue mb-2">
             {filteredPosts.length === 0 ? "No articles found" : "Latest Articles"}
           </h3>
           
           {totalItems > 0 && (
-            <p className="text-sm text-qx-gray mb-8">
+            <p className="text-job-meta text-qx-gray mb-8">
               Showing {startIndex}–{endIndex} of {totalItems} articles
             </p>
           )}
@@ -157,14 +157,14 @@ export default function BlogModern() {
                     />
                   </div>
                   <div className="p-6">
-                    <span className="inline-block px-2 py-1 bg-qx-orange/10 text-qx-orange text-xs font-medium rounded mb-3">
+                    <span className="inline-block px-2 py-1 bg-qx-orange/10 text-qx-orange text-filter-label rounded mb-3">
                       {post.category}
                     </span>
-                    <h4 className="font-montserrat text-lg font-bold text-qx-blue mb-2 group-hover:text-qx-orange transition-colors line-clamp-2">
+                    <h4 className="text-job-title text-qx-blue mb-2 group-hover:text-qx-orange transition-colors line-clamp-2">
                       {post.title}
                     </h4>
-                    <p className="text-qx-gray text-sm mb-4 line-clamp-2">{post.excerpt}</p>
-                    <div className="flex items-center justify-between text-xs text-qx-gray">
+                    <p className="text-body-paragraph text-qx-gray mb-4 line-clamp-2">{post.excerpt}</p>
+                    <div className="flex items-center justify-between text-job-meta text-qx-gray">
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
                         {post.date}
@@ -177,7 +177,7 @@ export default function BlogModern() {
             </div>
           ) : (
             !featuredPost && (
-              <p className="text-center text-qx-gray py-12">
+              <p className="text-center text-body-paragraph text-qx-gray py-12">
                 No articles match your search criteria. Try a different search term or category.
               </p>
             )
@@ -270,10 +270,10 @@ export default function BlogModern() {
       {/* Newsletter CTA */}
       <section className="py-16 bg-qx-blue">
         <div className="container mx-auto px-4 lg:px-8 text-center">
-          <h3 className="text-2xl md:text-3xl font-montserrat font-bold text-white mb-4">
+          <h3 className="text-section-title text-white mb-4">
             Stay Updated
           </h3>
-          <p className="text-white/70 max-w-xl mx-auto mb-8">
+          <p className="text-hero-subtext text-white/70 max-w-xl mx-auto mb-8">
             Subscribe to our newsletter for the latest insights on accounting outsourcing and
             industry trends.
           </p>
