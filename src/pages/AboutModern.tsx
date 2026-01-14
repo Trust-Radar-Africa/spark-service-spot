@@ -1,58 +1,18 @@
 import { Link } from "react-router-dom";
 import { LayoutModern } from "@/components/layout/LayoutModern";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CheckCircle2, Users, Target, Award, Globe, Shield, Zap } from "lucide-react";
+import { ArrowRight, CheckCircle2, Users, Award, Globe, Phone, Send, Mail } from "lucide-react";
 import teamImg from "@/assets/team.jpg";
 import { AnimatedSection } from "@/components/AnimatedSection";
-
-const values = [
-  {
-    icon: Award,
-    title: "Integrity",
-    description: "We uphold the highest ethical standards in all our dealings.",
-  },
-  {
-    icon: Target,
-    title: "Competence",
-    description: "Certified professionals with proven expertise across multiple frameworks.",
-  },
-  {
-    icon: Users,
-    title: "Dedication",
-    description: "Committed to your success as our responsibility.",
-  },
-  {
-    icon: Globe,
-    title: "Global Standards",
-    description: "IFAC affiliate adhering to international ethics.",
-  },
-];
 
 const benefits = [
   "Handle back office tasks at a fraction of local staff costs",
   "No compromise on quality or professionalism",
   "Staff assigned exclusively under your operational control",
-  "Access to candidates experienced in US, Canada, Australia, and Europe",
+  "Candidates with experience from USA, Canada, Australia and Europe",
   "Interview candidates to ensure best fit for your firm",
   "Licensed professional firm guaranteeing ethical standards",
-];
-
-const approach = [
-  {
-    icon: Users,
-    title: "People",
-    description: "1,100+ dedicated, certified accountants ready to support your firm.",
-  },
-  {
-    icon: Zap,
-    title: "Process",
-    description: "Proven workflows and four-eyed review ensuring consistent quality.",
-  },
-  {
-    icon: Shield,
-    title: "Platforms",
-    description: "Secure, compliant technology infrastructure backing every engagement.",
-  },
+  "Expertise in bookkeeping, tax, audit, compilation and financial analysis",
 ];
 
 export default function AboutModern() {
@@ -67,13 +27,14 @@ export default function AboutModern() {
         <div className="relative container mx-auto px-4 lg:px-8">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 mb-4">
+              <Globe className="w-4 h-4 text-qx-orange" />
               <span className="text-filter-label text-qx-orange uppercase tracking-wider">
-                About Us
+                About Multiverse CPA
               </span>
             </div>
             <h1 className="text-hero-headline text-white mb-4">
-              Your Partner in{" "}
-              <span className="text-qx-orange">Accounting Excellence</span>
+              Certified Public Accountants for{" "}
+              <span className="text-qx-orange">Global Firms</span>
             </h1>
             <p className="text-hero-subtext text-white/80">
               A firm of Certified Public Accountants handling exclusively outsourced assignments from firms of accountants in the USA, Canada, Europe and Australia.
@@ -82,47 +43,21 @@ export default function AboutModern() {
         </div>
       </section>
 
-      {/* People, Process, Platforms */}
-      <AnimatedSection>
-        <section className="py-12 md:py-14 bg-white border-b">
-          <div className="container mx-auto px-4 lg:px-8">
-            <div className="grid md:grid-cols-3 gap-4 md:gap-6">
-              {approach.map((item, index) => (
-                <AnimatedSection key={item.title} delay={index * 100}>
-                  <div className="flex items-start gap-4 p-5 rounded-xl bg-qx-light-gray">
-                    <div className="w-10 h-10 rounded-lg bg-qx-orange flex items-center justify-center flex-shrink-0">
-                      <item.icon className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-job-title text-qx-blue mb-1">{item.title}</h3>
-                      <p className="text-body-paragraph text-qx-gray">{item.description}</p>
-                    </div>
-                  </div>
-                </AnimatedSection>
-              ))}
-            </div>
-          </div>
-        </section>
-      </AnimatedSection>
-
-      {/* Main Content Section */}
+      {/* Our Team Section */}
       <section className="py-14 md:py-16 bg-white">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-12 items-center">
             <AnimatedSection animation="slide-left">
               <div>
                 <h2 className="text-section-title text-qx-blue mb-4">
-                  Who We Are
+                  Our Team
                 </h2>
-                <p className="text-body-paragraph text-qx-gray mb-4">
-                  Our team comprises Certified Public Accountants and Chartered Accountants from diverse nationalities and backgrounds. Our professionals have been vetted, tried and tested and are members in good standing of their respective professional bodies.
-                </p>
-                <p className="text-body-paragraph text-qx-gray mb-6">
-                  Multiverse CPA is an affiliate member firm of International Federation of Accountants. Being a reputable licensed professional firm of accountants, we guarantee that your affairs will be handled in accordance with best international ethical and professional standards.
+                <p className="text-body-paragraph text-qx-gray mb-4 leading-relaxed">
+                  Our team comprises <span className="font-semibold text-qx-blue">Certified Public Accountants and Chartered Accountants</span> from diverse nationalities and backgrounds. Our professionals have been vetted, tried and tested and are members in good standing of their respective professional bodies.
                 </p>
 
                 <div className="flex items-center gap-4 p-4 rounded-xl bg-qx-light-gray border border-gray-100">
-                  <div className="w-10 h-10 rounded-lg bg-qx-orange flex items-center justify-center flex-shrink-0">
+                  <div className="w-11 h-11 rounded-lg bg-gradient-to-br from-qx-blue to-qx-blue-dark flex items-center justify-center flex-shrink-0">
                     <Award className="w-5 h-5 text-white" />
                   </div>
                   <div>
@@ -143,8 +78,10 @@ export default function AboutModern() {
                   />
                 </div>
                 <div className="absolute -bottom-4 -right-4 bg-qx-orange text-white p-4 rounded-xl shadow-lg">
-                  <div className="text-job-salary text-2xl">10+</div>
-                  <div className="text-job-meta text-white/80">Years Excellence</div>
+                  <div className="flex items-center gap-2">
+                    <Users className="w-5 h-5" />
+                    <span className="text-job-title">Global Team</span>
+                  </div>
                 </div>
               </div>
             </AnimatedSection>
@@ -156,17 +93,20 @@ export default function AboutModern() {
       <section className="py-14 md:py-16 bg-qx-light-gray">
         <div className="container mx-auto px-4 lg:px-8">
           <AnimatedSection>
-            <div className="text-center max-w-3xl mx-auto mb-10">
-              <h2 className="text-section-title text-qx-blue mb-3">
-                Why Outsource to Multiverse CPA?
+            <div className="max-w-3xl mx-auto mb-10">
+              <h2 className="text-section-title text-qx-blue mb-4">
+                Why Outsource to <span className="text-qx-orange">Multiverse CPA</span>?
               </h2>
-              <p className="text-section-subtitle text-qx-gray">
-                Discover the advantages of partnering with a globally recognized accounting outsourcing firm.
+              <p className="text-body-paragraph text-qx-gray leading-relaxed mb-4">
+                The team at Multiverse CPA will handle all your back office tasks at a fraction of the cost of locally based staff. This will happen <span className="font-semibold text-qx-blue">without compromising on quality</span>. Your accounting firm will enter into a contract with Multiverse CPA but the staff assigned to your firm will be under your exclusive operational control.
+              </p>
+              <p className="text-body-paragraph text-qx-gray leading-relaxed">
+                Multiverse CPA being a reputable licensed professional firm of accountants guarantees that your affairs will be handled in accordance with best international ethical and professional standards. Based on your needs, we shall identify the most suitable candidate for the role. We shall allow you to also interview the candidate to ascertain whether they are best fit for the role.
               </p>
             </div>
           </AnimatedSection>
 
-          <div className="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-3 max-w-4xl mx-auto">
             {benefits.map((benefit, index) => (
               <AnimatedSection key={index} delay={index * 50}>
                 <div className="flex items-start gap-3 p-4 rounded-xl bg-white border border-gray-100">
@@ -179,67 +119,92 @@ export default function AboutModern() {
         </div>
       </section>
 
-      {/* Values Section */}
-      <section className="py-14 md:py-16 bg-white">
-        <div className="container mx-auto px-4 lg:px-8">
-          <AnimatedSection>
-            <div className="text-center max-w-3xl mx-auto mb-10">
-              <h2 className="text-section-title text-qx-blue mb-3">
-                Our Core Values
+      {/* Take the Next Step CTA Section */}
+      <AnimatedSection>
+        <section className="py-14 md:py-16 bg-gradient-to-br from-qx-blue via-qx-blue-dark to-qx-blue relative overflow-hidden">
+          <div className="absolute inset-0 opacity-15">
+            <div className="absolute top-10 right-10 w-64 h-64 bg-qx-orange rounded-full blur-3xl animate-float" />
+            <div className="absolute bottom-10 left-10 w-48 h-48 bg-cyan-400 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+          </div>
+
+          <div className="container mx-auto px-4 lg:px-8 relative z-10">
+            <div className="text-center mb-10">
+              <h2 className="text-section-title text-white mb-3">
+                Take the <span className="text-qx-orange">Next Step</span>
               </h2>
-              <p className="text-section-subtitle text-qx-gray">
-                The pillars that define our commitment to excellence.
+              <p className="text-hero-subtext text-white/70 max-w-2xl mx-auto">
+                We strongly recommend that you schedule a call to discuss further how we can contribute to the mission of your firm.
               </p>
             </div>
-          </AnimatedSection>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-            {values.map((value, index) => (
-              <AnimatedSection key={value.title} delay={index * 100}>
-                <div className="text-center p-6 rounded-xl bg-qx-light-gray border border-gray-100 hover:shadow-lg hover:border-qx-orange/20 transition-all duration-300 h-full">
-                  <div className="w-12 h-12 rounded-full bg-qx-orange/10 flex items-center justify-center mx-auto mb-4">
-                    <value.icon className="w-6 h-6 text-qx-orange" />
+            <div className="grid md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+              {/* Schedule a Call */}
+              <AnimatedSection delay={100}>
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 text-center h-full flex flex-col">
+                  <div className="w-12 h-12 rounded-full bg-qx-orange/20 flex items-center justify-center mx-auto mb-4">
+                    <Phone className="w-6 h-6 text-qx-orange" />
                   </div>
-                  <h3 className="text-job-title text-qx-blue mb-2">
-                    {value.title}
-                  </h3>
-                  <p className="text-body-paragraph text-qx-gray">
-                    {value.description}
+                  <h3 className="text-job-title text-white mb-2">Schedule a Call</h3>
+                  <p className="text-body-paragraph text-white/70 mb-4 flex-grow">
+                    Discuss how we can contribute to the mission of your firm.
                   </p>
+                  <Button 
+                    className="bg-gradient-to-r from-qx-orange to-amber-500 hover:from-qx-orange-dark hover:to-amber-600 text-white rounded-full w-full"
+                    asChild
+                  >
+                    <Link to="/contact">
+                      Book a Call
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
                 </div>
               </AnimatedSection>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* CTA Section */}
-      <AnimatedSection>
-        <section className="py-14 md:py-16 bg-qx-blue">
-          <div className="container mx-auto px-4 lg:px-8 text-center">
-            <h2 className="text-section-title text-white mb-3">
-              Take the Next Step
-            </h2>
-            <p className="text-hero-subtext text-white/70 max-w-2xl mx-auto mb-8">
-              Schedule a call to discuss further how we can contribute to the mission of your firm.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button 
-                className="bg-qx-orange hover:bg-qx-orange-dark text-white rounded-full px-8 py-6 text-base"
-                asChild
-              >
-                <Link to="/contact">
-                  Book a Free Consultation
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-              <Button 
-                variant="outline"
-                className="border-white/30 text-white hover:bg-white/10 rounded-full px-8 py-6 text-base"
-                asChild
-              >
-                <Link to="/services">Explore Services</Link>
-              </Button>
+              {/* Request a Candidate */}
+              <AnimatedSection delay={200}>
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 text-center h-full flex flex-col">
+                  <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4">
+                    <Send className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-job-title text-white mb-2">Request a Candidate</h3>
+                  <p className="text-body-paragraph text-white/70 mb-4 flex-grow">
+                    Need a candidate meeting certain specifications? Send us your request.
+                  </p>
+                  <Button 
+                    variant="outline"
+                    className="border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50 rounded-full w-full"
+                    asChild
+                  >
+                    <Link to="/employers">
+                      Send Request
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
+              </AnimatedSection>
+
+              {/* Contact Us */}
+              <AnimatedSection delay={300}>
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 text-center h-full flex flex-col">
+                  <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4">
+                    <Mail className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-job-title text-white mb-2">Contact Us</h3>
+                  <p className="text-body-paragraph text-white/70 mb-4 flex-grow">
+                    Have enquiries or need clarifications? We're here to help.
+                  </p>
+                  <Button 
+                    variant="outline"
+                    className="border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50 rounded-full w-full"
+                    asChild
+                  >
+                    <Link to="/contact">
+                      Get in Touch
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
+              </AnimatedSection>
             </div>
           </div>
         </section>
