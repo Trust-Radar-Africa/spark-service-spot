@@ -104,12 +104,12 @@ export default function IndexModern() {
             <div className="text-center mb-8 md:mb-10">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-qx-orange/10 border border-qx-orange/20 mb-3">
                 <Sparkles className="w-3.5 h-3.5 text-qx-orange" />
-                <span className="text-xs font-semibold text-qx-orange">Industry Leaders</span>
+                <span className="text-filter-label text-qx-orange">Industry Leaders</span>
               </div>
-              <h2 className="text-2xl md:text-3xl font-montserrat font-bold text-qx-blue mb-2">
+              <h2 className="text-section-title text-qx-blue mb-2">
                 Market Leaders in <span className="text-gradient-vibrant">Accounting Outsourcing</span>
               </h2>
-              <p className="text-qx-gray max-w-xl mx-auto">
+              <p className="text-section-subtitle text-qx-gray max-w-xl mx-auto">
                 Trusted by future-focused accountancy firms to deliver speed, accuracy, and massive cost savings.
               </p>
             </div>
@@ -121,10 +121,10 @@ export default function IndexModern() {
                     <div className={`w-12 h-12 md:w-14 md:h-14 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
                       <stat.icon className="w-6 h-6 md:w-7 md:h-7 text-white" />
                     </div>
-                    <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-qx-blue to-qx-blue-dark bg-clip-text text-transparent mb-1">
+                    <div className="text-job-salary text-3xl md:text-4xl bg-gradient-to-r from-qx-blue to-qx-blue-dark bg-clip-text text-transparent mb-1">
                       {stat.value}
                     </div>
-                    <div className="text-xs md:text-sm text-qx-gray font-medium">
+                    <div className="text-job-meta text-qx-gray">
                       {stat.label}
                     </div>
                   </div>
@@ -147,12 +147,12 @@ export default function IndexModern() {
             <div className="text-center mb-10">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 mb-3">
                 <Zap className="w-3.5 h-3.5 text-qx-orange" />
-                <span className="text-xs font-semibold text-white/90">Why Choose Us</span>
+                <span className="text-filter-label text-white/90">Why Choose Us</span>
               </div>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-montserrat font-bold text-white mb-2">
+              <h2 className="text-section-title text-white mb-2">
                 Why Choose <span className="text-qx-orange">Multiverse CPA</span>
               </h2>
-              <p className="text-white/70 max-w-xl mx-auto text-sm md:text-base">
+              <p className="text-section-subtitle text-white/70 max-w-xl mx-auto">
                 We align with your firm's goals and help achieve strategic growth through bespoke talent and tech support.
               </p>
             </div>
@@ -165,10 +165,10 @@ export default function IndexModern() {
                   <div className={`w-10 h-10 md:w-12 md:h-12 rounded-lg bg-gradient-to-br ${item.gradient} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300`}>
                     <item.icon className={`w-5 h-5 md:w-6 md:h-6 ${item.iconColor}`} />
                   </div>
-                  <h3 className="text-sm md:text-base font-montserrat font-bold text-white mb-1.5 group-hover:text-qx-orange transition-colors leading-tight">
+                  <h3 className="text-job-title text-white mb-1.5 group-hover:text-qx-orange transition-colors">
                     {item.title}
                   </h3>
-                  <p className="text-white/70 text-xs md:text-sm leading-relaxed line-clamp-3">
+                  <p className="text-body-paragraph text-white/70 line-clamp-3">
                     {item.description}
                   </p>
                 </div>
@@ -187,12 +187,12 @@ export default function IndexModern() {
             <div className="text-center mb-10">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-qx-blue/10 border border-qx-blue/20 mb-3">
                 <TrendingUp className="w-3.5 h-3.5 text-qx-blue" />
-                <span className="text-xs font-semibold text-qx-blue">Our Services</span>
+                <span className="text-filter-label text-qx-blue">Our Services</span>
               </div>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-montserrat font-bold text-qx-blue mb-2">
+              <h2 className="text-section-title text-qx-blue mb-2">
                 Our <span className="text-qx-orange">Outsourcing</span> Services
               </h2>
-              <p className="text-qx-gray max-w-xl mx-auto text-sm md:text-base">
+              <p className="text-section-subtitle text-qx-gray max-w-xl mx-auto">
                 Comprehensive solutions designed to help your firm scale efficiently and profitably.
               </p>
             </div>
@@ -218,14 +218,14 @@ export default function IndexModern() {
                       <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-qx-orange to-amber-400 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
                         <service.icon className="w-5 h-5 text-white" />
                       </div>
-                      <h3 className="text-lg font-montserrat font-bold text-qx-blue group-hover:text-qx-orange transition-colors duration-300">
+                      <h3 className="text-job-title text-qx-blue group-hover:text-qx-orange transition-colors duration-300">
                         {service.title}
                       </h3>
                     </div>
-                    <p className="text-qx-gray text-sm mb-4 leading-relaxed line-clamp-2">
+                    <p className="text-body-paragraph text-qx-gray mb-4 line-clamp-2">
                       {service.description}
                     </p>
-                    <span className="inline-flex items-center gap-2 text-qx-orange text-sm font-semibold group-hover:gap-3 transition-all duration-300">
+                    <span className="inline-flex items-center gap-2 text-qx-orange text-job-company group-hover:gap-3 transition-all duration-300">
                       Learn More
                       <ArrowRight className="w-4 h-4" />
                     </span>
@@ -253,13 +253,13 @@ export default function IndexModern() {
           <div className="container mx-auto px-4 lg:px-8 text-center relative z-10">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 mb-4">
               <Sparkles className="w-3.5 h-3.5 text-qx-orange" />
-              <span className="text-xs font-semibold text-white/90">Get Started Today</span>
+              <span className="text-filter-label text-white/90">Get Started Today</span>
             </div>
             
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-montserrat font-bold text-white mb-3">
+            <h2 className="text-section-title text-white mb-3">
               Ready to Scale Your <span className="text-qx-orange">Accounting Firm</span>?
             </h2>
-            <p className="text-white/70 max-w-xl mx-auto mb-8 text-sm md:text-base">
+            <p className="text-hero-subtext text-white/70 max-w-xl mx-auto mb-8">
               Schedule a free consultation to discover how our People, Process & Platforms approach can transform your operations.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
