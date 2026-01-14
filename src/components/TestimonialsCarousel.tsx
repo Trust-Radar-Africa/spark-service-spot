@@ -77,26 +77,26 @@ export function TestimonialsCarousel({ variant = "classic" }: TestimonialsCarous
 
   if (variant === "modern") {
     return (
-      <section className="py-24 bg-gradient-to-b from-qx-light-gray to-white relative overflow-hidden">
+      <section className="py-14 md:py-16 bg-gradient-to-b from-qx-light-gray to-white relative overflow-hidden">
         {/* Background decorations */}
-        <div className="absolute top-0 left-0 w-96 h-96 bg-qx-orange/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-qx-blue/5 rounded-full blur-3xl" />
+        <div className="absolute top-0 left-0 w-64 h-64 bg-qx-orange/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-0 w-72 h-72 bg-qx-blue/5 rounded-full blur-3xl" />
         
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-qx-orange/10 border border-qx-orange/20 mb-4">
-              <Sparkles className="w-4 h-4 text-qx-orange" />
-              <span className="text-sm font-semibold text-qx-orange">Client Success Stories</span>
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-qx-orange/10 border border-qx-orange/20 mb-3">
+              <Sparkles className="w-3.5 h-3.5 text-qx-orange" />
+              <span className="text-xs font-semibold text-qx-orange">Client Success Stories</span>
             </div>
-            <h2 className="text-3xl md:text-5xl font-montserrat font-bold text-qx-blue mb-4">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-montserrat font-bold text-qx-blue mb-2">
               What Our <span className="text-qx-orange">Clients</span> Say
             </h2>
-            <p className="text-qx-gray max-w-2xl mx-auto text-lg">
+            <p className="text-qx-gray max-w-xl mx-auto text-sm md:text-base">
               Trusted by accounting firms worldwide to deliver exceptional results.
             </p>
           </div>
 
-          <div className="max-w-5xl mx-auto">
+          <div className="max-w-4xl mx-auto">
             <Carousel
               setApi={setApi}
               opts={{ loop: true, align: "center" }}
@@ -106,32 +106,32 @@ export function TestimonialsCarousel({ variant = "classic" }: TestimonialsCarous
               <CarouselContent>
                 {testimonials.map((testimonial, index) => (
                   <CarouselItem key={index}>
-                    <div className="glass-card rounded-3xl p-10 md:p-14 shadow-xl border border-gray-100 hover-lift mx-2">
+                    <div className="glass-card rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100 mx-2">
                       {/* Rating stars */}
-                      <div className="flex justify-center gap-1 mb-6">
+                      <div className="flex justify-center gap-0.5 mb-4">
                         {[...Array(testimonial.rating)].map((_, i) => (
-                          <Star key={i} className="w-5 h-5 fill-qx-orange text-qx-orange" />
+                          <Star key={i} className="w-4 h-4 fill-qx-orange text-qx-orange" />
                         ))}
                       </div>
                       
-                      <div className="flex justify-center mb-8">
-                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-qx-orange to-amber-400 flex items-center justify-center shadow-lg shadow-qx-orange/30">
-                          <Quote className="w-8 h-8 text-white" />
+                      <div className="flex justify-center mb-4">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-qx-orange to-amber-400 flex items-center justify-center shadow-md">
+                          <Quote className="w-6 h-6 text-white" />
                         </div>
                       </div>
                       
-                      <blockquote className="text-xl md:text-2xl text-qx-blue text-center leading-relaxed mb-10 font-medium">
+                      <blockquote className="text-base md:text-lg text-qx-blue text-center leading-relaxed mb-6 font-medium">
                         "{testimonial.quote}"
                       </blockquote>
                       
                       <div className="text-center">
-                        <div className="font-montserrat font-bold text-qx-blue text-xl mb-1">
+                        <div className="font-montserrat font-bold text-qx-blue text-base mb-0.5">
                           {testimonial.author}
                         </div>
-                        <div className="text-qx-orange font-semibold text-lg">
+                        <div className="text-qx-orange font-semibold text-sm">
                           {testimonial.role}
                         </div>
-                        <div className="text-qx-gray mt-2">
+                        <div className="text-qx-gray text-xs mt-1">
                           {testimonial.company} • {testimonial.location}
                         </div>
                       </div>
@@ -139,20 +139,20 @@ export function TestimonialsCarousel({ variant = "classic" }: TestimonialsCarous
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              <CarouselPrevious className="hidden md:flex -left-14 w-14 h-14 bg-white border-gray-200 hover:bg-gradient-to-r hover:from-qx-orange hover:to-amber-500 hover:text-white hover:border-transparent shadow-lg transition-all duration-300" />
-              <CarouselNext className="hidden md:flex -right-14 w-14 h-14 bg-white border-gray-200 hover:bg-gradient-to-r hover:from-qx-orange hover:to-amber-500 hover:text-white hover:border-transparent shadow-lg transition-all duration-300" />
+              <CarouselPrevious className="hidden md:flex -left-12 w-10 h-10 bg-white border-gray-200 hover:bg-gradient-to-r hover:from-qx-orange hover:to-amber-500 hover:text-white hover:border-transparent shadow-md transition-all duration-300" />
+              <CarouselNext className="hidden md:flex -right-12 w-10 h-10 bg-white border-gray-200 hover:bg-gradient-to-r hover:from-qx-orange hover:to-amber-500 hover:text-white hover:border-transparent shadow-md transition-all duration-300" />
             </Carousel>
 
             {/* Enhanced Indicators */}
-            <div className="flex justify-center gap-2 mt-10">
+            <div className="flex justify-center gap-1.5 mt-6">
               {testimonials.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => api?.scrollTo(index)}
-                  className={`h-3 rounded-full transition-all duration-500 ${
+                  className={`h-2 rounded-full transition-all duration-500 ${
                     current === index
-                      ? "bg-gradient-to-r from-qx-orange to-amber-400 w-10 shadow-lg shadow-qx-orange/30"
-                      : "bg-qx-blue/20 hover:bg-qx-blue/40 w-3"
+                      ? "bg-gradient-to-r from-qx-orange to-amber-400 w-8"
+                      : "bg-qx-blue/20 hover:bg-qx-blue/40 w-2"
                   }`}
                   aria-label={`Go to testimonial ${index + 1}`}
                 />
@@ -166,18 +166,18 @@ export function TestimonialsCarousel({ variant = "classic" }: TestimonialsCarous
 
   // Classic variant
   return (
-    <section className="py-24 bg-secondary">
+    <section className="py-14 md:py-16 bg-secondary">
       <div className="container mx-auto px-4 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground mb-4">
+        <div className="text-center max-w-2xl mx-auto mb-10">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-foreground mb-3">
             Client <span className="text-accent">Testimonials</span>
           </h2>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground text-sm md:text-base">
             Hear from accounting firms who have transformed their operations with our services.
           </p>
         </div>
 
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-3xl mx-auto">
           <Carousel
             setApi={setApi}
             opts={{ loop: true, align: "center" }}
@@ -187,25 +187,25 @@ export function TestimonialsCarousel({ variant = "classic" }: TestimonialsCarous
             <CarouselContent>
               {testimonials.map((testimonial, index) => (
                 <CarouselItem key={index}>
-                  <div className="bg-card rounded-2xl p-8 md:p-12 shadow-card border border-border">
-                    <div className="flex justify-center mb-6">
-                      <div className="w-14 h-14 rounded-full bg-accent/10 flex items-center justify-center">
-                        <Quote className="w-7 h-7 text-accent" />
+                  <div className="bg-card rounded-xl p-6 md:p-8 shadow-card border border-border">
+                    <div className="flex justify-center mb-4">
+                      <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center">
+                        <Quote className="w-6 h-6 text-accent" />
                       </div>
                     </div>
                     
-                    <blockquote className="text-lg md:text-xl text-foreground text-center leading-relaxed mb-8 font-serif">
+                    <blockquote className="text-base md:text-lg text-foreground text-center leading-relaxed mb-6 font-serif">
                       "{testimonial.quote}"
                     </blockquote>
                     
                     <div className="text-center">
-                      <div className="font-serif font-bold text-foreground text-lg">
+                      <div className="font-serif font-bold text-foreground text-base">
                         {testimonial.author}
                       </div>
-                      <div className="text-accent font-medium">
+                      <div className="text-accent font-medium text-sm">
                         {testimonial.role}
                       </div>
-                      <div className="text-muted-foreground text-sm mt-1">
+                      <div className="text-muted-foreground text-xs mt-1">
                         {testimonial.company} • {testimonial.location}
                       </div>
                     </div>
@@ -213,19 +213,19 @@ export function TestimonialsCarousel({ variant = "classic" }: TestimonialsCarous
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="hidden md:flex -left-12 bg-card border-border hover:bg-accent hover:text-accent-foreground hover:border-accent" />
-            <CarouselNext className="hidden md:flex -right-12 bg-card border-border hover:bg-accent hover:text-accent-foreground hover:border-accent" />
+            <CarouselPrevious className="hidden md:flex -left-10 bg-card border-border hover:bg-accent hover:text-accent-foreground hover:border-accent" />
+            <CarouselNext className="hidden md:flex -right-10 bg-card border-border hover:bg-accent hover:text-accent-foreground hover:border-accent" />
           </Carousel>
 
           {/* Indicators */}
-          <div className="flex justify-center gap-2 mt-8">
+          <div className="flex justify-center gap-1.5 mt-6">
             {testimonials.map((_, index) => (
               <button
                 key={index}
                 onClick={() => api?.scrollTo(index)}
-                className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
                   current === index
-                    ? "bg-accent w-6"
+                    ? "bg-accent w-5"
                     : "bg-foreground/20 hover:bg-foreground/40"
                 }`}
                 aria-label={`Go to testimonial ${index + 1}`}
