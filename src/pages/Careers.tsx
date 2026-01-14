@@ -41,6 +41,7 @@ import {
 } from 'lucide-react';
 import { useJobPostingsStore, getExperienceLabel, WORK_TYPE_LABELS, WORK_TYPE_OPTIONS } from '@/stores/jobPostingsStore';
 import { ExperienceLevel, WorkType } from '@/types/admin';
+import { AnimatedSection } from '@/components/AnimatedSection';
 
 const benefits = [
   'Challenging and rewarding environment',
@@ -134,17 +135,17 @@ export default function Careers() {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="relative py-24 bg-gradient-navy overflow-hidden">
+      <section className="relative py-16 md:py-20 bg-gradient-navy overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,hsl(38_92%_50%/0.1),transparent_70%)]" />
         </div>
 
         <div className="relative container mx-auto px-4 lg:px-8">
           <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-primary-foreground mb-6">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-primary-foreground mb-4">
               Join Our <span className="text-gradient-gold">Team</span>
             </h1>
-            <p className="text-xl text-primary-foreground/80 leading-relaxed mb-8">
+            <p className="text-lg text-primary-foreground/80 leading-relaxed mb-6">
               At Multiverse CPA, we provide a challenging and rewarding environment and the chance
               for you to build your own knowledge and expertise.
             </p>
@@ -160,378 +161,389 @@ export default function Careers() {
         </div>
       </section>
 
-      {/* Why Join Us Section */}
-      <section className="py-24 bg-background">
-        <div className="container mx-auto px-4 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground mb-6">
-                Why Work With <span className="text-accent">Us</span>?
+      {/* Vacancies Section - Now immediately after hero */}
+      <AnimatedSection animation="fade-up">
+        <section id="vacancies" className="py-14 md:py-16 bg-muted">
+          <div className="container mx-auto px-4 lg:px-8">
+            <div className="text-center max-w-3xl mx-auto mb-10">
+              <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground mb-3">
+                Available <span className="text-accent">Vacancies</span>
               </h2>
-              <p className="text-muted-foreground mb-8 leading-relaxed">
-                Our dedication to providing outstanding levels of client service means we are always
-                on the lookout for bright and ambitious individuals to join our team of
-                professionals. When you join our team, you will be assigned to work remotely with
-                one of the firms of accountants with which we have a contractual relationship.
+              <p className="text-muted-foreground">
+                Explore our current openings and find your next opportunity.
               </p>
-
-              <div className="grid sm:grid-cols-2 gap-4">
-                {benefits.map((benefit) => (
-                  <div key={benefit} className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
-                    <span className="text-foreground text-sm">{benefit}</span>
-                  </div>
-                ))}
-              </div>
             </div>
 
-            <div className="bg-muted rounded-2xl p-8 border border-border">
-              <h3 className="font-serif text-2xl font-bold text-foreground mb-4">Career Growth</h3>
-              <p className="text-muted-foreground mb-6">
-                We provide extensive training and development to help you achieve your best. At
-                Multiverse CPA, you will be valued as an individual, mentored as a future leader,
-                and recognized for your accomplishments and potential.
-              </p>
-              <Button variant="gold" asChild>
-                <a href="#vacancies">
-                  View Open Positions
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </a>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Vacancies Section */}
-      <section id="vacancies" className="py-24 bg-muted">
-        <div className="container mx-auto px-4 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-12">
-            <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground mb-4">
-              Available <span className="text-accent">Vacancies</span>
-            </h2>
-            <p className="text-muted-foreground">
-              Explore our current openings and find your next opportunity.
-            </p>
-          </div>
-
-          {/* Filters */}
-          <div className="max-w-4xl mx-auto mb-8">
-            <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
-              {/* Main search row */}
-              <div className="p-4 flex flex-col sm:flex-row gap-4">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search jobs by title, description, or location..."
-                    className="pl-10"
-                    value={searchQuery}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value);
-                      setCurrentPage(1);
-                    }}
-                  />
-                </div>
-                <Button
-                  variant="outline"
-                  onClick={() => setFiltersExpanded(!filtersExpanded)}
-                  className="gap-2"
-                >
-                  <SlidersHorizontal className="h-4 w-4" />
-                  Filters
-                  {hasActiveFilters && (
-                    <Badge variant="secondary" className="ml-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
-                      {[experienceFilter !== 'all', countryFilter !== 'all', locationFilter, workTypeFilter !== 'all'].filter(Boolean).length}
-                    </Badge>
-                  )}
-                </Button>
-              </div>
-
-              {/* Expandable filters */}
-              <Collapsible open={filtersExpanded} onOpenChange={setFiltersExpanded}>
-                <CollapsibleContent>
-                  <div className="px-4 pb-4 border-t border-border pt-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                      <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
-                          <Clock className="h-3 w-3" />
-                          Experience
-                        </label>
-                        <Select
-                          value={experienceFilter}
-                          onValueChange={(value) => {
-                            setExperienceFilter(value);
-                            setCurrentPage(1);
-                          }}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="All levels" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">All levels</SelectItem>
-                            <SelectItem value="0-3">0-3 years</SelectItem>
-                            <SelectItem value="3-7">3-7 years</SelectItem>
-                            <SelectItem value="7-10">7-10 years</SelectItem>
-                            <SelectItem value="10+">10+ years</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
-                          <Globe className="h-3 w-3" />
-                          Country
-                        </label>
-                        <Select
-                          value={countryFilter}
-                          onValueChange={(value) => {
-                            setCountryFilter(value);
-                            setCurrentPage(1);
-                          }}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="All countries" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">All countries</SelectItem>
-                            {countries.map((country) => (
-                              <SelectItem key={country} value={country}>
-                                {country}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
-                          <MapPin className="h-3 w-3" />
-                          City/Location
-                        </label>
-                        <Input
-                          placeholder="e.g. London, Dublin..."
-                          value={locationFilter}
-                          onChange={(e) => {
-                            setLocationFilter(e.target.value);
-                            setCurrentPage(1);
-                          }}
-                        />
-                      </div>
-
-                      <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
-                          <Building2 className="h-3 w-3" />
-                          Work Type
-                        </label>
-                        <Select
-                          value={workTypeFilter}
-                          onValueChange={(value) => {
-                            setWorkTypeFilter(value);
-                            setCurrentPage(1);
-                          }}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="All types" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">All types</SelectItem>
-                            {WORK_TYPE_OPTIONS.map((opt) => (
-                              <SelectItem key={opt.value} value={opt.value}>
-                                {opt.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
+            {/* Filters */}
+            <div className="max-w-4xl mx-auto mb-8">
+              <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
+                {/* Main search row */}
+                <div className="p-4 flex flex-col sm:flex-row gap-4">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search jobs by title, description, or location..."
+                      className="pl-10"
+                      value={searchQuery}
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        setCurrentPage(1);
+                      }}
+                    />
                   </div>
-                </CollapsibleContent>
-              </Collapsible>
-
-              {/* Results summary */}
-              {hasActiveFilters && (
-                <div className="flex items-center justify-between px-4 py-3 bg-muted/50 border-t border-border">
-                  <p className="text-sm text-muted-foreground">
-                    Showing {filteredJobs.length} of {activeJobs.length} jobs
-                  </p>
-                  <Button variant="ghost" size="sm" onClick={clearFilters}>
-                    Clear filters
+                  <Button
+                    variant="outline"
+                    onClick={() => setFiltersExpanded(!filtersExpanded)}
+                    className="gap-2"
+                  >
+                    <SlidersHorizontal className="h-4 w-4" />
+                    Filters
+                    {hasActiveFilters && (
+                      <Badge variant="secondary" className="ml-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
+                        {[experienceFilter !== 'all', countryFilter !== 'all', locationFilter, workTypeFilter !== 'all'].filter(Boolean).length}
+                      </Badge>
+                    )}
                   </Button>
                 </div>
+
+                {/* Expandable filters */}
+                <Collapsible open={filtersExpanded} onOpenChange={setFiltersExpanded}>
+                  <CollapsibleContent>
+                    <div className="px-4 pb-4 border-t border-border pt-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div>
+                          <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
+                            <Clock className="h-3 w-3" />
+                            Experience
+                          </label>
+                          <Select
+                            value={experienceFilter}
+                            onValueChange={(value) => {
+                              setExperienceFilter(value);
+                              setCurrentPage(1);
+                            }}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="All levels" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">All levels</SelectItem>
+                              <SelectItem value="0-3">0-3 years</SelectItem>
+                              <SelectItem value="3-7">3-7 years</SelectItem>
+                              <SelectItem value="7-10">7-10 years</SelectItem>
+                              <SelectItem value="10+">10+ years</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div>
+                          <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
+                            <Globe className="h-3 w-3" />
+                            Country
+                          </label>
+                          <Select
+                            value={countryFilter}
+                            onValueChange={(value) => {
+                              setCountryFilter(value);
+                              setCurrentPage(1);
+                            }}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="All countries" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">All countries</SelectItem>
+                              {countries.map((country) => (
+                                <SelectItem key={country} value={country}>
+                                  {country}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div>
+                          <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
+                            <MapPin className="h-3 w-3" />
+                            City/Location
+                          </label>
+                          <Input
+                            placeholder="e.g. London, Dublin..."
+                            value={locationFilter}
+                            onChange={(e) => {
+                              setLocationFilter(e.target.value);
+                              setCurrentPage(1);
+                            }}
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
+                            <Building2 className="h-3 w-3" />
+                            Work Type
+                          </label>
+                          <Select
+                            value={workTypeFilter}
+                            onValueChange={(value) => {
+                              setWorkTypeFilter(value);
+                              setCurrentPage(1);
+                            }}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="All types" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">All types</SelectItem>
+                              {WORK_TYPE_OPTIONS.map((opt) => (
+                                <SelectItem key={opt.value} value={opt.value}>
+                                  {opt.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+
+                {/* Results summary */}
+                {hasActiveFilters && (
+                  <div className="flex items-center justify-between px-4 py-3 bg-muted/50 border-t border-border">
+                    <p className="text-sm text-muted-foreground">
+                      Showing {filteredJobs.length} of {activeJobs.length} jobs
+                    </p>
+                    <Button variant="ghost" size="sm" onClick={clearFilters}>
+                      Clear filters
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Job Listings */}
+            <div className="space-y-4 max-w-4xl mx-auto">
+              {paginatedJobs.length === 0 ? (
+                <div className="bg-card rounded-2xl p-10 border border-border text-center">
+                  <Briefcase className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+                  <h3 className="text-lg font-semibold text-foreground mb-2">No jobs found</h3>
+                  <p className="text-muted-foreground mb-4 text-sm">
+                    Try adjusting your search or filters to find opportunities.
+                  </p>
+                  <Button variant="outline" onClick={clearFilters}>
+                    Clear all filters
+                  </Button>
+                </div>
+              ) : (
+                paginatedJobs.map((job, index) => {
+                  const isExpanded = expandedJobs.has(job.id);
+                  return (
+                    <AnimatedSection key={job.id} animation="fade-up" delay={index * 100}>
+                      <div className="bg-card rounded-2xl border border-border shadow-card hover:shadow-card-hover transition-all duration-300 overflow-hidden">
+                        {/* Job Header */}
+                        <div className="p-5 sm:p-6">
+                          <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
+                            <div>
+                              <h3 className="font-serif text-lg sm:text-xl font-bold text-foreground mb-2">
+                                {job.title}
+                              </h3>
+                              <div className="flex flex-wrap gap-2">
+                                <Badge variant="outline" className="gap-1.5 text-xs">
+                                  <Globe className="w-3 h-3" />
+                                  {job.country}
+                                </Badge>
+                                <Badge variant="outline" className="gap-1.5 text-xs">
+                                  <MapPin className="w-3 h-3" />
+                                  {job.location}
+                                </Badge>
+                                <Badge variant="outline" className="gap-1.5 text-xs">
+                                  <Clock className="w-3 h-3" />
+                                  {getExperienceLabel(job.experience_required)}
+                                </Badge>
+                                <Badge className="gap-1.5 text-xs bg-accent/10 text-accent border-accent/20 hover:bg-accent/20">
+                                  <Building2 className="w-3 h-3" />
+                                  {WORK_TYPE_LABELS[job.work_type]}
+                                </Badge>
+                                {job.salary_range && (
+                                  <Badge variant="secondary" className="gap-1.5 text-xs">
+                                    <DollarSign className="w-3 h-3" />
+                                    {job.salary_range}
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          <p className="text-muted-foreground text-sm mb-3 line-clamp-2">{job.description}</p>
+
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => toggleJobExpand(job.id)}
+                            className="text-accent hover:text-accent/80"
+                          >
+                            {isExpanded ? (
+                              <>
+                                Show less <ChevronUp className="ml-1 h-4 w-4" />
+                              </>
+                            ) : (
+                              <>
+                                View details <ChevronDown className="ml-1 h-4 w-4" />
+                              </>
+                            )}
+                          </Button>
+                        </div>
+
+                        {/* Expanded Content */}
+                        {isExpanded && (
+                          <div className="px-5 sm:px-6 pb-5 sm:pb-6 pt-0 border-t border-border">
+                            <div className="grid md:grid-cols-2 gap-6 py-5">
+                              {job.requirements && (
+                                <div>
+                                  <h4 className="font-semibold text-foreground mb-3 text-sm">Requirements</h4>
+                                  <div className="space-y-2 text-sm text-muted-foreground whitespace-pre-line">
+                                    {job.requirements}
+                                  </div>
+                                </div>
+                              )}
+                              {job.benefits && (
+                                <div>
+                                  <h4 className="font-semibold text-foreground mb-3 text-sm">Benefits</h4>
+                                  <div className="space-y-2 text-sm text-muted-foreground whitespace-pre-line">
+                                    {job.benefits}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="flex flex-wrap gap-4 pt-5 border-t border-border">
+                              <Button variant="gold" size="lg" asChild>
+                                <Link to={`/apply?job=${encodeURIComponent(job.title)}`}>
+                                  Apply Now
+                                  <ArrowRight className="ml-2 h-4 w-4" />
+                                </Link>
+                              </Button>
+                              <p className="text-xs text-muted-foreground self-center">
+                                Should you not be shortlisted, your details will be considered for other
+                                opportunities.
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </AnimatedSection>
+                  );
+                })
               )}
             </div>
-          </div>
 
-          {/* Job Listings */}
-          <div className="space-y-6 max-w-4xl mx-auto">
-            {paginatedJobs.length === 0 ? (
-              <div className="bg-card rounded-2xl p-12 border border-border text-center">
-                <Briefcase className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-foreground mb-2">No jobs found</h3>
-                <p className="text-muted-foreground mb-4">
-                  Try adjusting your search or filters to find opportunities.
-                </p>
-                <Button variant="outline" onClick={clearFilters}>
-                  Clear all filters
-                </Button>
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-10">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious
+                        onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                        className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          onClick={() => handlePageChange(page)}
+                          isActive={currentPage === page}
+                          className="cursor-pointer"
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                    <PaginationItem>
+                      <PaginationNext
+                        onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                        className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
               </div>
-            ) : (
-              paginatedJobs.map((job) => {
-                const isExpanded = expandedJobs.has(job.id);
-                return (
-                  <div
-                    key={job.id}
-                    className="bg-card rounded-2xl border border-border shadow-card hover:shadow-card-hover transition-all duration-300 overflow-hidden"
-                  >
-                    {/* Job Header */}
-                    <div className="p-6 sm:p-8">
-                      <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
-                        <div>
-                          <h3 className="font-serif text-xl sm:text-2xl font-bold text-foreground mb-2">
-                            {job.title}
-                          </h3>
-                          <div className="flex flex-wrap gap-2">
-                            <Badge variant="outline" className="gap-1.5">
-                              <Globe className="w-3 h-3" />
-                              {job.country}
-                            </Badge>
-                            <Badge variant="outline" className="gap-1.5">
-                              <MapPin className="w-3 h-3" />
-                              {job.location}
-                            </Badge>
-                            <Badge variant="outline" className="gap-1.5">
-                              <Clock className="w-3 h-3" />
-                              {getExperienceLabel(job.experience_required)}
-                            </Badge>
-                            <Badge className="gap-1.5 bg-accent/10 text-accent border-accent/20 hover:bg-accent/20">
-                              <Building2 className="w-3 h-3" />
-                              {WORK_TYPE_LABELS[job.work_type]}
-                            </Badge>
-                            {job.salary_range && (
-                              <Badge variant="secondary" className="gap-1.5">
-                                <DollarSign className="w-3 h-3" />
-                                {job.salary_range}
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      <p className="text-muted-foreground mb-4">{job.description}</p>
-
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => toggleJobExpand(job.id)}
-                        className="text-accent hover:text-accent/80"
-                      >
-                        {isExpanded ? (
-                          <>
-                            Show less <ChevronUp className="ml-1 h-4 w-4" />
-                          </>
-                        ) : (
-                          <>
-                            View details <ChevronDown className="ml-1 h-4 w-4" />
-                          </>
-                        )}
-                      </Button>
-                    </div>
-
-                    {/* Expanded Content */}
-                    {isExpanded && (
-                      <div className="px-6 sm:px-8 pb-6 sm:pb-8 pt-0 border-t border-border">
-                        <div className="grid md:grid-cols-2 gap-8 py-6">
-                          {job.requirements && (
-                            <div>
-                              <h4 className="font-semibold text-foreground mb-4">Requirements</h4>
-                              <div className="space-y-2 text-sm text-muted-foreground whitespace-pre-line">
-                                {job.requirements}
-                              </div>
-                            </div>
-                          )}
-                          {job.benefits && (
-                            <div>
-                              <h4 className="font-semibold text-foreground mb-4">Benefits</h4>
-                              <div className="space-y-2 text-sm text-muted-foreground whitespace-pre-line">
-                                {job.benefits}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="flex flex-wrap gap-4 pt-6 border-t border-border">
-                          <Button variant="gold" size="lg" asChild>
-                            <Link to={`/apply?job=${encodeURIComponent(job.title)}`}>
-                              Apply Now
-                              <ArrowRight className="ml-2 h-4 w-4" />
-                            </Link>
-                          </Button>
-                          <p className="text-sm text-muted-foreground self-center">
-                            Should you not be shortlisted, your details will be considered for other
-                            opportunities.
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })
             )}
           </div>
+        </section>
+      </AnimatedSection>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="mt-12">
-              <Pagination>
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious
-                      onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                      className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                    />
-                  </PaginationItem>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <PaginationItem key={page}>
-                      <PaginationLink
-                        onClick={() => handlePageChange(page)}
-                        isActive={currentPage === page}
-                        className="cursor-pointer"
-                      >
-                        {page}
-                      </PaginationLink>
-                    </PaginationItem>
-                  ))}
-                  <PaginationItem>
-                    <PaginationNext
-                      onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                      className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
+      {/* Why Join Us Section - Now after vacancies */}
+      <AnimatedSection animation="fade-up">
+        <section className="py-14 md:py-16 bg-background">
+          <div className="container mx-auto px-4 lg:px-8">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <AnimatedSection animation="slide-left">
+                <div>
+                  <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground mb-4">
+                    Why Work With <span className="text-accent">Us</span>?
+                  </h2>
+                  <p className="text-muted-foreground mb-6 leading-relaxed text-sm">
+                    Our dedication to providing outstanding levels of client service means we are always
+                    on the lookout for bright and ambitious individuals to join our team of
+                    professionals. When you join our team, you will be assigned to work remotely with
+                    one of the firms of accountants with which we have a contractual relationship.
+                  </p>
+
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    {benefits.map((benefit, index) => (
+                      <AnimatedSection key={benefit} animation="fade-up" delay={index * 50}>
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
+                          <span className="text-foreground text-sm">{benefit}</span>
+                        </div>
+                      </AnimatedSection>
+                    ))}
+                  </div>
+                </div>
+              </AnimatedSection>
+
+              <AnimatedSection animation="slide-right">
+                <div className="bg-muted rounded-2xl p-6 border border-border">
+                  <h3 className="font-serif text-xl font-bold text-foreground mb-3">Career Growth</h3>
+                  <p className="text-muted-foreground mb-5 text-sm">
+                    We provide extensive training and development to help you achieve your best. At
+                    Multiverse CPA, you will be valued as an individual, mentored as a future leader,
+                    and recognized for your accomplishments and potential.
+                  </p>
+                  <Button variant="gold" asChild>
+                    <a href="#vacancies">
+                      View Open Positions
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </a>
+                  </Button>
+                </div>
+              </AnimatedSection>
             </div>
-          )}
-        </div>
-      </section>
+          </div>
+        </section>
+      </AnimatedSection>
 
       {/* CTA Section */}
-      <section className="py-24 bg-gradient-navy">
-        <div className="container mx-auto px-4 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-serif font-bold text-primary-foreground mb-4">
-            Don't See a Suitable Role?
-          </h2>
-          <p className="text-primary-foreground/70 max-w-2xl mx-auto mb-10">
-            Send us your resume and we'll keep you in mind for future opportunities that match your
-            skills and experience.
-          </p>
-          <Button variant="hero" size="xl" asChild>
-            <Link to="/apply">
-              Submit Your Resume
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-          </Button>
-        </div>
-      </section>
+      <AnimatedSection animation="fade-up">
+        <section className="py-14 md:py-16 bg-gradient-navy">
+          <div className="container mx-auto px-4 lg:px-8 text-center">
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-primary-foreground mb-3">
+              Don't See a Suitable Role?
+            </h2>
+            <p className="text-primary-foreground/70 max-w-2xl mx-auto mb-8 text-sm">
+              Send us your resume and we'll keep you in mind for future opportunities that match your
+              skills and experience.
+            </p>
+            <Button variant="hero" size="xl" asChild>
+              <Link to="/apply">
+                Submit Your Resume
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+          </div>
+        </section>
+      </AnimatedSection>
     </Layout>
   );
 }
