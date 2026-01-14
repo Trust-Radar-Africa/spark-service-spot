@@ -14,14 +14,14 @@ export default {
     },
     extend: {
       fontFamily: {
-        // Primary fonts
-        heading: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
-        body: ['DM Sans', 'system-ui', 'sans-serif'],
-        sans: ['DM Sans', 'system-ui', 'sans-serif'],
+        // Primary font - Inter self-paired
+        heading: ['Inter', 'system-ui', 'sans-serif'],
+        body: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
         // Legacy fonts for compatibility
-        serif: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
-        montserrat: ['Plus Jakarta Sans', 'sans-serif'],
-        poppins: ['DM Sans', 'sans-serif'],
+        serif: ['Inter', 'system-ui', 'sans-serif'],
+        montserrat: ['Inter', 'sans-serif'],
+        poppins: ['Inter', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
