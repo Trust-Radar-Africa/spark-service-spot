@@ -139,8 +139,7 @@ export function HeroCarousel({ variant = "classic" }: HeroCarouselProps) {
                           </Link>
                         </Button>
                         <Button
-                          variant="outline"
-                          className="border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50 rounded-full px-6 py-2.5 text-sm font-semibold backdrop-blur-sm transition-all duration-300"
+                          className="bg-white hover:bg-white/90 text-qx-blue rounded-full px-6 py-2.5 text-sm font-semibold shadow-lg transition-all duration-300 hover:-translate-y-1"
                           asChild
                         >
                           <Link to="/services">Explore Services</Link>
