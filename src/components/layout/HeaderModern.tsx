@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ArrowRight, ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Menu, X, ChevronDown, Globe } from "lucide-react";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import { cn } from "@/lib/utils";
 import {
@@ -23,9 +22,17 @@ const recruitmentLinks = [
   { name: "For Employers", href: "/employers", description: "Submit recruitment requests" },
 ];
 
+const languages = [
+  { code: "en", name: "English", flag: "🇺🇸" },
+  { code: "es", name: "Español", flag: "🇪🇸" },
+  { code: "fr", name: "Français", flag: "🇫🇷" },
+  { code: "de", name: "Deutsch", flag: "🇩🇪" },
+];
+
 export function HeaderModern() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [recruitmentOpen, setRecruitmentOpen] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState(languages[0]);
   const location = useLocation();
 
   const isRecruitmentActive = recruitmentLinks.some(
@@ -35,7 +42,7 @@ export function HeaderModern() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm">
       <nav className="container mx-auto px-4 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex min-h-[100px] items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
             <div className="w-9 h-9 rounded-lg bg-qx-blue flex items-center justify-center">
@@ -115,21 +122,63 @@ export function HeaderModern() {
           </div>
 
           {/* Right side */}
-          <div className="hidden lg:flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-3">
             <ThemeSwitcher />
-            <Button 
-              className="bg-qx-orange hover:bg-qx-orange-dark text-white rounded-full px-6"
-              asChild
-            >
-              <Link to="/contact">
-                Book a Free Consultation
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
+            
+            {/* Language Chooser */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-qx-gray hover:text-qx-blue transition-colors rounded-full border border-gray-200 hover:border-qx-blue/30 bg-white">
+                  <span className="text-base">{selectedLanguage.flag}</span>
+                  <span>{selectedLanguage.code.toUpperCase()}</span>
+                  <ChevronDown className="w-3 h-3" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-40 bg-white border border-gray-200 shadow-lg z-50">
+                {languages.map((lang) => (
+                  <DropdownMenuItem 
+                    key={lang.code}
+                    onClick={() => setSelectedLanguage(lang)}
+                    className={cn(
+                      "flex items-center gap-2 px-3 py-2 cursor-pointer",
+                      selectedLanguage.code === lang.code && "bg-qx-light-gray"
+                    )}
+                  >
+                    <span className="text-base">{lang.flag}</span>
+                    <span className="text-sm font-medium text-qx-blue">{lang.name}</span>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {/* Mobile Menu Button */}
           <div className="flex items-center gap-2 lg:hidden">
+            {/* Mobile Language Chooser */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-1 px-2 py-1 text-sm text-qx-gray">
+                  <span>{selectedLanguage.flag}</span>
+                  <ChevronDown className="w-3 h-3" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-36 bg-white border border-gray-200 shadow-lg z-50">
+                {languages.map((lang) => (
+                  <DropdownMenuItem 
+                    key={lang.code}
+                    onClick={() => setSelectedLanguage(lang)}
+                    className={cn(
+                      "flex items-center gap-2 px-3 py-2 cursor-pointer",
+                      selectedLanguage.code === lang.code && "bg-qx-light-gray"
+                    )}
+                  >
+                    <span>{lang.flag}</span>
+                    <span className="text-sm">{lang.name}</span>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            
             <ThemeSwitcher />
             <button
               type="button"
@@ -213,17 +262,6 @@ export function HeaderModern() {
                 Contact
               </Link>
 
-              <div className="pt-4 px-4">
-                <Button 
-                  className="w-full bg-qx-orange hover:bg-qx-orange-dark text-white rounded-full"
-                  asChild
-                >
-                  <Link to="/contact" onClick={() => setMobileMenuOpen(false)}>
-                    Book a Free Consultation
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-              </div>
             </div>
           </div>
         )}
