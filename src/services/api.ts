@@ -61,17 +61,25 @@ class ApiService {
     return response.json();
   }
 
+  // Demo user credentials
+  private demoUsers: Record<string, { id: number; name: string; email: string; role: 'super_admin' | 'editor' | 'viewer' }> = {
+    'admin@demo.com': { id: 1, name: 'Demo Admin', email: 'admin@demo.com', role: 'super_admin' },
+    'editor@demo.com': { id: 2, name: 'Test Editor', email: 'editor@demo.com', role: 'editor' },
+    'viewer@demo.com': { id: 3, name: 'Test Viewer', email: 'viewer@demo.com', role: 'viewer' },
+  };
+
   // Auth endpoints
   async login(email: string, password: string) {
     // Demo mode - bypass API if no backend URL is set or using demo credentials
     const isDemoMode = !import.meta.env.VITE_LARAVEL_API_URL || 
                        API_BASE_URL === 'http://localhost:8000';
     
-    if (isDemoMode && email === 'admin@demo.com' && password === 'demo123') {
-      const demoToken = 'demo-token-' + Date.now();
+    const demoUser = this.demoUsers[email];
+    if (isDemoMode && demoUser && password === 'demo123') {
+      const demoToken = `demo-token-${demoUser.role}-` + Date.now();
       this.setToken(demoToken);
       return {
-        user: { id: 1, name: 'Demo Admin', email: 'admin@demo.com' },
+        user: demoUser,
         token: demoToken,
       };
     }
@@ -92,11 +100,12 @@ class ApiService {
       return response;
     } catch (error) {
       // If API fails and using demo credentials, allow demo login
-      if (email === 'admin@demo.com' && password === 'demo123') {
-        const demoToken = 'demo-token-' + Date.now();
+      const fallbackUser = this.demoUsers[email];
+      if (fallbackUser && password === 'demo123') {
+        const demoToken = `demo-token-${fallbackUser.role}-` + Date.now();
         this.setToken(demoToken);
         return {
-          user: { id: 1, name: 'Demo Admin', email: 'admin@demo.com' },
+          user: fallbackUser,
           token: demoToken,
         };
       }
@@ -124,9 +133,14 @@ class ApiService {
     // Demo mode check
     const token = this.token;
     if (token?.startsWith('demo-token-')) {
-      return {
-        user: { id: 1, name: 'Demo Admin', email: 'admin@demo.com' },
-      };
+      // Extract role from token to return correct user
+      if (token.includes('-editor-')) {
+        return { user: this.demoUsers['editor@demo.com'] };
+      }
+      if (token.includes('-viewer-')) {
+        return { user: this.demoUsers['viewer@demo.com'] };
+      }
+      return { user: this.demoUsers['admin@demo.com'] };
     }
     
     return this.request<{ user: any }>('/api/admin/user');

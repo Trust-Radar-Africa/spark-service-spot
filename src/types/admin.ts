@@ -8,6 +8,8 @@ export interface CandidateApplication {
   country: string;
   location: string;
   experience: ExperienceLevel;
+  job_applied?: string; // Job title/role they applied for
+  job_id?: number; // Reference to job posting
   cv_url: string;
   cover_letter_url: string;
   created_at: string;
@@ -21,6 +23,7 @@ export interface CandidateFilters {
   nationality?: string;
   country?: string;
   location?: string;
+  job_applied?: string;
   search?: string;
 }
 

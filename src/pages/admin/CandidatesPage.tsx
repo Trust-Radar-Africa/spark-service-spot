@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { CandidateFilters, ExperienceLevel } from '@/types/admin';
+import { CandidateFilters, ExperienceLevel, CandidateApplication } from '@/types/admin';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,10 +28,18 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
+import {
   Collapsible,
   CollapsibleContent,
 } from '@/components/ui/collapsible';
 import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import {
   Search,
@@ -47,6 +55,10 @@ import {
   SlidersHorizontal,
   MapPin,
   Flag,
+  Eye,
+  Briefcase,
+  Mail,
+  Calendar,
 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { BulkActionsBar } from '@/components/admin/BulkActionsBar';
@@ -65,7 +77,9 @@ import { exportToCSV } from '@/utils/csvExport';
 import ItemsPerPageSelect from '@/components/admin/ItemsPerPageSelect';
 import { ItemsPerPageOption } from '@/hooks/useItemsPerPage';
 import { useCandidatesStore } from '@/stores/candidatesStore';
-import { CandidateApplication } from '@/types/admin';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+import { useAuditLogger } from '@/stores/auditLogStore';
+import { useAdminAuth } from '@/contexts/AdminAuthContext';
 
 const experienceLevels: { value: ExperienceLevel; label: string }[] = [
   { value: '0-3', label: '0-3 years' },
@@ -91,18 +105,28 @@ const getStoredItemsPerPage = (): ItemsPerPageOption => {
 
 export default function CandidatesPage() {
   const { candidates, isLoading, fetchCandidates, deleteCandidate } = useCandidatesStore();
+  const { canDelete, isViewer } = useAdminPermissions();
+  const { user } = useAdminAuth();
+  const { logAction } = useAuditLogger();
   const [filters, setFilters] = useState<CandidateFilters>({});
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPageOption>(getStoredItemsPerPage);
   const [candidateToDelete, setCandidateToDelete] = useState<CandidateApplication | null>(null);
+  const [candidateToView, setCandidateToView] = useState<CandidateApplication | null>(null);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [filtersExpanded, setFiltersExpanded] = useState(false);
   const { toast } = useToast();
   const { sortKey, sortDirection, handleSort, sortData } = useSorting<CandidateApplication>();
 
-  const hasActiveFilters = !!(filters.search || filters.nationality || filters.country || filters.location || filters.experience);
-  const activeFilterCount = [filters.nationality, filters.country, filters.location, filters.experience].filter(Boolean).length;
+  const hasActiveFilters = !!(filters.search || filters.nationality || filters.country || filters.location || filters.experience || filters.job_applied);
+  const activeFilterCount = [filters.nationality, filters.country, filters.location, filters.experience, filters.job_applied].filter(Boolean).length;
+
+  // Get unique job titles for filter
+  const jobOptions = useMemo(() => {
+    const jobs = [...new Set(candidates.map((c) => c.job_applied).filter(Boolean))].sort();
+    return jobs.map((j) => ({ value: j!, label: j! }));
+  }, [candidates]);
 
   useEffect(() => {
     fetchCandidates();
@@ -121,6 +145,7 @@ export default function CandidatesPage() {
       { key: 'last_name', header: 'Last Name' },
       { key: 'email', header: 'Email' },
       { key: 'nationality', header: 'Nationality' },
+      { key: 'job_applied', header: 'Job Applied' },
       { key: 'experience', header: 'Experience' },
       { key: 'created_at', header: 'Applied Date' },
     ]);
@@ -151,13 +176,17 @@ export default function CandidatesPage() {
         c.location?.toLowerCase().includes(filters.location!.toLowerCase())
       );
     }
+    if (filters.job_applied) {
+      filtered = filtered.filter((c) => c.job_applied === filters.job_applied);
+    }
     if (filters.search) {
       const search = filters.search.toLowerCase();
       filtered = filtered.filter(
         (c) =>
           c.first_name.toLowerCase().includes(search) ||
           c.last_name.toLowerCase().includes(search) ||
-          c.email.toLowerCase().includes(search)
+          c.email.toLowerCase().includes(search) ||
+          c.job_applied?.toLowerCase().includes(search)
       );
     }
     return filtered;
@@ -216,10 +245,27 @@ export default function CandidatesPage() {
   };
 
   const handleDelete = async () => {
-    if (!candidateToDelete) return;
+    if (!candidateToDelete || !canDelete('candidates')) {
+      toast({
+        title: 'Permission denied',
+        description: 'You do not have permission to delete candidates.',
+        variant: 'destructive',
+      });
+      return;
+    }
     setIsDeleting(true);
     try {
       deleteCandidate(candidateToDelete.id);
+      // Log the action
+      if (user) {
+        logAction(
+          'delete',
+          'candidates',
+          candidateToDelete.id,
+          `${candidateToDelete.first_name} ${candidateToDelete.last_name}`,
+          { id: String(user.id), name: user.name, email: user.email, role: user.role || 'super_admin' }
+        );
+      }
       toast({
         title: 'Candidate deleted',
         description: `${candidateToDelete.first_name} ${candidateToDelete.last_name} has been removed.`,
@@ -237,8 +283,25 @@ export default function CandidatesPage() {
   };
 
   const handleBulkDelete = () => {
+    if (!canDelete('candidates')) {
+      toast({
+        title: 'Permission denied',
+        description: 'You do not have permission to delete candidates.',
+        variant: 'destructive',
+      });
+      return;
+    }
     for (const item of selectedItems) {
       deleteCandidate(item.id);
+      if (user) {
+        logAction(
+          'delete',
+          'candidates',
+          item.id,
+          `${item.first_name} ${item.last_name}`,
+          { id: String(user.id), name: user.name, email: user.email, role: user.role || 'super_admin' }
+        );
+      }
     }
     toast({
       title: 'Candidates deleted',
@@ -254,6 +317,7 @@ export default function CandidatesPage() {
       { key: 'last_name', header: 'Last Name' },
       { key: 'email', header: 'Email' },
       { key: 'nationality', header: 'Nationality' },
+      { key: 'job_applied', header: 'Job Applied' },
       { key: 'experience', header: 'Experience' },
       { key: 'created_at', header: 'Applied Date' },
     ]);
@@ -382,7 +446,7 @@ export default function CandidatesPage() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search by name or email..."
+                placeholder="Search by name, email, or job..."
                 className="pl-10"
                 value={filters.search || ''}
                 onChange={(e) => setFilters({ ...filters, search: e.target.value })}
@@ -407,7 +471,21 @@ export default function CandidatesPage() {
           <Collapsible open={filtersExpanded} onOpenChange={setFiltersExpanded}>
             <CollapsibleContent>
               <div className="px-4 pb-4 border-t border-border pt-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
+                      <Briefcase className="h-3 w-3" />
+                      Job Applied
+                    </label>
+                    <SearchableSelect
+                      options={jobOptions}
+                      value={filters.job_applied || ''}
+                      onValueChange={(value) => setFilters({ ...filters, job_applied: value })}
+                      placeholder="All Jobs"
+                      searchPlaceholder="Search job..."
+                    />
+                  </div>
+
                   <div>
                     <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
                       <Flag className="h-3 w-3" />
@@ -504,15 +582,17 @@ export default function CandidatesPage() {
         </div>
 
         {/* Bulk Actions */}
-        <BulkActionsBar
-          selectedCount={selectedCount}
-          totalCount={filteredCandidates.length}
-          onSelectAll={selectAll}
-          allSelected={allSelected}
-          onDelete={() => setBulkDeleteOpen(true)}
-          onExport={handleBulkExport}
-          onClearSelection={clearSelection}
-        />
+        {!isViewer && (
+          <BulkActionsBar
+            selectedCount={selectedCount}
+            totalCount={filteredCandidates.length}
+            onSelectAll={selectAll}
+            allSelected={allSelected}
+            onDelete={canDelete('candidates') ? () => setBulkDeleteOpen(true) : undefined}
+            onExport={handleBulkExport}
+            onClearSelection={clearSelection}
+          />
+        )}
 
         {/* Bulk Download Actions */}
         {selectedCount > 0 && (
@@ -557,9 +637,8 @@ export default function CandidatesPage() {
                   <TableRow>
                     <TableHead className="w-[40px]"><div className="h-4 w-4 bg-muted animate-pulse rounded" /></TableHead>
                     <TableHead><div className="h-4 w-16 bg-muted animate-pulse rounded" /></TableHead>
-                    <TableHead><div className="h-4 w-16 bg-muted animate-pulse rounded" /></TableHead>
-                    <TableHead><div className="h-4 w-20 bg-muted animate-pulse rounded" /></TableHead>
                     <TableHead><div className="h-4 w-24 bg-muted animate-pulse rounded" /></TableHead>
+                    <TableHead><div className="h-4 w-20 bg-muted animate-pulse rounded" /></TableHead>
                     <TableHead><div className="h-4 w-24 bg-muted animate-pulse rounded" /></TableHead>
                     <TableHead><div className="h-4 w-16 bg-muted animate-pulse rounded" /></TableHead>
                     <TableHead><div className="h-4 w-16 bg-muted animate-pulse rounded" /></TableHead>
@@ -570,12 +649,11 @@ export default function CandidatesPage() {
                     <TableRow key={i}>
                       <TableCell><div className="h-4 w-4 bg-muted animate-pulse rounded" /></TableCell>
                       <TableCell><div className="h-4 w-28 bg-muted animate-pulse rounded" /></TableCell>
-                      <TableCell><div className="h-4 w-36 bg-muted animate-pulse rounded" /></TableCell>
+                      <TableCell><div className="h-4 w-32 bg-muted animate-pulse rounded" /></TableCell>
                       <TableCell><div className="h-4 w-24 bg-muted animate-pulse rounded" /></TableCell>
                       <TableCell><div className="h-6 w-20 bg-muted animate-pulse rounded-full" /></TableCell>
                       <TableCell><div className="h-4 w-20 bg-muted animate-pulse rounded" /></TableCell>
-                      <TableCell><div className="flex gap-2"><div className="h-8 w-8 bg-muted animate-pulse rounded" /><div className="h-8 w-8 bg-muted animate-pulse rounded" /></div></TableCell>
-                      <TableCell><div className="h-8 w-8 bg-muted animate-pulse rounded" /></TableCell>
+                      <TableCell><div className="flex gap-2"><div className="h-8 w-8 bg-muted animate-pulse rounded" /></div></TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -599,6 +677,7 @@ export default function CandidatesPage() {
                         checked={allSelected}
                         onCheckedChange={selectAll}
                         aria-label="Select all"
+                        disabled={isViewer}
                       />
                     </TableHead>
                     <SortableTableHead
@@ -610,13 +689,12 @@ export default function CandidatesPage() {
                       Name
                     </SortableTableHead>
                     <SortableTableHead
-                      sortKey="email"
+                      sortKey="job_applied"
                       currentSortKey={sortKey}
                       currentSortDirection={sortDirection}
                       onSort={handleSort}
-                      className="hidden md:table-cell"
                     >
-                      Email
+                      Job Applied
                     </SortableTableHead>
                     <SortableTableHead
                       sortKey="nationality"
@@ -626,24 +704,6 @@ export default function CandidatesPage() {
                       className="hidden lg:table-cell"
                     >
                       Nationality
-                    </SortableTableHead>
-                    <SortableTableHead
-                      sortKey="country"
-                      currentSortKey={sortKey}
-                      currentSortDirection={sortDirection}
-                      onSort={handleSort}
-                      className="hidden lg:table-cell"
-                    >
-                      Country
-                    </SortableTableHead>
-                    <SortableTableHead
-                      sortKey="location"
-                      currentSortKey={sortKey}
-                      currentSortDirection={sortDirection}
-                      onSort={handleSort}
-                      className="hidden xl:table-cell"
-                    >
-                      Location
                     </SortableTableHead>
                     <SortableTableHead
                       sortKey="experience"
@@ -673,20 +733,26 @@ export default function CandidatesPage() {
                           checked={isSelected(candidate.id)}
                           onCheckedChange={() => toggleItem(candidate.id)}
                           aria-label={`Select ${candidate.first_name} ${candidate.last_name}`}
+                          disabled={isViewer}
                         />
                       </TableCell>
                       <TableCell>
                         <div className="font-medium">
                           {candidate.first_name} {candidate.last_name}
                         </div>
-                        <div className="md:hidden text-xs text-muted-foreground">{candidate.email}</div>
+                        <div className="text-xs text-muted-foreground">{candidate.email}</div>
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">{candidate.email}</TableCell>
+                      <TableCell>
+                        {candidate.job_applied ? (
+                          <Badge variant="outline" className="flex items-center gap-1 w-fit">
+                            <Briefcase className="h-3 w-3" />
+                            {candidate.job_applied}
+                          </Badge>
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
+                      </TableCell>
                       <TableCell className="hidden lg:table-cell">{candidate.nationality}</TableCell>
-                      <TableCell className="hidden lg:table-cell">{candidate.country}</TableCell>
-                      <TableCell className="hidden xl:table-cell">
-                        {candidate.location || <span className="text-muted-foreground">—</span>}
-                      </TableCell>
                       <TableCell>
                         <Badge variant={getExperienceBadgeVariant(candidate.experience)}>
                           {candidate.experience} yrs
@@ -697,6 +763,14 @@ export default function CandidatesPage() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setCandidateToView(candidate)}
+                            title="View Details"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
                           <Button
                             variant="ghost"
                             size="icon"
@@ -713,15 +787,17 @@ export default function CandidatesPage() {
                           >
                             <FileText className="h-4 w-4" />
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setCandidateToDelete(candidate)}
-                            className="text-destructive hover:text-destructive"
-                            title="Delete"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          {canDelete('candidates') && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => setCandidateToDelete(candidate)}
+                              className="text-destructive hover:text-destructive"
+                              title="Delete"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -777,6 +853,155 @@ export default function CandidatesPage() {
           </div>
         </div>
       </div>
+
+      {/* View Candidate Details Sheet */}
+      <Sheet open={!!candidateToView} onOpenChange={() => setCandidateToView(null)}>
+        <SheetContent className="sm:max-w-lg overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Candidate Details</SheetTitle>
+            <SheetDescription>
+              Full application information
+            </SheetDescription>
+          </SheetHeader>
+          {candidateToView && (
+            <div className="mt-6 space-y-6">
+              {/* Basic Info */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  Personal Information
+                </h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Full Name</p>
+                    <p className="font-medium">{candidateToView.first_name} {candidateToView.last_name}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Email</p>
+                    <p className="font-medium flex items-center gap-1">
+                      <Mail className="h-3 w-3" />
+                      {candidateToView.email}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Nationality</p>
+                    <p className="font-medium flex items-center gap-1">
+                      <Flag className="h-3 w-3" />
+                      {candidateToView.nationality}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Experience</p>
+                    <Badge variant={getExperienceBadgeVariant(candidateToView.experience)}>
+                      {candidateToView.experience} years
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Location */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg flex items-center gap-2">
+                  <MapPin className="h-5 w-5" />
+                  Location
+                </h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Country</p>
+                    <p className="font-medium">{candidateToView.country}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">City/Location</p>
+                    <p className="font-medium">{candidateToView.location || '—'}</p>
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Job Applied */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg flex items-center gap-2">
+                  <Briefcase className="h-5 w-5" />
+                  Job Application
+                </h3>
+                <div>
+                  <p className="text-sm text-muted-foreground">Position Applied For</p>
+                  {candidateToView.job_applied ? (
+                    <Badge variant="outline" className="mt-1">
+                      {candidateToView.job_applied}
+                    </Badge>
+                  ) : (
+                    <p className="text-muted-foreground">General Application</p>
+                  )}
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Applied On</p>
+                  <p className="font-medium flex items-center gap-1">
+                    <Calendar className="h-3 w-3" />
+                    {new Date(candidateToView.created_at).toLocaleDateString('en-US', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </p>
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Documents */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  Documents
+                </h3>
+                <div className="flex flex-col gap-2">
+                  <Button
+                    variant="outline"
+                    className="justify-start"
+                    onClick={() => handleDownloadCV(candidateToView)}
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Download CV / Resume
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="justify-start"
+                    onClick={() => handleDownloadCoverLetter(candidateToView)}
+                  >
+                    <FileText className="h-4 w-4 mr-2" />
+                    Download Cover Letter
+                  </Button>
+                </div>
+              </div>
+
+              {/* Actions */}
+              {canDelete('candidates') && (
+                <>
+                  <Separator />
+                  <div className="pt-2">
+                    <Button
+                      variant="destructive"
+                      className="w-full"
+                      onClick={() => {
+                        setCandidateToView(null);
+                        setCandidateToDelete(candidateToView);
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete Candidate
+                    </Button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={!!candidateToDelete} onOpenChange={() => setCandidateToDelete(null)}>
