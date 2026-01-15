@@ -20,6 +20,8 @@ import {
   FileText,
   Calendar as CalendarIcon,
   TrendingUp,
+  History,
+  ArrowRight,
 } from 'lucide-react';
 import {
   AreaChart,
@@ -36,13 +38,44 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
-import { format, subDays, startOfDay, isAfter, isBefore, isWithinInterval, startOfWeek, startOfMonth, startOfQuarter, startOfYear, eachDayOfInterval, eachWeekOfInterval } from 'date-fns';
+import { format, subDays, startOfDay, isAfter, isBefore, isWithinInterval, startOfWeek, startOfMonth, startOfQuarter, startOfYear, eachDayOfInterval, eachWeekOfInterval, parseISO } from 'date-fns';
 import { useJobPostingsStore } from '@/stores/jobPostingsStore';
 import { useBlogPostsStore } from '@/stores/blogPostsStore';
 import { useEmployerRequestsStore } from '@/stores/employerRequestsStore';
+import { useAuditLogStore, AuditLogEntry } from '@/stores/auditLogStore';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { CandidateApplication, ExperienceLevel } from '@/types/admin';
 import { cn } from '@/lib/utils';
 import { DateRange } from 'react-day-picker';
+
+const ACTION_LABELS: Record<AuditLogEntry['action'], string> = {
+  create: 'Created',
+  update: 'Updated',
+  delete: 'Deleted',
+  archive: 'Archived',
+  deactivate: 'Deactivated',
+  activate: 'Activated',
+  publish: 'Published',
+  unpublish: 'Unpublished',
+};
+
+const ACTION_COLORS: Record<AuditLogEntry['action'], string> = {
+  create: 'bg-green-500/10 text-green-600',
+  update: 'bg-blue-500/10 text-blue-600',
+  delete: 'bg-red-500/10 text-red-600',
+  archive: 'bg-amber-500/10 text-amber-600',
+  deactivate: 'bg-gray-500/10 text-gray-600',
+  activate: 'bg-emerald-500/10 text-emerald-600',
+  publish: 'bg-purple-500/10 text-purple-600',
+  unpublish: 'bg-orange-500/10 text-orange-600',
+};
+
+const MODULE_LABELS: Record<AuditLogEntry['module'], string> = {
+  candidates: 'Candidates',
+  jobs: 'Jobs',
+  employer_requests: 'Employers',
+  blog: 'Blog',
+};
 
 // Mock candidates data
 const mockCandidates: CandidateApplication[] = [
@@ -71,7 +104,14 @@ export default function AdminDashboard() {
   const { jobs } = useJobPostingsStore();
   const { posts } = useBlogPostsStore();
   const { requests } = useEmployerRequestsStore();
+  const { getRecentLogs } = useAuditLogStore();
+  const { isAdmin } = useAdminPermissions();
   const candidates = mockCandidates;
+
+  // Get recent audit logs (only for super admins)
+  const recentAuditLogs = useMemo(() => {
+    return isAdmin ? getRecentLogs(5) : [];
+  }, [isAdmin, getRecentLogs]);
 
   // Date range state
   const [datePreset, setDatePreset] = useState<DatePreset>('30d');
@@ -574,6 +614,65 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Audit Log Widget - Only for Super Admins */}
+        {isAdmin && (
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <div>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <History className="h-5 w-5" />
+                  Recent Admin Actions
+                </CardTitle>
+                <CardDescription>Latest changes made by administrators</CardDescription>
+              </div>
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/admin/audit-log" className="flex items-center gap-1">
+                  View All
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {recentAuditLogs.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <History className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p className="text-sm">No audit logs yet</p>
+                  <p className="text-xs">Actions will appear here as they occur</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {recentAuditLogs.map((log) => (
+                    <div key={log.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                        <span className="text-xs font-medium text-primary">
+                          {log.userName.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-sm font-medium">{log.userName}</span>
+                          <Badge className={cn("text-xs", ACTION_COLORS[log.action])}>
+                            {ACTION_LABELS[log.action]}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs">
+                            {MODULE_LABELS[log.module]}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground truncate">
+                          {log.resourceName}
+                        </p>
+                      </div>
+                      <div className="text-xs text-muted-foreground whitespace-nowrap">
+                        {format(parseISO(log.timestamp), 'MMM d, h:mm a')}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Quick Links */}
         <Card>
