@@ -446,7 +446,7 @@ export default function BlogManagementPage() {
           totalCount={filteredPosts.length}
           onSelectAll={selectAll}
           allSelected={allSelected}
-          onDelete={() => setBulkDeleteOpen(true)}
+          onDelete={canDelete('blog') ? () => setBulkDeleteOpen(true) : undefined}
           onExport={handleBulkExport}
           onClearSelection={clearSelection}
         />

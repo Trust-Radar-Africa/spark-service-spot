@@ -845,6 +845,7 @@ export default function JobPostingsPage() {
                           <Switch
                             checked={job.is_active}
                             onCheckedChange={() => handleToggleStatus(job)}
+                            disabled={isViewer}
                           />
                           <Badge variant={job.is_active ? 'default' : 'secondary'} className="hidden sm:inline-flex">
                             {job.is_active ? 'Active' : 'Inactive'}
