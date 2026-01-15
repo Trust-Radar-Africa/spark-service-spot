@@ -57,33 +57,33 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   // Common user section component for sidebar
   const UserSection = ({ isMobile = false }: { isMobile?: boolean }) => (
     <div className={cn(
-      "border-t bg-card/50",
-      isMobile ? "p-3" : "p-4"
+      "border-t bg-card/30",
+      isMobile ? "p-2" : "px-3 py-2"
     )}>
-      <div className="flex items-center gap-3 mb-3">
-        <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-          <span className="text-sm font-medium text-primary">
+      <div className="flex items-center gap-2 mb-1.5">
+        <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+          <span className="text-xs font-medium text-primary">
             {user?.name?.charAt(0) || 'A'}
           </span>
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium truncate">{user?.name || 'Admin'}</p>
-          <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+          <p className="text-xs font-medium truncate">{user?.name || 'Admin'}</p>
+          <p className="text-[10px] text-muted-foreground truncate">{user?.email}</p>
         </div>
       </div>
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-0.5">
         {isAdmin && (
           <Link
             to="/admin/audit-log"
             onClick={() => setMobileMenuOpen(false)}
             className={cn(
-              "flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors",
+              "flex items-center gap-2 px-2 py-1.5 rounded text-xs transition-colors",
               location.pathname === '/admin/audit-log'
                 ? "bg-primary text-primary-foreground"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
             )}
           >
-            <History className="h-4 w-4" />
+            <History className="h-3.5 w-3.5" />
             Audit Log
           </Link>
         )}
@@ -91,20 +91,20 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           to="/admin/settings"
           onClick={() => setMobileMenuOpen(false)}
           className={cn(
-            "flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors",
+            "flex items-center gap-2 px-2 py-1.5 rounded text-xs transition-colors",
             location.pathname === '/admin/settings'
               ? "bg-primary text-primary-foreground"
               : "text-muted-foreground hover:bg-muted hover:text-foreground"
           )}
         >
-          <Settings className="h-4 w-4" />
+          <Settings className="h-3.5 w-3.5" />
           Settings
         </Link>
         <button
           onClick={handleLogout}
-          className="flex items-center gap-2 px-3 py-2 rounded-md text-sm text-destructive hover:bg-destructive/10 transition-colors w-full text-left"
+          className="flex items-center gap-2 px-2 py-1.5 rounded text-xs text-destructive hover:bg-destructive/10 transition-colors w-full text-left"
         >
-          <LogOut className="h-4 w-4" />
+          <LogOut className="h-3.5 w-3.5" />
           Sign out
         </button>
       </div>
