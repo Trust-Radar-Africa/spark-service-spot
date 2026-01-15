@@ -33,7 +33,7 @@ interface AdminLayoutProps {
   children: ReactNode;
 }
 
-const baseNavigation = [
+const navigation = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { name: 'Candidates', href: '/admin/candidates', icon: Users },
   { name: 'Job Postings', href: '/admin/jobs', icon: Briefcase },
@@ -48,11 +48,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  // Add Audit Log for super admins only
-  const navigation = isAdmin 
-    ? [...baseNavigation, { name: 'Audit Log', href: '/admin/audit-log', icon: History }]
-    : baseNavigation;
 
   const handleLogout = async () => {
     await logout();
@@ -77,6 +72,21 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         </div>
       </div>
       <div className="flex flex-col gap-1">
+        {isAdmin && (
+          <Link
+            to="/admin/audit-log"
+            onClick={() => setMobileMenuOpen(false)}
+            className={cn(
+              "flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors",
+              location.pathname === '/admin/audit-log'
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+            )}
+          >
+            <History className="h-4 w-4" />
+            Audit Log
+          </Link>
+        )}
         <Link
           to="/admin/settings"
           onClick={() => setMobileMenuOpen(false)}
@@ -147,6 +157,14 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 <p className="text-xs text-muted-foreground">{user?.email}</p>
               </div>
               <DropdownMenuSeparator />
+              {isAdmin && (
+                <DropdownMenuItem asChild>
+                  <Link to="/admin/audit-log" className="flex items-center cursor-pointer">
+                    <History className="h-4 w-4 mr-2" />
+                    Audit Log
+                  </Link>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem asChild>
                 <Link to="/admin/settings" className="flex items-center cursor-pointer">
                   <Settings className="h-4 w-4 mr-2" />
@@ -183,6 +201,14 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56 bg-popover border shadow-lg z-50">
+            {isAdmin && (
+              <DropdownMenuItem asChild>
+                <Link to="/admin/audit-log" className="flex items-center cursor-pointer">
+                  <History className="h-4 w-4 mr-2" />
+                  Audit Log
+                </Link>
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem asChild>
               <Link to="/admin/settings" className="flex items-center cursor-pointer">
                 <Settings className="h-4 w-4 mr-2" />
