@@ -287,12 +287,32 @@ export default function JobPostingsPage() {
 
       if (editingJob) {
         updateJob(editingJob.id, data);
+        // Log update action
+        if (user) {
+          logAction(
+            'update',
+            'jobs',
+            editingJob.id,
+            data.title,
+            { id: String(user.id), name: user.name, email: user.email, role: user.role || 'super_admin' }
+          );
+        }
         toast({
           title: 'Job updated',
           description: `"${data.title}" has been updated.`,
         });
       } else {
         addJob(data);
+        // Log create action
+        if (user) {
+          logAction(
+            'create',
+            'jobs',
+            'new',
+            data.title,
+            { id: String(user.id), name: user.name, email: user.email, role: user.role || 'super_admin' }
+          );
+        }
         toast({
           title: 'Job created',
           description: `"${data.title}" has been created.`,
@@ -314,10 +334,28 @@ export default function JobPostingsPage() {
 
   const handleDelete = async () => {
     if (!deletingJob) return;
+    if (!canDelete('jobs')) {
+      toast({
+        title: 'Permission denied',
+        description: 'You do not have permission to delete job postings.',
+        variant: 'destructive',
+      });
+      return;
+    }
     setIsDeleting(true);
     try {
       await new Promise((resolve) => setTimeout(resolve, 300));
       deleteJob(deletingJob.id);
+      // Log delete action
+      if (user) {
+        logAction(
+          'delete',
+          'jobs',
+          deletingJob.id,
+          deletingJob.title,
+          { id: String(user.id), name: user.name, email: user.email, role: user.role || 'super_admin' }
+        );
+      }
       toast({
         title: 'Job deleted',
         description: `"${deletingJob.title}" has been removed.`,
@@ -335,10 +373,27 @@ export default function JobPostingsPage() {
   };
 
   const handleBulkDelete = async () => {
+    if (!canDelete('jobs')) {
+      toast({
+        title: 'Permission denied',
+        description: 'You do not have permission to delete job postings.',
+        variant: 'destructive',
+      });
+      return;
+    }
     setIsDeleting(true);
     try {
       for (const item of selectedItems) {
         deleteJob(item.id);
+        if (user) {
+          logAction(
+            'delete',
+            'jobs',
+            item.id,
+            item.title,
+            { id: String(user.id), name: user.name, email: user.email, role: user.role || 'super_admin' }
+          );
+        }
       }
       toast({
         title: 'Jobs deleted',
@@ -359,6 +414,16 @@ export default function JobPostingsPage() {
 
   const handleToggleStatus = (job: JobPosting) => {
     toggleJobStatus(job.id);
+    // Log activate/deactivate action
+    if (user) {
+      logAction(
+        job.is_active ? 'deactivate' : 'activate',
+        'jobs',
+        job.id,
+        job.title,
+        { id: String(user.id), name: user.name, email: user.email, role: user.role || 'super_admin' }
+      );
+    }
     toast({
       title: job.is_active ? 'Job deactivated' : 'Job activated',
       description: `"${job.title}" is now ${job.is_active ? 'hidden from' : 'visible on'} the Careers page.`,
@@ -397,10 +462,12 @@ export default function JobPostingsPage() {
                 <RefreshCw className={`h-4 w-4 sm:mr-2 ${isLoading ? 'animate-spin' : ''}`} />
                 <span className="hidden sm:inline">Refresh</span>
               </Button>
-              <Button onClick={handleCreate} size="sm">
-                <Plus className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">New Job</span>
-              </Button>
+              {canCreate('jobs') && (
+                <Button onClick={handleCreate} size="sm">
+                  <Plus className="h-4 w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">New Job</span>
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -789,27 +856,32 @@ export default function JobPostingsPage() {
                           </Badge>
                         </div>
                       </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleEdit(job)}
-                            title="Edit"
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setDeletingJob(job)}
-                            className="text-destructive hover:text-destructive"
-                            title="Delete"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            {canUpdate('jobs') && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleEdit(job)}
+                                title="Edit"
+                                disabled={isViewer}
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                            )}
+                            {canDelete('jobs') && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => setDeletingJob(job)}
+                                className="text-destructive hover:text-destructive"
+                                title="Delete"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                        </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
