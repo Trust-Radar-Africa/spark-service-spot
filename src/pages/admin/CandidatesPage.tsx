@@ -590,7 +590,7 @@ export default function CandidatesPage() {
         )}
 
         {/* Bulk Download Actions */}
-        {selectedCount > 0 && (
+        {selectedCount > 0 && !isViewer && (
           <div className="flex gap-2 p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
             <Button
               variant="outline"
@@ -766,22 +766,26 @@ export default function CandidatesPage() {
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleDownloadCV(candidate)}
-                            title="Download CV"
-                          >
-                            <Download className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleDownloadCoverLetter(candidate)}
-                            title="Download Cover Letter"
-                          >
-                            <FileText className="h-4 w-4" />
-                          </Button>
+                          {!isViewer && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDownloadCV(candidate)}
+                              title="Download CV"
+                            >
+                              <Download className="h-4 w-4" />
+                            </Button>
+                          )}
+                          {!isViewer && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDownloadCoverLetter(candidate)}
+                              title="Download Cover Letter"
+                            >
+                              <FileText className="h-4 w-4" />
+                            </Button>
+                          )}
                           {canDelete('candidates') && (
                             <Button
                               variant="ghost"
@@ -954,24 +958,28 @@ export default function CandidatesPage() {
                   <FileText className="h-5 w-5" />
                   Documents
                 </h3>
-                <div className="flex flex-col gap-2">
-                  <Button
-                    variant="outline"
-                    className="justify-start"
-                    onClick={() => handleDownloadCV(candidateToView)}
-                  >
-                    <Download className="h-4 w-4 mr-2" />
-                    Download CV / Resume
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="justify-start"
-                    onClick={() => handleDownloadCoverLetter(candidateToView)}
-                  >
-                    <FileText className="h-4 w-4 mr-2" />
-                    Download Cover Letter
-                  </Button>
-                </div>
+                {isViewer ? (
+                  <p className="text-sm text-muted-foreground">You don't have permission to download documents.</p>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    <Button
+                      variant="outline"
+                      className="justify-start"
+                      onClick={() => handleDownloadCV(candidateToView)}
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Download CV / Resume
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="justify-start"
+                      onClick={() => handleDownloadCoverLetter(candidateToView)}
+                    >
+                      <FileText className="h-4 w-4 mr-2" />
+                      Download Cover Letter
+                    </Button>
+                  </div>
+                )}
               </div>
 
               {/* Actions */}
