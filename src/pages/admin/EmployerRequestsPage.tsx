@@ -77,6 +77,9 @@ import { ItemsPerPageOption } from '@/hooks/useItemsPerPage';
 import { SearchableSelect, SearchableSelectOption } from '@/components/ui/searchable-select';
 import { BulkActionsBar } from '@/components/admin/BulkActionsBar';
 import { useBulkSelection } from '@/hooks/useBulkSelection';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+import { useAuditLogger } from '@/stores/auditLogStore';
+import { useAdminAuth } from '@/contexts/AdminAuthContext';
 
 import { COUNTRIES, NATIONALITIES } from '@/data/countries';
 
@@ -104,6 +107,9 @@ export default function EmployerRequestsPage() {
   const { requests, isLoading, fetchRequests, deleteRequest } = useEmployerRequestsStore();
   const { toast } = useToast();
   const { sortKey, sortDirection, handleSort, sortData } = useSorting<EmployerRequest>();
+  const { canDelete, isViewer } = useAdminPermissions();
+  const { user } = useAdminAuth();
+  const { logAction } = useAuditLogger();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [countryFilter, setCountryFilter] = useState('');
@@ -228,20 +234,56 @@ export default function EmployerRequestsPage() {
   };
 
   const handleDelete = () => {
-    if (requestToDelete) {
-      deleteRequest(requestToDelete.id);
+    if (!requestToDelete) return;
+    if (!canDelete('employer_requests')) {
       toast({
-        title: 'Request deleted',
-        description: `Request from ${requestToDelete.firm_name} has been removed.`,
+        title: 'Permission denied',
+        description: 'You do not have permission to delete employer requests.',
+        variant: 'destructive',
       });
-      setDeleteDialogOpen(false);
-      setRequestToDelete(null);
+      return;
     }
+    
+    deleteRequest(requestToDelete.id);
+    // Log delete action
+    if (user) {
+      logAction(
+        'delete',
+        'employer_requests',
+        requestToDelete.id,
+        requestToDelete.firm_name,
+        { id: String(user.id), name: user.name, email: user.email, role: user.role || 'super_admin' }
+      );
+    }
+    toast({
+      title: 'Request deleted',
+      description: `Request from ${requestToDelete.firm_name} has been removed.`,
+    });
+    setDeleteDialogOpen(false);
+    setRequestToDelete(null);
   };
 
   const handleBulkDelete = () => {
+    if (!canDelete('employer_requests')) {
+      toast({
+        title: 'Permission denied',
+        description: 'You do not have permission to delete employer requests.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     for (const item of selectedItems) {
       deleteRequest(item.id);
+      if (user) {
+        logAction(
+          'delete',
+          'employer_requests',
+          item.id,
+          item.firm_name,
+          { id: String(user.id), name: user.name, email: user.email, role: user.role || 'super_admin' }
+        );
+      }
     }
     toast({
       title: 'Requests deleted',

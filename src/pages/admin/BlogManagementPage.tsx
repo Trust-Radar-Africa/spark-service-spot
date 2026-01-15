@@ -7,13 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
   Table,
   TableBody,
   TableCell,
@@ -29,6 +22,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  Collapsible,
+  CollapsibleContent,
+} from '@/components/ui/collapsible';
 import { useBlogPostsStore, BlogPostData } from '@/stores/blogPostsStore';
 import {
   FileText,
@@ -46,6 +43,7 @@ import {
   CheckCircle,
   Clock,
   Download,
+  SlidersHorizontal,
 } from 'lucide-react';
 import {
   Pagination,
@@ -65,6 +63,9 @@ import { ItemsPerPageOption } from '@/hooks/useItemsPerPage';
 import { SearchableSelect, SearchableSelectOption } from '@/components/ui/searchable-select';
 import { BulkActionsBar } from '@/components/admin/BulkActionsBar';
 import { useBulkSelection } from '@/hooks/useBulkSelection';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+import { useAuditLogger } from '@/stores/auditLogStore';
+import { useAdminAuth } from '@/contexts/AdminAuthContext';
 
 const getStoredItemsPerPage = (): ItemsPerPageOption => {
   if (typeof window !== 'undefined') {
@@ -80,10 +81,13 @@ export default function BlogManagementPage() {
   const { posts, addPost, updatePost, deletePost, togglePublish } = useBlogPostsStore();
   const { toast } = useToast();
   const { sortKey, sortDirection, handleSort, sortData } = useSorting<BlogPostData>();
+  const { canDelete, canCreate, canUpdate, isViewer } = useAdminPermissions();
+  const { user } = useAdminAuth();
+  const { logAction } = useAuditLogger();
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('');
   const [authorFilter, setAuthorFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPageOption>(getStoredItemsPerPage);
@@ -93,6 +97,10 @@ export default function BlogManagementPage() {
   const [postToDelete, setPostToDelete] = useState<BlogPostData | null>(null);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
+
+  const hasActiveFilters = !!(searchTerm || statusFilter || categoryFilter || authorFilter);
+  const activeFilterCount = [statusFilter, categoryFilter, authorFilter].filter(Boolean).length;
 
   const handleItemsPerPageChange = (value: ItemsPerPageOption) => {
     setItemsPerPage(value);
@@ -120,14 +128,23 @@ export default function BlogManagementPage() {
     });
   };
 
-  // Get unique categories
-  const categories = [...new Set(posts.map((p) => p.category))].sort();
+  // Get unique categories for filter
+  const categoryOptions: SearchableSelectOption[] = useMemo(() => {
+    const uniqueCategories = [...new Set(posts.map((p) => p.category))].sort();
+    return uniqueCategories.map((c) => ({ value: c, label: c }));
+  }, [posts]);
 
   // Get unique authors for filter
   const authorOptions: SearchableSelectOption[] = useMemo(() => {
     const uniqueAuthors = [...new Set(posts.map((p) => p.author))].sort();
     return uniqueAuthors.map((a) => ({ value: a, label: a }));
   }, [posts]);
+
+  // Status options
+  const statusOptions: SearchableSelectOption[] = [
+    { value: 'published', label: 'Published' },
+    { value: 'draft', label: 'Drafts' },
+  ];
 
   // Filter and sort posts
   const filteredPosts = useMemo(() => {
@@ -139,11 +156,11 @@ export default function BlogManagementPage() {
         post.author.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesStatus =
-        statusFilter === 'all' ||
+        !statusFilter ||
         (statusFilter === 'published' && post.is_published) ||
         (statusFilter === 'draft' && !post.is_published);
 
-      const matchesCategory = categoryFilter === 'all' || post.category === categoryFilter;
+      const matchesCategory = !categoryFilter || post.category === categoryFilter;
       const matchesAuthor = !authorFilter || post.author === authorFilter;
 
       return matchesSearch && matchesStatus && matchesCategory && matchesAuthor;
@@ -209,12 +226,32 @@ export default function BlogManagementPage() {
 
     if (editingPost) {
       updatePost(editingPost.id, data);
+      // Log update action
+      if (user) {
+        logAction(
+          'update',
+          'blog',
+          editingPost.id,
+          data.title || editingPost.title,
+          { id: String(user.id), name: user.name, email: user.email, role: user.role || 'super_admin' }
+        );
+      }
       toast({
         title: 'Post updated',
         description: `"${data.title}" has been updated successfully.`,
       });
     } else {
       addPost(data as Omit<BlogPostData, 'id' | 'created_at' | 'updated_at'>);
+      // Log create action
+      if (user) {
+        logAction(
+          'create',
+          'blog',
+          'new',
+          data.title || 'Untitled',
+          { id: String(user.id), name: user.name, email: user.email, role: user.role || 'super_admin' }
+        );
+      }
       toast({
         title: 'Post created',
         description: `"${data.title}" has been created successfully.`,
@@ -227,20 +264,56 @@ export default function BlogManagementPage() {
   };
 
   const handleDelete = () => {
-    if (postToDelete) {
-      deletePost(postToDelete.id);
+    if (!postToDelete) return;
+    if (!canDelete('blog')) {
       toast({
-        title: 'Post deleted',
-        description: `"${postToDelete.title}" has been deleted.`,
+        title: 'Permission denied',
+        description: 'You do not have permission to delete blog posts.',
+        variant: 'destructive',
       });
-      setDeleteDialogOpen(false);
-      setPostToDelete(null);
+      return;
     }
+    
+    deletePost(postToDelete.id);
+    // Log delete action
+    if (user) {
+      logAction(
+        'delete',
+        'blog',
+        postToDelete.id,
+        postToDelete.title,
+        { id: String(user.id), name: user.name, email: user.email, role: user.role || 'super_admin' }
+      );
+    }
+    toast({
+      title: 'Post deleted',
+      description: `"${postToDelete.title}" has been deleted.`,
+    });
+    setDeleteDialogOpen(false);
+    setPostToDelete(null);
   };
 
   const handleBulkDelete = () => {
+    if (!canDelete('blog')) {
+      toast({
+        title: 'Permission denied',
+        description: 'You do not have permission to delete blog posts.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     for (const item of selectedItems) {
       deletePost(item.id);
+      if (user) {
+        logAction(
+          'delete',
+          'blog',
+          item.id,
+          item.title,
+          { id: String(user.id), name: user.name, email: user.email, role: user.role || 'super_admin' }
+        );
+      }
     }
     toast({
       title: 'Posts deleted',
@@ -266,6 +339,16 @@ export default function BlogManagementPage() {
 
   const handleTogglePublish = (post: BlogPostData) => {
     togglePublish(post.id);
+    // Log publish/unpublish action
+    if (user) {
+      logAction(
+        post.is_published ? 'unpublish' : 'publish',
+        'blog',
+        post.id,
+        post.title,
+        { id: String(user.id), name: user.name, email: user.email, role: user.role || 'super_admin' }
+      );
+    }
     toast({
       title: post.is_published ? 'Post unpublished' : 'Post published',
       description: `"${post.title}" is now ${post.is_published ? 'a draft' : 'published'}.`,
@@ -316,10 +399,12 @@ export default function BlogManagementPage() {
               <Download className="w-4 h-4 mr-2" />
               Export CSV
             </Button>
-            <Button onClick={handleCreateNew}>
-              <Plus className="w-4 h-4 mr-2" />
-              New Post
-            </Button>
+            {canCreate('blog') && (
+              <Button onClick={handleCreateNew}>
+                <Plus className="w-4 h-4 mr-2" />
+                New Post
+              </Button>
+            )}
           </div>
         </div>
 
@@ -372,58 +457,119 @@ export default function BlogManagementPage() {
         />
 
         {/* Filters */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 p-4 bg-card rounded-lg border">
-          <div className="relative lg:col-span-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search posts..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9"
-            />
+        <div className="bg-card rounded-lg border overflow-hidden">
+          {/* Main search row */}
+          <div className="p-4 flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search posts by title, excerpt, or author..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => setFiltersExpanded(!filtersExpanded)}
+              className="gap-2"
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+              Filters
+              {activeFilterCount > 0 && (
+                <Badge variant="secondary" className="ml-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
+                  {activeFilterCount}
+                </Badge>
+              )}
+            </Button>
           </div>
-          <SearchableSelect
-            options={authorOptions}
-            value={authorFilter}
-            onValueChange={setAuthorFilter}
-            placeholder="All Authors"
-            searchPlaceholder="Search author..."
-          />
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger>
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent className="bg-popover border shadow-lg z-50">
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="published">Published</SelectItem>
-              <SelectItem value="draft">Drafts</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger>
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent className="bg-popover border shadow-lg z-50">
-              <SelectItem value="all">All Categories</SelectItem>
-              {categories.map((cat) => (
-                <SelectItem key={cat} value={cat}>
-                  {cat}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button
-            variant="ghost"
-            onClick={() => {
-              setSearchTerm('');
-              setAuthorFilter('');
-              setStatusFilter('all');
-              setCategoryFilter('all');
-            }}
-            className="text-muted-foreground"
-          >
-            Clear Filters
-          </Button>
+
+          {/* Expandable filters */}
+          <Collapsible open={filtersExpanded} onOpenChange={setFiltersExpanded}>
+            <CollapsibleContent>
+              <div className="px-4 pb-4 border-t border-border pt-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
+                      <User className="h-3 w-3" />
+                      Author
+                    </label>
+                    <SearchableSelect
+                      options={authorOptions}
+                      value={authorFilter}
+                      onValueChange={setAuthorFilter}
+                      placeholder="All Authors"
+                      searchPlaceholder="Search author..."
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
+                      <Eye className="h-3 w-3" />
+                      Status
+                    </label>
+                    <SearchableSelect
+                      options={statusOptions}
+                      value={statusFilter}
+                      onValueChange={setStatusFilter}
+                      placeholder="All Status"
+                      searchPlaceholder="Search status..."
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
+                      <Tag className="h-3 w-3" />
+                      Category
+                    </label>
+                    <SearchableSelect
+                      options={categoryOptions}
+                      value={categoryFilter}
+                      onValueChange={setCategoryFilter}
+                      placeholder="All Categories"
+                      searchPlaceholder="Search category..."
+                    />
+                  </div>
+
+                  <div className="flex items-end">
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        setSearchTerm('');
+                        setAuthorFilter('');
+                        setStatusFilter('');
+                        setCategoryFilter('');
+                      }}
+                      className="text-muted-foreground w-full"
+                    >
+                      Clear Filters
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+
+          {/* Results summary */}
+          {hasActiveFilters && (
+            <div className="flex items-center justify-between px-4 py-3 bg-muted/50 border-t border-border">
+              <p className="text-sm text-muted-foreground">
+                Showing {filteredPosts.length} of {posts.length} posts
+              </p>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setSearchTerm('');
+                  setAuthorFilter('');
+                  setStatusFilter('');
+                  setCategoryFilter('');
+                }}
+              >
+                Clear filters
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Posts Table */}
@@ -542,37 +688,45 @@ export default function BlogManagementPage() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleTogglePublish(post)}
-                            title={post.is_published ? 'Unpublish' : 'Publish'}
-                          >
-                            {post.is_published ? (
-                              <EyeOff className="w-4 h-4" />
-                            ) : (
-                              <Eye className="w-4 h-4" />
-                            )}
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleEdit(post)}
-                            title="Edit"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => {
-                              setPostToDelete(post);
-                              setDeleteDialogOpen(true);
-                            }}
-                            title="Delete"
-                          >
-                            <Trash2 className="w-4 h-4 text-destructive" />
-                          </Button>
+                          {canUpdate('blog') && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleTogglePublish(post)}
+                              title={post.is_published ? 'Unpublish' : 'Publish'}
+                              disabled={isViewer}
+                            >
+                              {post.is_published ? (
+                                <EyeOff className="w-4 h-4" />
+                              ) : (
+                                <Eye className="w-4 h-4" />
+                              )}
+                            </Button>
+                          )}
+                          {canUpdate('blog') && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleEdit(post)}
+                              title="Edit"
+                              disabled={isViewer}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                          )}
+                          {canDelete('blog') && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => {
+                                setPostToDelete(post);
+                                setDeleteDialogOpen(true);
+                              }}
+                              title="Delete"
+                            >
+                              <Trash2 className="w-4 h-4 text-destructive" />
+                            </Button>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>
