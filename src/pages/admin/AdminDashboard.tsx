@@ -105,7 +105,7 @@ export default function AdminDashboard() {
   const { posts } = useBlogPostsStore();
   const { requests } = useEmployerRequestsStore();
   const { getRecentLogs } = useAuditLogStore();
-  const { isAdmin } = useAdminPermissions();
+  const { isAdmin, isViewer } = useAdminPermissions();
   const candidates = mockCandidates;
 
   // Get recent audit logs (only for super admins)
@@ -422,7 +422,8 @@ export default function AdminDashboard() {
           ))}
         </div>
 
-        {/* Charts Row 1 */}
+        {/* Charts Row 1 - Hidden for viewers (minimal dashboard) */}
+        {!isViewer && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Activity Timeline */}
           <Card>
@@ -513,8 +514,10 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
         </div>
+        )}
 
-        {/* Charts Row 2 */}
+        {/* Charts Row 2 - Hidden for viewers (minimal dashboard) */}
+        {!isViewer && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Job Status */}
           <Card>
@@ -614,6 +617,7 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
         </div>
+        )}
 
         {/* Audit Log Widget - Only for Super Admins */}
         {isAdmin && (
@@ -677,7 +681,7 @@ export default function AdminDashboard() {
         {/* Quick Links */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Quick Actions</CardTitle>
+            <CardTitle className="text-lg">{isViewer ? 'Quick Links' : 'Quick Actions'}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -690,19 +694,19 @@ export default function AdminDashboard() {
               <Button variant="outline" asChild className="h-auto py-4 flex-col gap-2">
                 <Link to="/admin/jobs">
                   <Briefcase className="h-5 w-5" />
-                  <span>Manage Jobs</span>
+                  <span>{isViewer ? 'View Jobs' : 'Manage Jobs'}</span>
                 </Link>
               </Button>
               <Button variant="outline" asChild className="h-auto py-4 flex-col gap-2">
                 <Link to="/admin/employers">
                   <Building2 className="h-5 w-5" />
-                  <span>Employer Requests</span>
+                  <span>{isViewer ? 'View Requests' : 'Employer Requests'}</span>
                 </Link>
               </Button>
               <Button variant="outline" asChild className="h-auto py-4 flex-col gap-2">
                 <Link to="/admin/blog">
                   <FileText className="h-5 w-5" />
-                  <span>Blog Posts</span>
+                  <span>{isViewer ? 'View Blog' : 'Blog Posts'}</span>
                 </Link>
               </Button>
             </div>

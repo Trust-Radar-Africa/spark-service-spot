@@ -395,7 +395,7 @@ export default function EmployerRequestsPage() {
           totalCount={filteredRequests.length}
           onSelectAll={selectAll}
           allSelected={allSelected}
-          onDelete={() => setBulkDeleteOpen(true)}
+          onDelete={canDelete('employer_requests') ? () => setBulkDeleteOpen(true) : undefined}
           onExport={handleBulkExport}
           onClearSelection={clearSelection}
         />
@@ -706,16 +706,18 @@ export default function EmployerRequestsPage() {
                         >
                           <Eye className="w-4 h-4" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => {
-                            setRequestToDelete(request);
-                            setDeleteDialogOpen(true);
-                          }}
-                        >
-                          <Trash2 className="w-4 h-4 text-destructive" />
-                        </Button>
+                        {canDelete('employer_requests') && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              setRequestToDelete(request);
+                              setDeleteDialogOpen(true);
+                            }}
+                          >
+                            <Trash2 className="w-4 h-4 text-destructive" />
+                          </Button>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>

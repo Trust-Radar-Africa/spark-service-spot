@@ -156,8 +156,12 @@ function hexToHsl(hex: string): string {
   }
 }
 
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+
 export default function SettingsPage() {
   const { toast } = useToast();
+  const { canUpdate, isAdmin } = useAdminPermissions();
+  const canEditSettings = canUpdate('settings');
   const {
     branding,
     setBranding,
@@ -369,6 +373,11 @@ export default function SettingsPage() {
           <p className="text-muted-foreground">
             Configure your admin panel and website settings
           </p>
+          {!canEditSettings && (
+            <p className="text-sm text-amber-600 mt-1">
+              You have read-only access to settings. Only administrators can make changes.
+            </p>
+          )}
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -425,23 +434,27 @@ export default function SettingsPage() {
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="logo-upload" className="cursor-pointer">
-                      <div className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
-                        <Upload className="h-4 w-4" />
-                        Upload Logo
-                      </div>
-                    </Label>
-                    <Input
-                      id="logo-upload"
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleLogoUpload}
-                    />
+                    {canEditSettings && (
+                      <>
+                        <Label htmlFor="logo-upload" className="cursor-pointer">
+                          <div className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
+                            <Upload className="h-4 w-4" />
+                            Upload Logo
+                          </div>
+                        </Label>
+                        <Input
+                          id="logo-upload"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleLogoUpload}
+                        />
+                      </>
+                    )}
                     <p className="text-xs text-muted-foreground">
                       Recommended: 200x200px, PNG or SVG
                     </p>
-                    {branding.logoUrl && (
+                    {branding.logoUrl && canEditSettings && (
                       <Button
                         variant="ghost"
                         size="sm"
@@ -472,6 +485,7 @@ export default function SettingsPage() {
                       value={branding.companyName}
                       onChange={(e) => setBranding({ companyName: e.target.value })}
                       placeholder="Your Company Name"
+                      disabled={!canEditSettings}
                     />
                   </div>
                   <div className="space-y-2">
@@ -481,6 +495,7 @@ export default function SettingsPage() {
                       value={branding.tagline}
                       onChange={(e) => setBranding({ tagline: e.target.value })}
                       placeholder="Your company tagline"
+                      disabled={!canEditSettings}
                     />
                   </div>
                 </div>
