@@ -54,13 +54,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     navigate('/admin/login');
   };
 
-  // Common user section component for sidebar
-  const UserSection = ({ isMobile = false }: { isMobile?: boolean }) => (
-    <div className={cn(
-      "border-t bg-card/30",
-      isMobile ? "p-2" : "px-3 py-2"
-    )}>
-      <div className="flex items-center gap-2 mb-1.5">
+  // Common user section component for sidebar - name and email only
+  const UserSection = () => (
+    <div className="border-t bg-card/30 px-3 py-2">
+      <div className="flex items-center gap-2">
         <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
           <span className="text-xs font-medium text-primary">
             {user?.name?.charAt(0) || 'A'}
@@ -70,43 +67,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <p className="text-xs font-medium truncate">{user?.name || 'Admin'}</p>
           <p className="text-[10px] text-muted-foreground truncate">{user?.email}</p>
         </div>
-      </div>
-      <div className="flex flex-col gap-0.5">
-        {isAdmin && (
-          <Link
-            to="/admin/audit-log"
-            onClick={() => setMobileMenuOpen(false)}
-            className={cn(
-              "flex items-center gap-2 px-2 py-1.5 rounded text-xs transition-colors",
-              location.pathname === '/admin/audit-log'
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground"
-            )}
-          >
-            <History className="h-3.5 w-3.5" />
-            Audit Log
-          </Link>
-        )}
-        <Link
-          to="/admin/settings"
-          onClick={() => setMobileMenuOpen(false)}
-          className={cn(
-            "flex items-center gap-2 px-2 py-1.5 rounded text-xs transition-colors",
-            location.pathname === '/admin/settings'
-              ? "bg-primary text-primary-foreground"
-              : "text-muted-foreground hover:bg-muted hover:text-foreground"
-          )}
-        >
-          <Settings className="h-3.5 w-3.5" />
-          Settings
-        </Link>
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-2 px-2 py-1.5 rounded text-xs text-destructive hover:bg-destructive/10 transition-colors w-full text-left"
-        >
-          <LogOut className="h-3.5 w-3.5" />
-          Sign out
-        </button>
       </div>
     </div>
   );
