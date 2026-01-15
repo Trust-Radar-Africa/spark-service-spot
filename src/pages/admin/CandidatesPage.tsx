@@ -391,10 +391,6 @@ export default function CandidatesPage() {
             </p>
           </div>
           <div className="flex gap-2">
-            <Button onClick={handleExportCSV} variant="outline" disabled={filteredCandidates.length === 0}>
-              <Download className="h-4 w-4 mr-2" />
-              Export CSV
-            </Button>
             <Button onClick={handleRefresh} variant="outline" disabled={isLoading}>
               <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
               Refresh
