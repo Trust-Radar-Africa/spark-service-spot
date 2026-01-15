@@ -454,10 +454,6 @@ export default function JobPostingsPage() {
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button variant="outline" size="sm" onClick={handleExportCSV}>
-                <Download className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">Export CSV</span>
-              </Button>
               <Button onClick={handleRefresh} variant="outline" size="sm" disabled={isLoading}>
                 <RefreshCw className={`h-4 w-4 sm:mr-2 ${isLoading ? 'animate-spin' : ''}`} />
                 <span className="hidden sm:inline">Refresh</span>

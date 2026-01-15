@@ -395,10 +395,6 @@ export default function BlogManagementPage() {
             <p className="text-muted-foreground">Create and manage blog posts</p>
           </div>
           <div className="flex gap-2">
-            <Button onClick={handleExportCSV} variant="outline" disabled={filteredPosts.length === 0}>
-              <Download className="w-4 h-4 mr-2" />
-              Export CSV
-            </Button>
             {canCreate('blog') && (
               <Button onClick={handleCreateNew}>
                 <Plus className="w-4 h-4 mr-2" />
