@@ -27,6 +27,7 @@ import NotificationsDropdown from './NotificationsDropdown';
 import { ThemeToggle } from './ThemeToggle';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+import { Badge } from '@/components/ui/badge';
 import Breadcrumbs from './Breadcrumbs';
 
 interface AdminLayoutProps {
@@ -44,7 +45,20 @@ const navigation = [
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const { user, logout } = useAdminAuth();
   const { branding } = useSettingsStore();
-  const { isAdmin } = useAdminPermissions();
+  const { isAdmin, isEditor, isViewer, userRole } = useAdminPermissions();
+
+  const getRoleBadgeVariant = () => {
+    if (isAdmin) return 'default';
+    if (isEditor) return 'secondary';
+    return 'outline';
+  };
+
+  const getRoleLabel = () => {
+    if (isAdmin) return 'Admin';
+    if (isEditor) return 'Editor';
+    if (isViewer) return 'Viewer';
+    return userRole || 'User';
+  };
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -113,7 +127,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 bg-popover border shadow-lg z-50">
               <div className="px-2 py-1.5">
-                <p className="text-sm font-medium">{user?.name || 'Admin'}</p>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-sm font-medium">{user?.name || 'Admin'}</p>
+                  <Badge variant={getRoleBadgeVariant()} className="text-[10px] px-1.5 py-0">
+                    {getRoleLabel()}
+                  </Badge>
+                </div>
                 <p className="text-xs text-muted-foreground">{user?.email}</p>
               </div>
               <DropdownMenuSeparator />
@@ -157,6 +176,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 <p className="text-sm font-medium leading-none">{user?.name || 'Admin'}</p>
                 <p className="text-xs text-muted-foreground leading-none mt-0.5">{user?.email}</p>
               </div>
+              <Badge variant={getRoleBadgeVariant()} className="text-[10px] px-1.5 py-0 hidden sm:flex">
+                {getRoleLabel()}
+              </Badge>
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
             </Button>
           </DropdownMenuTrigger>
