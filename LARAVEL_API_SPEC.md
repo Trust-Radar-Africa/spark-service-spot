@@ -66,10 +66,69 @@ Returns the authenticated user. Requires authentication.
 
 ---
 
+## Role-Based Access Control
+
+The admin panel implements granular role-based permissions. All endpoints should validate user roles before performing operations.
+
+### Role Definitions
+
+| Role | Label | Description |
+|------|-------|-------------|
+| super_admin | Admin | Full access to all features and settings |
+| editor | Editor | Can manage blog posts and job postings, view other modules |
+| viewer | Viewer | Read-only access to all data, no downloads |
+
+### Granular Permissions Matrix
+
+| Permission | Super Admin | Editor | Viewer |
+|------------|-------------|--------|--------|
+| candidates:view | ✓ | ✓ | ✓ |
+| candidates:create | ✓ | ✗ | ✗ |
+| candidates:update | ✓ | ✗ | ✗ |
+| candidates:delete | ✓ | ✗ | ✗ |
+| candidates:download | ✓ | ✓ | ✗ |
+| jobs:view | ✓ | ✓ | ✓ |
+| jobs:create | ✓ | ✓ | ✗ |
+| jobs:update | ✓ | ✓ | ✗ |
+| jobs:delete | ✓ | ✗ | ✗ |
+| jobs:archive | ✓ | ✓ | ✗ |
+| jobs:toggle_status | ✓ | ✓ | ✗ |
+| employer_requests:view | ✓ | ✓ | ✓ |
+| employer_requests:delete | ✓ | ✗ | ✗ |
+| blog:view | ✓ | ✓ | ✓ |
+| blog:create | ✓ | ✓ | ✗ |
+| blog:update | ✓ | ✓ | ✗ |
+| blog:delete | ✓ | ✓ | ✗ |
+| settings:view | ✓ | ✓ | ✓ |
+| settings:update | ✓ | ✗ | ✗ |
+| users:view | ✓ | ✗ | ✗ |
+| users:create | ✓ | ✗ | ✗ |
+| users:update | ✓ | ✗ | ✗ |
+| users:delete | ✓ | ✗ | ✗ |
+| audit_logs:view | ✓ | ✗ | ✗ |
+| dashboard:charts | ✓ | ✓ | ✗ |
+
+### Demo Users (Mock Mode)
+
+For development/demo, the following test accounts are pre-configured:
+
+| Email | Password | Role |
+|-------|----------|------|
+| admin@demo.com | demo123 | Super Admin |
+| editor@demo.com | demo123 | Editor |
+| viewer@demo.com | demo123 | Viewer |
+
+---
+
 ## Dashboard
 
 ### GET /api/admin/dashboard
 Get dashboard statistics and overview data. Requires authentication.
+
+**Query Parameters:**
+- `date_from` (optional): Start date for filtering (YYYY-MM-DD)
+- `date_to` (optional): End date for filtering (YYYY-MM-DD)
+- `preset` (optional): Date preset (7d, 30d, 90d, ytd)
 
 **Response:**
 ```json
@@ -77,12 +136,16 @@ Get dashboard statistics and overview data. Requires authentication.
   "stats": {
     "total_candidates": 156,
     "candidates_this_week": 12,
+    "candidates_in_range": 45,
     "total_jobs": 25,
     "active_jobs": 18,
+    "jobs_in_range": 8,
     "total_employer_requests": 42,
     "employer_requests_this_week": 5,
+    "employer_requests_in_range": 12,
     "total_blog_posts": 15,
-    "published_blog_posts": 12
+    "published_blog_posts": 12,
+    "blog_posts_in_range": 4
   },
   "recent_candidates": [
     {
@@ -115,18 +178,26 @@ Get dashboard statistics and overview data. Requires authentication.
       "7-10": 32,
       "10+": 17
     },
-    "candidates_by_month": [
-      { "month": "Jan", "count": 25 },
-      { "month": "Feb", "count": 32 },
-      { "month": "Mar", "count": 28 }
+    "candidates_by_date": [
+      { "date": "2024-01-01", "count": 5 },
+      { "date": "2024-01-02", "count": 8 },
+      { "date": "2024-01-03", "count": 3 }
     ],
     "jobs_by_status": {
       "active": 18,
       "inactive": 7
+    },
+    "blog_by_category": {
+      "Industry Insights": 5,
+      "Best Practices": 4,
+      "Technical": 3,
+      "Tax Advisory": 3
     }
   }
 }
 ```
+
+**Note:** Chart data should only be included if the user has `dashboard:charts` permission (super_admin, editor).
 
 ---
 
@@ -140,8 +211,10 @@ List all candidate applications with filtering and pagination.
 - `nationality` (optional): Filter by nationality
 - `country` (optional): Filter by country
 - `location` (optional): Filter by location
+- `job_applied` (optional): Filter by job applied for
 - `search` (optional): Search by name or email
 - `page` (optional): Page number for pagination
+- `per_page` (optional): Items per page (default from settings)
 
 **Response:**
 ```json
@@ -156,6 +229,8 @@ List all candidate applications with filtering and pagination.
       "country": "United Kingdom",
       "location": "London",
       "experience": "3-7",
+      "job_applied": "Senior Accountant",
+      "job_id": 5,
       "cv_url": "/storage/cvs/cv-1.docx",
       "cover_letter_url": "/storage/cover-letters/cl-1.docx",
       "created_at": "2024-01-15T10:30:00Z",
@@ -165,6 +240,7 @@ List all candidate applications with filtering and pagination.
   "meta": {
     "current_page": 1,
     "last_page": 5,
+    "per_page": 10,
     "total": 48
   }
 }
@@ -173,11 +249,17 @@ List all candidate applications with filtering and pagination.
 ### GET /api/admin/candidates/{id}/cv
 Download candidate's CV file. Returns the Word document as a binary stream.
 
+**Authorization:** Requires `candidates:download` permission. Viewers (role=viewer) should receive 403 Forbidden.
+
 ### GET /api/admin/candidates/{id}/cover-letter
 Download candidate's cover letter. Returns the Word document as a binary stream.
 
+**Authorization:** Requires `candidates:download` permission. Viewers should receive 403 Forbidden.
+
 ### POST /api/admin/candidates/bulk-download
 Download multiple CVs or cover letters as a ZIP file.
+
+**Authorization:** Requires `candidates:download` permission. Viewers should receive 403 Forbidden.
 
 **Request:**
 ```json
@@ -190,10 +272,10 @@ Download multiple CVs or cover letters as a ZIP file.
 **Response:** Binary ZIP file stream
 
 ### DELETE /api/admin/candidates/{id}
-Delete a candidate application. Requires authentication.
+Delete a candidate application. Requires `candidates:delete` permission (super_admin only).
 
 ### DELETE /api/admin/candidates/bulk
-Bulk delete candidate applications. Requires authentication.
+Bulk delete candidate applications. Requires `candidates:delete` permission (super_admin only).
 
 **Request:**
 ```json
@@ -201,6 +283,18 @@ Bulk delete candidate applications. Requires authentication.
   "ids": [1, 2, 3]
 }
 ```
+
+### POST /api/admin/candidates/bulk-export
+Export selected candidates to CSV.
+
+**Request:**
+```json
+{
+  "ids": [1, 2, 3, 4, 5]
+}
+```
+
+**Response:** CSV file stream
 
 ### GET /api/admin/nationalities
 Get list of unique nationalities for filter dropdown.
@@ -225,6 +319,7 @@ List all job postings with filtering and pagination.
 - `work_type` (optional): Filter by work type (remote, hybrid, on-site, flexible)
 - `experience` (optional): Filter by experience level
 - `page` (optional): Page number for pagination
+- `per_page` (optional): Items per page
 
 **Response:**
 ```json
@@ -250,13 +345,14 @@ List all job postings with filtering and pagination.
   "meta": {
     "current_page": 1,
     "last_page": 3,
+    "per_page": 10,
     "total": 25
   }
 }
 ```
 
 ### POST /api/admin/jobs
-Create a new job posting. Requires authentication.
+Create a new job posting. Requires `jobs:create` permission (super_admin, editor).
 
 **Request:**
 ```json
@@ -287,20 +383,42 @@ Create a new job posting. Requires authentication.
 ```
 
 ### PUT /api/admin/jobs/{id}
-Update an existing job posting. Requires authentication.
+Update an existing job posting. Requires `jobs:update` permission (super_admin, editor).
 
 **Request:** Same as POST
 
 ### DELETE /api/admin/jobs/{id}
-Delete a job posting. Requires authentication.
+Delete a job posting. Requires `jobs:delete` permission (super_admin only).
 
 ### PATCH /api/admin/jobs/{id}/toggle-status
-Toggle the active status of a job posting.
+Toggle the active status of a job posting. Requires `jobs:toggle_status` permission (super_admin, editor).
+
+**Note:** Viewers cannot toggle job status.
 
 **Request:**
 ```json
 {
   "is_active": true
+}
+```
+
+### DELETE /api/admin/jobs/bulk
+Bulk delete job postings. Requires `jobs:delete` permission (super_admin only).
+
+**Request:**
+```json
+{
+  "ids": [1, 2, 3]
+}
+```
+
+### POST /api/admin/jobs/bulk-export
+Export selected jobs to CSV.
+
+**Request:**
+```json
+{
+  "ids": [1, 2, 3]
 }
 ```
 
@@ -341,6 +459,7 @@ List all employer requests with filtering and pagination. Requires authenticatio
 - `experience` (optional): Filter by experience level (0-3, 3-7, 7-10, 10+)
 - `search` (optional): Search by firm name, email, or position title
 - `page` (optional): Page number for pagination
+- `per_page` (optional): Items per page
 
 **Response:**
 ```json
@@ -363,16 +482,31 @@ List all employer requests with filtering and pagination. Requires authenticatio
   "meta": {
     "current_page": 1,
     "last_page": 3,
+    "per_page": 10,
     "total": 25
   }
 }
 ```
 
 ### DELETE /api/admin/employer-requests/{id}
-Delete an employer request. Requires authentication.
+Delete an employer request. Requires `employer_requests:delete` permission (super_admin only).
+
+**Authorization:** Editors and Viewers cannot delete employer requests.
 
 ### DELETE /api/admin/employer-requests/bulk
-Bulk delete employer requests. Requires authentication.
+Bulk delete employer requests. Requires `employer_requests:delete` permission (super_admin only).
+
+**Authorization:** Editors and Viewers cannot perform bulk delete.
+
+**Request:**
+```json
+{
+  "ids": [1, 2, 3]
+}
+```
+
+### POST /api/admin/employer-requests/bulk-export
+Export selected employer requests to CSV.
 
 **Request:**
 ```json
@@ -434,6 +568,8 @@ Schema::create('candidate_applications', function (Blueprint $table) {
     $table->string('country');
     $table->string('location');
     $table->enum('experience', ['0-3', '3-7', '7-10', '10+']);
+    $table->string('job_applied')->nullable();
+    $table->foreignId('job_id')->nullable()->constrained('job_postings')->nullOnDelete();
     $table->string('cv_path');
     $table->string('cover_letter_path');
     $table->timestamps();
@@ -458,6 +594,7 @@ Public endpoint for candidates to submit their application.
 - `cv`: file, required, mime: docx (application/vnd.openxmlformats-officedocument.wordprocessingml.document), max 5MB
 - `cover_letter`: file, required, mime: docx, max 5MB
 - `job_title`: string, optional (if applying for a specific job)
+- `job_id`: integer, optional (reference to job posting)
 
 **Response (Success):**
 ```json
@@ -514,6 +651,7 @@ List all blog posts with filtering and pagination. Requires authentication.
 - `status` (optional): Filter by status (published, draft)
 - `category` (optional): Filter by category
 - `page` (optional): Page number for pagination
+- `per_page` (optional): Items per page
 
 **Response:**
 ```json
@@ -537,13 +675,25 @@ List all blog posts with filtering and pagination. Requires authentication.
   "meta": {
     "current_page": 1,
     "last_page": 3,
+    "per_page": 10,
     "total": 25
   }
 }
 ```
 
+### GET /api/blog
+Public endpoint to list published blog posts.
+
+**Query Parameters:**
+- `search` (optional): Search by title or excerpt
+- `category` (optional): Filter by category
+- `page` (optional): Page number
+
+### GET /api/blog/{slug}
+Public endpoint to get a single published blog post by slug.
+
 ### POST /api/admin/blog
-Create a new blog post. Requires authentication.
+Create a new blog post. Requires `blog:create` permission (super_admin, editor).
 
 **Request:**
 ```json
@@ -571,15 +721,25 @@ Create a new blog post. Requires authentication.
 ```
 
 ### PUT /api/admin/blog/{id}
-Update an existing blog post. Requires authentication.
+Update an existing blog post. Requires `blog:update` permission (super_admin, editor).
 
 **Request:** Same as POST
 
 ### DELETE /api/admin/blog/{id}
-Delete a blog post. Requires authentication.
+Delete a blog post. Requires `blog:delete` permission (super_admin, editor).
+
+### DELETE /api/admin/blog/bulk
+Bulk delete blog posts. Requires `blog:delete` permission (super_admin, editor).
+
+**Request:**
+```json
+{
+  "ids": [1, 2, 3]
+}
+```
 
 ### PATCH /api/admin/blog/{id}/publish
-Toggle publish status of a blog post.
+Toggle publish status of a blog post. Requires `blog:update` permission.
 
 **Request:**
 ```json
@@ -671,7 +831,7 @@ Schema::create('blog_posts', function (Blueprint $table) {
 ## Admin Settings
 
 ### GET /api/admin/settings
-Get all admin settings.
+Get all admin settings. Requires authentication.
 
 **Response:**
 ```json
@@ -679,7 +839,18 @@ Get all admin settings.
   "branding": {
     "logo_url": "/storage/branding/logo.png",
     "company_name": "Global Outsourced Accounting",
-    "tagline": "Global Out Sourced Offshore Accounting Solutions"
+    "tagline": "Global Out Sourced Offshore Accounting Solutions",
+    "primary_color": "222 47% 11%",
+    "accent_color": "45 93% 47%"
+  },
+  "general": {
+    "theme_mode": "light",
+    "items_per_page": 10,
+    "date_format": "MM/DD/YYYY",
+    "time_format": "12h",
+    "currency_format": "USD",
+    "auto_archive_days": 90,
+    "auto_archive_enabled": false
   },
   "social_links": [
     {
@@ -719,18 +890,42 @@ Get all admin settings.
 ```
 
 ### PUT /api/admin/settings/branding
-Update branding settings.
+Update branding settings. Requires `settings:update` permission (super_admin only).
 
 **Request:**
 ```json
 {
   "company_name": "Global Outsourced Accounting",
-  "tagline": "Your tagline here"
+  "tagline": "Your tagline here",
+  "primary_color": "222 47% 11%",
+  "accent_color": "45 93% 47%"
 }
 ```
 
+### PUT /api/admin/settings/general
+Update general settings. Requires `settings:update` permission (super_admin only).
+
+**Request:**
+```json
+{
+  "theme_mode": "light",
+  "items_per_page": 10,
+  "date_format": "MM/DD/YYYY",
+  "time_format": "12h",
+  "currency_format": "USD",
+  "auto_archive_days": 90,
+  "auto_archive_enabled": false
+}
+```
+
+**Valid Values:**
+- `theme_mode`: "light", "dark", "system"
+- `date_format`: "MM/DD/YYYY", "DD/MM/YYYY", "YYYY-MM-DD"
+- `time_format`: "12h", "24h"
+- `currency_format`: "USD", "EUR", "GBP", "AUD", "CAD"
+
 ### POST /api/admin/settings/branding/logo
-Upload company logo.
+Upload company logo. Requires `settings:update` permission (super_admin only).
 
 **Request:** multipart/form-data
 - `logo`: Image file (PNG, JPG, SVG, max 2MB)
@@ -743,14 +938,14 @@ Upload company logo.
 ```
 
 ### DELETE /api/admin/settings/branding/logo
-Remove company logo.
+Remove company logo. Requires `settings:update` permission (super_admin only).
 
 ---
 
 ## Social Links
 
 ### POST /api/admin/settings/social-links
-Create a new social link.
+Create a new social link. Requires `settings:update` permission (super_admin only).
 
 **Request:**
 ```json
@@ -763,17 +958,17 @@ Create a new social link.
 ```
 
 ### PUT /api/admin/settings/social-links/{id}
-Update a social link.
+Update a social link. Requires `settings:update` permission.
 
 ### DELETE /api/admin/settings/social-links/{id}
-Delete a social link.
+Delete a social link. Requires `settings:update` permission.
 
 ---
 
 ## Blog Categories
 
 ### POST /api/admin/settings/blog-categories
-Create a new category.
+Create a new category. Requires `settings:update` permission (super_admin only).
 
 **Request:**
 ```json
@@ -785,17 +980,17 @@ Create a new category.
 ```
 
 ### PUT /api/admin/settings/blog-categories/{id}
-Update a category.
+Update a category. Requires `settings:update` permission.
 
 ### DELETE /api/admin/settings/blog-categories/{id}
-Delete a category. Cannot delete default categories.
+Delete a category. Cannot delete default categories. Requires `settings:update` permission.
 
 ---
 
 ## Experience Levels
 
 ### POST /api/admin/settings/experience-levels
-Create a new experience level.
+Create a new experience level. Requires `settings:update` permission (super_admin only).
 
 **Request:**
 ```json
@@ -806,17 +1001,17 @@ Create a new experience level.
 ```
 
 ### PUT /api/admin/settings/experience-levels/{id}
-Update an experience level.
+Update an experience level. Requires `settings:update` permission.
 
 ### DELETE /api/admin/settings/experience-levels/{id}
-Delete an experience level. Cannot delete default levels.
+Delete an experience level. Cannot delete default levels. Requires `settings:update` permission.
 
 ---
 
 ## Notification Preferences
 
 ### PUT /api/admin/settings/notifications
-Update notification preferences.
+Update notification preferences. Requires `settings:update` permission (super_admin only).
 
 **Request:**
 ```json
@@ -830,12 +1025,15 @@ Update notification preferences.
 }
 ```
 
+**Valid Values:**
+- `email_digest_frequency`: "instant", "daily", "weekly", "never"
+
 ---
 
 ## Admin Users & Roles
 
 ### GET /api/admin/users
-List all admin users.
+List all admin users. Requires `users:view` permission (super_admin only).
 
 **Response:**
 ```json
@@ -854,7 +1052,7 @@ List all admin users.
 ```
 
 ### POST /api/admin/users
-Create/invite a new admin user. Requires super_admin role.
+Create/invite a new admin user. Requires `users:create` permission (super_admin only).
 
 **Request:**
 ```json
@@ -866,7 +1064,7 @@ Create/invite a new admin user. Requires super_admin role.
 ```
 
 ### PUT /api/admin/users/{id}/role
-Update user role. Requires super_admin role.
+Update user role. Requires `users:update` permission (super_admin only).
 
 **Request:**
 ```json
@@ -876,7 +1074,7 @@ Update user role. Requires super_admin role.
 ```
 
 ### DELETE /api/admin/users/{id}
-Delete an admin user. Requires super_admin role.
+Delete an admin user. Requires `users:delete` permission (super_admin only).
 
 ---
 
@@ -885,8 +1083,23 @@ Delete an admin user. Requires super_admin role.
 | Role | Permissions |
 |------|-------------|
 | super_admin | Full access to all features and settings |
-| editor | Can manage blog posts and job postings only |
-| viewer | Read-only access to all data |
+| editor | Can manage blog posts and job postings, view all other data |
+| viewer | Read-only access to all data, no downloads, no dashboard charts |
+
+### Frontend UI Restrictions by Role
+
+| UI Element | Super Admin | Editor | Viewer |
+|------------|-------------|--------|--------|
+| Dashboard Charts | Visible | Visible | Hidden |
+| Dashboard Quick Actions | Full | Limited | View Only |
+| Action Buttons | Full | Module-specific | "View" only |
+| Delete Buttons | Visible | Limited | Hidden |
+| Status Toggles | Enabled | Enabled | Disabled |
+| CV/Cover Letter Download | Enabled | Enabled | Hidden |
+| Bulk Actions | Full | Limited | Hidden |
+| Settings Edit | Enabled | Disabled | Disabled |
+| Audit Log Access | Visible | Hidden | Hidden |
+| Role Badge in Header | "Admin" | "Editor" | "Viewer" |
 
 ### Laravel Migration for Admin Roles
 
@@ -916,7 +1129,7 @@ Schema::create('settings', function (Blueprint $table) {
 // - branding.logo_url
 // - branding.primary_color
 // - branding.accent_color
-// - general.theme_mode
+// - general.theme_mode (default: 'light')
 // - general.items_per_page
 // - general.date_format
 // - general.time_format
@@ -963,13 +1176,16 @@ Schema::create('experience_levels', function (Blueprint $table) {
 ## Audit Logs
 
 ### GET /api/admin/audit-logs
-List all audit log entries with filtering. Requires authentication.
+List all audit log entries with filtering. Requires `audit_logs:view` permission (super_admin only).
 
 **Query Parameters:**
 - `module` (optional): Filter by module (candidates, jobs, employer_requests, blog)
-- `action` (optional): Filter by action type (create, update, delete, archive, publish)
+- `action` (optional): Filter by action type (create, update, delete, archive, deactivate, activate, publish, unpublish)
 - `user_id` (optional): Filter by user ID
+- `date_from` (optional): Filter from date (YYYY-MM-DD)
+- `date_to` (optional): Filter to date (YYYY-MM-DD)
 - `page` (optional): Page number for pagination
+- `per_page` (optional): Items per page
 
 **Response:**
 ```json
@@ -992,12 +1208,14 @@ List all audit log entries with filtering. Requires authentication.
           "old_value": "$50,000 - $60,000",
           "new_value": "$55,000 - $65,000"
         }
-      ]
+      ],
+      "metadata": {}
     }
   ],
   "meta": {
     "current_page": 1,
     "last_page": 10,
+    "per_page": 50,
     "total": 250
   }
 }
@@ -1023,6 +1241,7 @@ Schema::create('audit_logs', function (Blueprint $table) {
     
     $table->index(['module', 'timestamp']);
     $table->index(['user_id', 'timestamp']);
+    $table->index(['action', 'timestamp']);
 });
 ```
 
@@ -1069,10 +1288,161 @@ Job postings support the following work types:
 
 ---
 
+## Experience Levels
+
+Default experience levels (configurable in settings):
+
+| Value | Label |
+|-------|-------|
+| 0-3 | 0-3 years |
+| 3-7 | 3-7 years |
+| 7-10 | 7-10 years |
+| 10+ | 10+ years |
+
+---
+
+## Pagination
+
+All list endpoints support pagination with the following standard meta structure:
+
+```json
+{
+  "meta": {
+    "current_page": 1,
+    "last_page": 10,
+    "per_page": 10,
+    "total": 100
+  }
+}
+```
+
+The `per_page` value defaults to the global `items_per_page` setting but can be overridden per request.
+
+---
+
+## Error Responses
+
+### Standard Error Format
+
+```json
+{
+  "message": "Error description",
+  "errors": {
+    "field_name": ["Validation error message"]
+  }
+}
+```
+
+### HTTP Status Codes
+
+| Code | Description |
+|------|-------------|
+| 200 | Success |
+| 201 | Created |
+| 400 | Bad Request |
+| 401 | Unauthorized |
+| 403 | Forbidden (insufficient permissions) |
+| 404 | Not Found |
+| 422 | Validation Error |
+| 500 | Server Error |
+
+---
+
 ## Environment Variables (Laravel .env)
 
 ```env
 ADMIN_NOTIFICATION_EMAIL=hr@yourcompany.com
 SANCTUM_STATEFUL_DOMAINS=localhost:5173,your-frontend.com
 SESSION_DOMAIN=.yourdomain.com
+
+# Default theme mode for new users
+DEFAULT_THEME_MODE=light
+```
+
+---
+
+## Laravel Middleware Example
+
+```php
+// app/Http/Middleware/CheckAdminRole.php
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+
+class CheckAdminRole
+{
+    public function handle(Request $request, Closure $next, ...$roles)
+    {
+        $user = $request->user();
+        
+        if (!$user || !$user->adminUser) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+        
+        $userRole = $user->adminUser->role;
+        
+        if (!in_array($userRole, $roles)) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+        
+        return $next($request);
+    }
+}
+
+// Usage in routes:
+Route::middleware(['auth:sanctum', 'admin.role:super_admin'])->group(function () {
+    Route::delete('/admin/employer-requests/{id}', [EmployerRequestController::class, 'destroy']);
+    Route::put('/admin/settings/general', [SettingsController::class, 'updateGeneral']);
+});
+
+Route::middleware(['auth:sanctum', 'admin.role:super_admin,editor'])->group(function () {
+    Route::post('/admin/jobs', [JobController::class, 'store']);
+    Route::put('/admin/jobs/{id}', [JobController::class, 'update']);
+});
+```
+
+---
+
+## Permission Helper Example
+
+```php
+// app/Helpers/PermissionHelper.php
+namespace App\Helpers;
+
+class PermissionHelper
+{
+    const PERMISSIONS = [
+        'super_admin' => [
+            'candidates:view', 'candidates:create', 'candidates:update', 'candidates:delete', 'candidates:download',
+            'jobs:view', 'jobs:create', 'jobs:update', 'jobs:delete', 'jobs:archive', 'jobs:toggle_status',
+            'employer_requests:view', 'employer_requests:delete',
+            'blog:view', 'blog:create', 'blog:update', 'blog:delete',
+            'settings:view', 'settings:update',
+            'users:view', 'users:create', 'users:update', 'users:delete',
+            'audit_logs:view',
+            'dashboard:charts',
+        ],
+        'editor' => [
+            'candidates:view', 'candidates:download',
+            'jobs:view', 'jobs:create', 'jobs:update', 'jobs:archive', 'jobs:toggle_status',
+            'employer_requests:view',
+            'blog:view', 'blog:create', 'blog:update', 'blog:delete',
+            'settings:view',
+            'dashboard:charts',
+        ],
+        'viewer' => [
+            'candidates:view',
+            'jobs:view',
+            'employer_requests:view',
+            'blog:view',
+            'settings:view',
+        ],
+    ];
+    
+    public static function hasPermission(string $role, string $permission): bool
+    {
+        return in_array($permission, self::PERMISSIONS[$role] ?? []);
+    }
+}
 ```
