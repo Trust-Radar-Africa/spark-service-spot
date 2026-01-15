@@ -166,7 +166,7 @@ export const useSettingsStore = create<SettingsState>()(
 
       // General Settings
       general: {
-        themeMode: 'system',
+        themeMode: 'light',
         itemsPerPage: 10,
         dateFormat: 'MM/DD/YYYY',
         timeFormat: '12h',
