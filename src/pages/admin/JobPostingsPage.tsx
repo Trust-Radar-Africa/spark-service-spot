@@ -442,10 +442,9 @@ export default function JobPostingsPage() {
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <h1 className="text-xl sm:text-2xl font-bold">Job Postings</h1>
-                <Button variant="ghost" size="sm" className="h-7 px-2 text-xs text-muted-foreground" asChild>
+                <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground" asChild title="View Page">
                   <Link to="/careers" target="_blank">
-                    <ExternalLink className="h-3 w-3 mr-1" />
-                    View Page
+                    <ExternalLink className="h-3.5 w-3.5" />
                   </Link>
                 </Button>
               </div>
