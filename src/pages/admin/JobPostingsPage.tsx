@@ -100,8 +100,15 @@ const getStoredItemsPerPage = (): ItemsPerPageOption => {
   return 5;
 };
 
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
+import { useAuditLogger } from '@/stores/auditLogStore';
+import { useAdminAuth } from '@/contexts/AdminAuthContext';
+
 export default function JobPostingsPage() {
   const { jobs, isLoading, fetchJobs, addJob, updateJob, deleteJob, toggleJobStatus } = useJobPostingsStore();
+  const { canDelete, canCreate, canUpdate, isViewer } = useAdminPermissions();
+  const { user } = useAdminAuth();
+  const { logAction } = useAuditLogger();
   
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
@@ -109,6 +116,7 @@ export default function JobPostingsPage() {
   const [locationFilter, setLocationFilter] = useState('');
   const [workTypeFilter, setWorkTypeFilter] = useState<WorkType | ''>('');
   const [experienceFilter, setExperienceFilter] = useState('');
+  const [salaryFilter, setSalaryFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPageOption>(getStoredItemsPerPage);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -121,8 +129,8 @@ export default function JobPostingsPage() {
   const { toast } = useToast();
   const { sortKey, sortDirection, handleSort, sortData } = useSorting<JobPosting>();
 
-  const hasActiveFilters = !!(searchQuery || countryFilter || locationFilter || workTypeFilter || experienceFilter || statusFilter !== 'all');
-  const activeFilterCount = [countryFilter, locationFilter, workTypeFilter, experienceFilter, statusFilter !== 'all' ? statusFilter : ''].filter(Boolean).length;
+  const hasActiveFilters = !!(searchQuery || countryFilter || locationFilter || workTypeFilter || experienceFilter || salaryFilter || statusFilter !== 'all');
+  const activeFilterCount = [countryFilter, locationFilter, workTypeFilter, experienceFilter, salaryFilter, statusFilter !== 'all' ? statusFilter : ''].filter(Boolean).length;
 
   useEffect(() => {
     fetchJobs();
@@ -139,7 +147,7 @@ export default function JobPostingsPage() {
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, statusFilter, countryFilter, locationFilter, workTypeFilter, experienceFilter]);
+  }, [searchQuery, statusFilter, countryFilter, locationFilter, workTypeFilter, experienceFilter, salaryFilter]);
 
   // Filter and sort jobs
   const filteredJobs = useMemo(() => {
@@ -177,8 +185,22 @@ export default function JobPostingsPage() {
       filtered = filtered.filter((job) => job.experience_required === experienceFilter);
     }
 
+    if (salaryFilter) {
+      filtered = filtered.filter((job) => {
+        if (!job.salary_range) return false;
+        const minSalary = parseInt(job.salary_range.split('-')[0].replace(/\D/g, '')) || 0;
+        switch (salaryFilter) {
+          case '0-50000': return minSalary < 50000;
+          case '50000-100000': return minSalary >= 50000 && minSalary < 100000;
+          case '100000-150000': return minSalary >= 100000 && minSalary < 150000;
+          case '150000+': return minSalary >= 150000;
+          default: return true;
+        }
+      });
+    }
+
     return sortData(filtered);
-  }, [jobs, searchQuery, statusFilter, countryFilter, locationFilter, workTypeFilter, experienceFilter, sortKey, sortDirection]);
+  }, [jobs, searchQuery, statusFilter, countryFilter, locationFilter, workTypeFilter, experienceFilter, salaryFilter, sortKey, sortDirection]);
 
   // Bulk selection
   const {
