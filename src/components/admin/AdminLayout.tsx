@@ -21,17 +21,19 @@ import {
   X,
   Settings,
   ChevronDown,
+  History,
 } from 'lucide-react';
 import NotificationsDropdown from './NotificationsDropdown';
 import { ThemeToggle } from './ThemeToggle';
 import { useSettingsStore } from '@/stores/settingsStore';
+import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import Breadcrumbs from './Breadcrumbs';
 
 interface AdminLayoutProps {
   children: ReactNode;
 }
 
-const navigation = [
+const baseNavigation = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { name: 'Candidates', href: '/admin/candidates', icon: Users },
   { name: 'Job Postings', href: '/admin/jobs', icon: Briefcase },
@@ -42,9 +44,15 @@ const navigation = [
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const { user, logout } = useAdminAuth();
   const { branding } = useSettingsStore();
+  const { isAdmin } = useAdminPermissions();
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Add Audit Log for super admins only
+  const navigation = isAdmin 
+    ? [...baseNavigation, { name: 'Audit Log', href: '/admin/audit-log', icon: History }]
+    : baseNavigation;
 
   const handleLogout = async () => {
     await logout();

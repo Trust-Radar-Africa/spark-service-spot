@@ -39,6 +39,7 @@ import JobPostingsPage from "./pages/admin/JobPostingsPage";
 import EmployerRequestsPage from "./pages/admin/EmployerRequestsPage";
 import BlogManagementPage from "./pages/admin/BlogManagementPage";
 import SettingsPage from "./pages/admin/SettingsPage";
+import AuditLogPage from "./pages/admin/AuditLogPage";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
 
 import NotFound from "./pages/NotFound";
@@ -146,6 +147,14 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <SettingsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/audit-log"
+                  element={
+                    <ProtectedRoute>
+                      <AuditLogPage />
                     </ProtectedRoute>
                   }
                 />
