@@ -13,7 +13,7 @@ const ThemeVersionContext = createContext<ThemeVersionContextType | undefined>(u
 export function ThemeVersionProvider({ children }: { children: ReactNode }) {
   const [version, setVersion] = useState<ThemeVersion>(() => {
     const saved = localStorage.getItem("theme-version");
-    return (saved as ThemeVersion) || "classic";
+    return (saved as ThemeVersion) || "modern";
   });
 
   useEffect(() => {
