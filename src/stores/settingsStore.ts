@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { useApiConfigStore } from './apiConfigStore';
 
 // Types
 export interface SocialLink {
@@ -91,13 +92,16 @@ export const ROLE_PERMISSIONS: Record<AdminRole, {
 };
 
 interface SettingsState {
+  // Loading state
+  isLoading: boolean;
+
   // Branding
   branding: BrandingSettings;
-  setBranding: (branding: Partial<BrandingSettings>) => void;
+  setBranding: (branding: Partial<BrandingSettings>) => Promise<void>;
 
   // General Settings
   general: GeneralSettings;
-  setGeneral: (settings: Partial<GeneralSettings>) => void;
+  setGeneral: (settings: Partial<GeneralSettings>) => Promise<void>;
 
   // Social Links
   socialLinks: SocialLink[];
@@ -120,11 +124,16 @@ interface SettingsState {
 
   // Notification Preferences
   notifications: NotificationPreferences;
-  setNotifications: (prefs: Partial<NotificationPreferences>) => void;
+  setNotifications: (prefs: Partial<NotificationPreferences>) => Promise<void>;
 
   // Admin Users (for display, managed by Laravel)
   adminUsers: AdminUser[];
   setAdminUsers: (users: AdminUser[]) => void;
+
+  // Live mode functions
+  fetchSettings: () => Promise<void>;
+  fetchAdminUsers: () => Promise<void>;
+  saveSettingsToApi: () => Promise<void>;
 }
 
 const defaultBlogCategories: BlogCategory[] = [
@@ -150,7 +159,10 @@ const defaultSocialLinks: SocialLink[] = [
 
 export const useSettingsStore = create<SettingsState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
+      // Loading state
+      isLoading: false,
+
       // Branding
       branding: {
         logoUrl: null,
@@ -159,10 +171,17 @@ export const useSettingsStore = create<SettingsState>()(
         primaryColor: '220 60% 20%',
         accentColor: '38 92% 50%',
       },
-      setBranding: (branding) =>
+      setBranding: async (branding) => {
         set((state) => ({
           branding: { ...state.branding, ...branding },
-        })),
+        }));
+
+        // Save to API if in live mode
+        const { isLiveMode } = useApiConfigStore.getState();
+        if (isLiveMode()) {
+          await get().saveSettingsToApi();
+        }
+      },
 
       // General Settings
       general: {
@@ -174,10 +193,17 @@ export const useSettingsStore = create<SettingsState>()(
         autoArchiveDays: 90,
         autoArchiveEnabled: false,
       },
-      setGeneral: (settings) =>
+      setGeneral: async (settings) => {
         set((state) => ({
           general: { ...state.general, ...settings },
-        })),
+        }));
+
+        // Save to API if in live mode
+        const { isLiveMode } = useApiConfigStore.getState();
+        if (isLiveMode()) {
+          await get().saveSettingsToApi();
+        }
+      },
 
       // Social Links
       socialLinks: defaultSocialLinks,
@@ -246,10 +272,17 @@ export const useSettingsStore = create<SettingsState>()(
         employerThreshold: 5,
         thresholdAlertEnabled: true,
       },
-      setNotifications: (prefs) =>
+      setNotifications: async (prefs) => {
         set((state) => ({
           notifications: { ...state.notifications, ...prefs },
-        })),
+        }));
+
+        // Save to API if in live mode
+        const { isLiveMode } = useApiConfigStore.getState();
+        if (isLiveMode()) {
+          await get().saveSettingsToApi();
+        }
+      },
 
       // Admin Users - includes test users for different roles
       adminUsers: [
@@ -279,6 +312,107 @@ export const useSettingsStore = create<SettingsState>()(
         },
       ],
       setAdminUsers: (users) => set({ adminUsers: users }),
+
+      // Live mode functions
+      fetchSettings: async () => {
+        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+
+        if (!isLiveMode()) return;
+
+        set({ isLoading: true });
+
+        try {
+          const token = localStorage.getItem('admin_token');
+          const response = await fetch(`${apiBaseUrl}/api/admin/settings`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Accept: 'application/json',
+            },
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            const settings = data.data || data;
+
+            // Update store with fetched settings
+            if (settings.branding) {
+              set((state) => ({ branding: { ...state.branding, ...settings.branding } }));
+            }
+            if (settings.general) {
+              set((state) => ({ general: { ...state.general, ...settings.general } }));
+            }
+            if (settings.notifications) {
+              set((state) => ({ notifications: { ...state.notifications, ...settings.notifications } }));
+            }
+            if (settings.socialLinks) {
+              set({ socialLinks: settings.socialLinks });
+            }
+            if (settings.blogCategories) {
+              set({ blogCategories: settings.blogCategories });
+            }
+            if (settings.experienceLevels) {
+              set({ experienceLevels: settings.experienceLevels });
+            }
+          }
+        } catch (error) {
+          console.error('Failed to fetch settings from API:', error);
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      fetchAdminUsers: async () => {
+        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+
+        if (!isLiveMode()) return;
+
+        try {
+          const token = localStorage.getItem('admin_token');
+          const response = await fetch(`${apiBaseUrl}/api/admin/users`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Accept: 'application/json',
+            },
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            set({ adminUsers: data.data || data });
+          }
+        } catch (error) {
+          console.error('Failed to fetch admin users from API:', error);
+        }
+      },
+
+      saveSettingsToApi: async () => {
+        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+
+        if (!isLiveMode()) return;
+
+        try {
+          const token = localStorage.getItem('admin_token');
+          const state = get();
+
+          await fetch(`${apiBaseUrl}/api/admin/settings`, {
+            method: 'PUT',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              branding: state.branding,
+              general: state.general,
+              notifications: state.notifications,
+              socialLinks: state.socialLinks,
+              blogCategories: state.blogCategories,
+              experienceLevels: state.experienceLevels,
+            }),
+          });
+        } catch (error) {
+          console.error('Failed to save settings to API:', error);
+        }
+      },
     }),
     {
       name: 'admin-settings',

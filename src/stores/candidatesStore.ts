@@ -6,7 +6,7 @@ interface CandidatesState {
   candidates: CandidateApplication[];
   isLoading: boolean;
   fetchCandidates: () => Promise<void>;
-  deleteCandidate: (id: number) => void;
+  deleteCandidate: (id: number) => Promise<void>;
 }
 
 // Demo data for testing
@@ -141,22 +141,43 @@ const mockCandidates: CandidateApplication[] = [
   },
 ];
 
+// Normalize candidate data from API (handles object fields)
+const normalizeCandidate = (candidate: any): CandidateApplication => ({
+  ...candidate,
+  // Handle nationality as object {id, name} or string
+  nationality: typeof candidate.nationality === 'object' && candidate.nationality !== null
+    ? candidate.nationality.name || ''
+    : candidate.nationality || '',
+  // Handle country as object {id, name, slug} or string
+  country: typeof candidate.country === 'object' && candidate.country !== null
+    ? candidate.country.name || ''
+    : candidate.country || '',
+  // Handle location as object {id, name} or string
+  location: typeof candidate.location === 'object' && candidate.location !== null
+    ? candidate.location.name || ''
+    : candidate.location || '',
+  // Handle job_applied as object {id, title} or string
+  job_applied: typeof candidate.job_applied === 'object' && candidate.job_applied !== null
+    ? candidate.job_applied.title || candidate.job_applied.name || ''
+    : candidate.job_applied || '',
+});
+
 export const useCandidatesStore = create<CandidatesState>((set) => ({
   candidates: mockCandidates,
   isLoading: false,
 
   fetchCandidates: async () => {
     const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
-    
+
     set({ isLoading: true });
-    
+
     // If in demo mode, reset to mock data with a small delay for UX
     if (!isLiveMode()) {
       await new Promise(resolve => setTimeout(resolve, 300));
       set({ candidates: [...mockCandidates], isLoading: false });
       return;
     }
-    
+
     try {
       const token = localStorage.getItem('admin_token');
       const response = await fetch(`${apiBaseUrl}/api/admin/candidates`, {
@@ -167,7 +188,12 @@ export const useCandidatesStore = create<CandidatesState>((set) => ({
       });
       if (response.ok) {
         const data = await response.json();
-        set({ candidates: data.data || data, isLoading: false });
+        const rawCandidates = data.data || data;
+        // Normalize candidates to handle object fields
+        const normalizedCandidates = Array.isArray(rawCandidates)
+          ? rawCandidates.map(normalizeCandidate)
+          : [];
+        set({ candidates: normalizedCandidates, isLoading: false });
         return;
       }
     } catch (error) {
@@ -177,9 +203,28 @@ export const useCandidatesStore = create<CandidatesState>((set) => ({
     set({ candidates: [...mockCandidates], isLoading: false });
   },
 
-  deleteCandidate: (id: number) => {
+  deleteCandidate: async (id: number) => {
+    const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+
+    // Optimistically update UI
     set((state) => ({
       candidates: state.candidates.filter((c) => c.id !== id),
     }));
+
+    // Call API if in live mode
+    if (isLiveMode()) {
+      try {
+        const token = localStorage.getItem('admin_token');
+        await fetch(`${apiBaseUrl}/api/admin/candidates/${id}`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: 'application/json',
+          },
+        });
+      } catch (error) {
+        console.error('Failed to delete candidate from API:', error);
+      }
+    }
   },
 }));

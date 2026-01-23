@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { useApiConfigStore } from './apiConfigStore';
 
 export interface BlogPostData {
   id: number;
@@ -19,10 +20,11 @@ export interface BlogPostData {
 interface BlogPostsState {
   posts: BlogPostData[];
   isLoading: boolean;
-  addPost: (post: Omit<BlogPostData, 'id' | 'created_at' | 'updated_at'>) => BlogPostData;
-  updatePost: (id: number, data: Partial<BlogPostData>) => void;
-  deletePost: (id: number) => void;
-  togglePublish: (id: number) => void;
+  fetchPosts: () => Promise<void>;
+  addPost: (post: Omit<BlogPostData, 'id' | 'created_at' | 'updated_at'>) => Promise<BlogPostData>;
+  updatePost: (id: number, data: Partial<BlogPostData>) => Promise<void>;
+  deletePost: (id: number) => Promise<void>;
+  togglePublish: (id: number) => Promise<void>;
   getPost: (id: number) => BlogPostData | undefined;
 }
 
@@ -205,13 +207,97 @@ const initialPosts: BlogPostData[] = [
   },
 ];
 
+// Normalize blog post data from API (handles object fields like category, author)
+const normalizePost = (post: any): BlogPostData => ({
+  ...post,
+  // Handle category as object {id, name, slug} or string
+  category: typeof post.category === 'object' && post.category !== null
+    ? post.category.name || post.category.slug || ''
+    : post.category || '',
+  // Handle author as object {id, name} or string
+  author: typeof post.author === 'object' && post.author !== null
+    ? post.author.name || ''
+    : post.author || '',
+});
+
 export const useBlogPostsStore = create<BlogPostsState>()(
   persist(
     (set, get) => ({
       posts: initialPosts,
       isLoading: false,
 
-      addPost: (postData) => {
+      fetchPosts: async () => {
+        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+
+        set({ isLoading: true });
+
+        // If in demo mode, reset to initial data with a small delay for UX
+        if (!isLiveMode()) {
+          await new Promise(resolve => setTimeout(resolve, 300));
+          set({ posts: [...initialPosts], isLoading: false });
+          return;
+        }
+
+        try {
+          const token = localStorage.getItem('admin_token');
+          const response = await fetch(`${apiBaseUrl}/api/admin/blog`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Accept: 'application/json',
+            },
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            const rawPosts = data.data || data;
+            // Normalize posts to handle object fields
+            const normalizedPosts = Array.isArray(rawPosts)
+              ? rawPosts.map(normalizePost)
+              : [];
+            set({ posts: normalizedPosts, isLoading: false });
+            return;
+          }
+        } catch (error) {
+          console.log('Using demo data for blog posts');
+        }
+        // Fall back to demo data
+        set({ posts: [...initialPosts], isLoading: false });
+      },
+
+      addPost: async (postData) => {
+        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+
+        if (isLiveMode()) {
+          try {
+            const token = localStorage.getItem('admin_token');
+            const response = await fetch(`${apiBaseUrl}/api/admin/blog`, {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                ...postData,
+                slug: postData.slug || generateSlug(postData.title),
+              }),
+            });
+
+            if (response.ok) {
+              const result = await response.json();
+              const rawPost = result.data || result.post || result;
+              const newPost = normalizePost(rawPost);
+              set((state) => ({
+                posts: [newPost, ...state.posts],
+              }));
+              return newPost;
+            }
+          } catch (error) {
+            console.error('Failed to create blog post via API:', error);
+          }
+        }
+
+        // Fallback for demo mode
         const newPost: BlogPostData = {
           ...postData,
           id: Date.now(),
@@ -225,7 +311,10 @@ export const useBlogPostsStore = create<BlogPostsState>()(
         return newPost;
       },
 
-      updatePost: (id, data) => {
+      updatePost: async (id, data) => {
+        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+
+        // Optimistically update UI
         set((state) => ({
           posts: state.posts.map((post) =>
             post.id === id
@@ -238,27 +327,84 @@ export const useBlogPostsStore = create<BlogPostsState>()(
               : post
           ),
         }));
+
+        if (isLiveMode()) {
+          try {
+            const token = localStorage.getItem('admin_token');
+            await fetch(`${apiBaseUrl}/api/admin/blog/${id}`, {
+              method: 'PUT',
+              headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(data),
+            });
+          } catch (error) {
+            console.error('Failed to update blog post via API:', error);
+          }
+        }
       },
 
-      deletePost: (id) => {
+      deletePost: async (id) => {
+        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+
+        // Optimistically update UI
         set((state) => ({
           posts: state.posts.filter((post) => post.id !== id),
         }));
+
+        if (isLiveMode()) {
+          try {
+            const token = localStorage.getItem('admin_token');
+            await fetch(`${apiBaseUrl}/api/admin/blog/${id}`, {
+              method: 'DELETE',
+              headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: 'application/json',
+              },
+            });
+          } catch (error) {
+            console.error('Failed to delete blog post via API:', error);
+          }
+        }
       },
 
-      togglePublish: (id) => {
+      togglePublish: async (id) => {
+        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+        const post = get().posts.find(p => p.id === id);
+        const newPublishState = post ? !post.is_published : false;
+
+        // Optimistically update UI
         set((state) => ({
           posts: state.posts.map((post) =>
             post.id === id
               ? {
                   ...post,
-                  is_published: !post.is_published,
-                  published_at: !post.is_published ? new Date().toISOString() : null,
+                  is_published: newPublishState,
+                  published_at: newPublishState ? new Date().toISOString() : null,
                   updated_at: new Date().toISOString(),
                 }
               : post
           ),
         }));
+
+        if (isLiveMode()) {
+          try {
+            const token = localStorage.getItem('admin_token');
+            await fetch(`${apiBaseUrl}/api/admin/blog/${id}/toggle-publish`, {
+              method: 'PATCH',
+              headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ is_published: newPublishState }),
+            });
+          } catch (error) {
+            console.error('Failed to toggle blog post publish status via API:', error);
+          }
+        }
       },
 
       getPost: (id) => {

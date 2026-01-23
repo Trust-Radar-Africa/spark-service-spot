@@ -27,6 +27,7 @@ import {
   CollapsibleContent,
 } from '@/components/ui/collapsible';
 import { useBlogPostsStore, BlogPostData } from '@/stores/blogPostsStore';
+import { useApiConfigStore } from '@/stores/apiConfigStore';
 import {
   FileText,
   Search,
@@ -78,12 +79,18 @@ const getStoredItemsPerPage = (): ItemsPerPageOption => {
 };
 
 export default function BlogManagementPage() {
-  const { posts, addPost, updatePost, deletePost, togglePublish } = useBlogPostsStore();
+  const { posts, addPost, updatePost, deletePost, togglePublish, fetchPosts, isLoading } = useBlogPostsStore();
+  const { isLiveMode } = useApiConfigStore();
   const { toast } = useToast();
   const { sortKey, sortDirection, handleSort, sortData } = useSorting<BlogPostData>();
   const { canDelete, canCreate, canUpdate, isViewer } = useAdminPermissions();
   const { user } = useAdminAuth();
   const { logAction } = useAuditLogger();
+
+  // Fetch blog posts from API on mount when in live mode
+  useEffect(() => {
+    fetchPosts();
+  }, [fetchPosts]);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');

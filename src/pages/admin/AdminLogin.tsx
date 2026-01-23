@@ -87,13 +87,15 @@ export default function AdminLogin() {
               )}
             </Button>
             
-            <div className="mt-4 p-3 bg-muted rounded-lg text-center">
-              <p className="text-xs text-muted-foreground">
-                <strong>Demo credentials:</strong><br />
-                Email: admin@demo.com<br />
-                Password: demo123
-              </p>
-            </div>
+            {!import.meta.env.VITE_LARAVEL_API_URL && (
+              <div className="mt-4 p-3 bg-muted rounded-lg text-center">
+                <p className="text-xs text-muted-foreground">
+                  <strong>Demo credentials:</strong><br />
+                  Email: admin@demo.com<br />
+                  Password: demo123
+                </p>
+              </div>
+            )}
           </form>
         </CardContent>
       </Card>

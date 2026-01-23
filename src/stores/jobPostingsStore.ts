@@ -160,19 +160,32 @@ const initialJobs: JobPosting[] = [
 interface JobPostingsState {
   jobs: JobPosting[];
   isLoading: boolean;
-  
+
   // Actions
   fetchJobs: () => Promise<void>;
-  addJob: (data: JobPostingFormData) => JobPosting;
-  updateJob: (id: number, data: JobPostingFormData) => void;
-  deleteJob: (id: number) => void;
-  toggleJobStatus: (id: number) => void;
-  archiveJob: (id: number) => void;
-  
+  addJob: (data: JobPostingFormData) => Promise<JobPosting>;
+  updateJob: (id: number, data: JobPostingFormData) => Promise<void>;
+  deleteJob: (id: number) => Promise<void>;
+  toggleJobStatus: (id: number) => Promise<void>;
+  archiveJob: (id: number) => Promise<void>;
+
   // Getters
   getActiveJobs: () => JobPosting[];
   getJobById: (id: number) => JobPosting | undefined;
 }
+
+// Normalize job data from API (handles object fields like country, location)
+const normalizeJob = (job: any): JobPosting => ({
+  ...job,
+  // Handle country as object {id, name, slug} or string
+  country: typeof job.country === 'object' && job.country !== null
+    ? job.country.name || ''
+    : job.country || '',
+  // Handle location as object {id, name} or string
+  location: typeof job.location === 'object' && job.location !== null
+    ? job.location.name || ''
+    : job.location || '',
+});
 
 export const useJobPostingsStore = create<JobPostingsState>()(
   persist(
@@ -194,7 +207,7 @@ export const useJobPostingsStore = create<JobPostingsState>()(
         
         try {
           const token = localStorage.getItem('admin_token');
-          const response = await fetch(`${apiBaseUrl}/api/admin/job-postings`, {
+          const response = await fetch(`${apiBaseUrl}/api/admin/jobs`, {
             headers: {
               Authorization: `Bearer ${token}`,
               Accept: 'application/json',
@@ -202,7 +215,12 @@ export const useJobPostingsStore = create<JobPostingsState>()(
           });
           if (response.ok) {
             const data = await response.json();
-            set({ jobs: data.data || data, isLoading: false });
+            const rawJobs = data.data || data;
+            // Normalize jobs to handle object fields
+            const normalizedJobs = Array.isArray(rawJobs)
+              ? rawJobs.map(normalizeJob)
+              : [];
+            set({ jobs: normalizedJobs, isLoading: false });
             return;
           }
         } catch (error) {
@@ -212,7 +230,34 @@ export const useJobPostingsStore = create<JobPostingsState>()(
         set({ jobs: [...initialJobs], isLoading: false });
       },
       
-      addJob: (data: JobPostingFormData) => {
+      addJob: async (data: JobPostingFormData) => {
+        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+
+        if (isLiveMode()) {
+          try {
+            const token = localStorage.getItem('admin_token');
+            const response = await fetch(`${apiBaseUrl}/api/admin/jobs`, {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(data),
+            });
+            if (response.ok) {
+              const result = await response.json();
+              const rawJob = result.data || result.job || result;
+              const newJob = normalizeJob(rawJob);
+              set(state => ({ jobs: [newJob, ...state.jobs] }));
+              return newJob;
+            }
+          } catch (error) {
+            console.error('Failed to create job via API:', error);
+          }
+        }
+
+        // Fallback for demo mode
         const newJob: JobPosting = {
           id: Math.max(...get().jobs.map(j => j.id), 0) + 1,
           ...data,
@@ -223,7 +268,10 @@ export const useJobPostingsStore = create<JobPostingsState>()(
         return newJob;
       },
       
-      updateJob: (id: number, data: JobPostingFormData) => {
+      updateJob: async (id: number, data: JobPostingFormData) => {
+        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+
+        // Optimistically update UI
         set(state => ({
           jobs: state.jobs.map(job =>
             job.id === id
@@ -231,25 +279,85 @@ export const useJobPostingsStore = create<JobPostingsState>()(
               : job
           ),
         }));
+
+        if (isLiveMode()) {
+          try {
+            const token = localStorage.getItem('admin_token');
+            await fetch(`${apiBaseUrl}/api/admin/jobs/${id}`, {
+              method: 'PUT',
+              headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(data),
+            });
+          } catch (error) {
+            console.error('Failed to update job via API:', error);
+          }
+        }
       },
-      
-      deleteJob: (id: number) => {
+
+      deleteJob: async (id: number) => {
+        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+
+        // Optimistically update UI
         set(state => ({
           jobs: state.jobs.filter(job => job.id !== id),
         }));
+
+        if (isLiveMode()) {
+          try {
+            const token = localStorage.getItem('admin_token');
+            await fetch(`${apiBaseUrl}/api/admin/jobs/${id}`, {
+              method: 'DELETE',
+              headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: 'application/json',
+              },
+            });
+          } catch (error) {
+            console.error('Failed to delete job via API:', error);
+          }
+        }
       },
-      
-      toggleJobStatus: (id: number) => {
+
+      toggleJobStatus: async (id: number) => {
+        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+        const job = get().jobs.find(j => j.id === id);
+        const newStatus = job ? !job.is_active : false;
+
+        // Optimistically update UI
         set(state => ({
           jobs: state.jobs.map(job =>
             job.id === id
-              ? { ...job, is_active: !job.is_active, updated_at: new Date().toISOString() }
+              ? { ...job, is_active: newStatus, updated_at: new Date().toISOString() }
               : job
           ),
         }));
+
+        if (isLiveMode()) {
+          try {
+            const token = localStorage.getItem('admin_token');
+            await fetch(`${apiBaseUrl}/api/admin/jobs/${id}/toggle-status`, {
+              method: 'PATCH',
+              headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ is_active: newStatus }),
+            });
+          } catch (error) {
+            console.error('Failed to toggle job status via API:', error);
+          }
+        }
       },
       
-      archiveJob: (id: number) => {
+      archiveJob: async (id: number) => {
+        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+
+        // Optimistically update UI
         set(state => ({
           jobs: state.jobs.map(job =>
             job.id === id
@@ -257,6 +365,23 @@ export const useJobPostingsStore = create<JobPostingsState>()(
               : job
           ),
         }));
+
+        if (isLiveMode()) {
+          try {
+            const token = localStorage.getItem('admin_token');
+            await fetch(`${apiBaseUrl}/api/admin/jobs/${id}/toggle-status`, {
+              method: 'PATCH',
+              headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ is_active: false }),
+            });
+          } catch (error) {
+            console.error('Failed to archive job via API:', error);
+          }
+        }
       },
       
       getActiveJobs: () => {

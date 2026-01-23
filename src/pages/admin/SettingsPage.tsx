@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -182,11 +182,21 @@ export default function SettingsPage() {
     notifications,
     setNotifications,
     adminUsers,
+    fetchSettings,
+    fetchAdminUsers,
   } = useSettingsStore();
 
-  const { dataMode, apiBaseUrl, setDataMode, setApiBaseUrl } = useApiConfigStore();
+  const { dataMode, apiBaseUrl, setDataMode, setApiBaseUrl, isLiveMode } = useApiConfigStore();
 
   const [activeTab, setActiveTab] = useState('branding');
+
+  // Fetch settings from API on mount when in live mode
+  useEffect(() => {
+    if (isLiveMode()) {
+      fetchSettings();
+      fetchAdminUsers();
+    }
+  }, [isLiveMode, fetchSettings, fetchAdminUsers]);
 
   // Dialog states
   const [socialLinkDialog, setSocialLinkDialog] = useState<{

@@ -1,3 +1,4 @@
+
 import { create } from 'zustand';
 import { EmployerRequest } from '@/types/admin';
 import { useApiConfigStore } from './apiConfigStore';
@@ -6,7 +7,7 @@ interface EmployerRequestsState {
   requests: EmployerRequest[];
   isLoading: boolean;
   fetchRequests: () => Promise<void>;
-  deleteRequest: (id: number) => void;
+  deleteRequest: (id: number) => Promise<void>;
 }
 
 // Demo data for testing
@@ -169,22 +170,39 @@ const mockRequests: EmployerRequest[] = [
   },
 ];
 
+// Normalize employer request data from API (handles object fields)
+const normalizeRequest = (request: any): EmployerRequest => ({
+  ...request,
+  // Handle country as object {id, name, slug} or string
+  country: typeof request.country === 'object' && request.country !== null
+    ? request.country.name || ''
+    : request.country || '',
+  // Handle location as object {id, name} or string
+  location: typeof request.location === 'object' && request.location !== null
+    ? request.location.name || ''
+    : request.location || '',
+  // Handle preferred_nationality as object {id, name} or string
+  preferred_nationality: typeof request.preferred_nationality === 'object' && request.preferred_nationality !== null
+    ? request.preferred_nationality.name || ''
+    : request.preferred_nationality || '',
+});
+
 export const useEmployerRequestsStore = create<EmployerRequestsState>((set, get) => ({
   requests: mockRequests,
   isLoading: false,
 
   fetchRequests: async () => {
-    const { dataMode, apiBaseUrl, isLiveMode } = useApiConfigStore.getState();
-    
+    const { apiBaseUrl, isLiveMode } = useApiConfigStore.getState();
+
     set({ isLoading: true });
-    
+
     // If in demo mode, just reset to mock data with a small delay for UX
     if (!isLiveMode()) {
       await new Promise(resolve => setTimeout(resolve, 300));
       set({ requests: [...mockRequests], isLoading: false });
       return;
     }
-    
+
     try {
       const token = localStorage.getItem('admin_token');
       const response = await fetch(`${apiBaseUrl}/api/admin/employer-requests`, {
@@ -195,7 +213,12 @@ export const useEmployerRequestsStore = create<EmployerRequestsState>((set, get)
       });
       if (response.ok) {
         const data = await response.json();
-        set({ requests: data.data || data, isLoading: false });
+        const rawRequests = data.data || data;
+        // Normalize requests to handle object fields
+        const normalizedRequests = Array.isArray(rawRequests)
+          ? rawRequests.map(normalizeRequest)
+          : [];
+        set({ requests: normalizedRequests, isLoading: false });
         return;
       }
     } catch (error) {
@@ -205,9 +228,28 @@ export const useEmployerRequestsStore = create<EmployerRequestsState>((set, get)
     set({ requests: [...mockRequests], isLoading: false });
   },
 
-  deleteRequest: (id: number) => {
+  deleteRequest: async (id: number) => {
+    const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+
+    // Optimistically update UI
     set((state) => ({
       requests: state.requests.filter((r) => r.id !== id),
     }));
+
+    // Call API if in live mode
+    if (isLiveMode()) {
+      try {
+        const token = localStorage.getItem('admin_token');
+        await fetch(`${apiBaseUrl}/api/admin/employer-requests/${id}`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: 'application/json',
+          },
+        });
+      } catch (error) {
+        console.error('Failed to delete employer request from API:', error);
+      }
+    }
   },
 }));
