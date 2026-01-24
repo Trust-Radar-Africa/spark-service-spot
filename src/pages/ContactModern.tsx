@@ -91,11 +91,12 @@ export default function ContactModern() {
                 </p>
                 <Button 
                   className="bg-gradient-to-r from-qx-orange to-amber-500 hover:from-qx-orange-dark hover:to-amber-600 text-white rounded-full w-full mt-auto"
-                  asChild
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById('calendly-section')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
                 >
-                  <a href="#calendly-section">
-                    Book Now
-                  </a>
+                  Book Now
                 </Button>
               </div>
             </AnimatedSection>
