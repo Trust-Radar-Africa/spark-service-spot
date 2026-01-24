@@ -954,16 +954,256 @@ List all blog posts with filtering and pagination. Requires authentication.
 }
 ```
 
+---
+
+## Public Blog API
+
+Public endpoints for the blog page to display published articles.
+
 ### GET /api/blog
-Public endpoint to list published blog posts.
+List all published blog posts for the public blog page. No authentication required.
 
 **Query Parameters:**
-- `search` (optional): Search by title or excerpt
-- `category` (optional): Filter by category
-- `page` (optional): Page number
+- `search` (optional): Search by title, excerpt, or content
+- `category` (optional): Filter by category slug or name
+- `author` (optional): Filter by author name
+- `page` (optional): Page number for pagination
+- `per_page` (optional): Items per page (default: 9)
+
+**Response:**
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "title": "The Future of Offshore Accounting",
+      "slug": "future-offshore-accounting-2024",
+      "excerpt": "Discover how technological advancements are reshaping the offshore accounting landscape...",
+      "category": "Industry Insights",
+      "author": "Sarah Mitchell",
+      "image_url": "/storage/blog/future-accounting.jpg",
+      "published_at": "2024-01-10T09:00:00Z",
+      "reading_time": 5
+    }
+  ],
+  "meta": {
+    "current_page": 1,
+    "last_page": 3,
+    "per_page": 9,
+    "total": 25
+  },
+  "filters": {
+    "categories": [
+      { "name": "Industry Insights", "slug": "industry-insights", "count": 8 },
+      { "name": "Best Practices", "slug": "best-practices", "count": 5 },
+      { "name": "Tax Advisory", "slug": "tax-advisory", "count": 4 }
+    ],
+    "authors": [
+      { "name": "Sarah Mitchell", "count": 10 },
+      { "name": "James Thompson", "count": 8 }
+    ]
+  }
+}
+```
+
+**Note:** Only returns posts where `is_published = true`. The `reading_time` is calculated based on content length (~200 words/minute).
 
 ### GET /api/blog/{slug}
-Public endpoint to get a single published blog post by slug.
+Get a single published blog post by slug. No authentication required.
+
+**Response:**
+```json
+{
+  "post": {
+    "id": 1,
+    "title": "The Future of Offshore Accounting",
+    "slug": "future-offshore-accounting-2024",
+    "excerpt": "Discover how technological advancements are reshaping...",
+    "content": "# The Future of Offshore Accounting\n\nIn today's rapidly evolving business landscape...\n\n## Key Trends\n\n### 1. AI-Powered Automation\n\nArtificial intelligence is transforming...",
+    "category": "Industry Insights",
+    "author": "Sarah Mitchell",
+    "image_url": "/storage/blog/future-accounting.jpg",
+    "published_at": "2024-01-10T09:00:00Z",
+    "reading_time": 5,
+    "table_of_contents": [
+      { "id": "key-trends", "title": "Key Trends", "level": 2 },
+      { "id": "ai-powered-automation", "title": "AI-Powered Automation", "level": 3 },
+      { "id": "cloud-integration", "title": "Cloud Integration", "level": 3 }
+    ]
+  },
+  "related_posts": [
+    {
+      "id": 5,
+      "title": "Best Practices for Remote Accounting Teams",
+      "slug": "best-practices-remote-accounting",
+      "excerpt": "Managing distributed accounting teams effectively...",
+      "category": "Best Practices",
+      "image_url": "/storage/blog/remote-teams.jpg",
+      "published_at": "2024-01-08T09:00:00Z"
+    }
+  ]
+}
+```
+
+**Error (Post not found or unpublished):**
+```json
+{
+  "message": "Post not found"
+}
+```
+Status: 404
+
+### GET /api/blog/categories
+Get available blog categories with post counts. No authentication required.
+
+**Response:**
+```json
+{
+  "categories": [
+    {
+      "id": 1,
+      "name": "Industry Insights",
+      "slug": "industry-insights",
+      "description": "Latest trends and news from the accounting industry",
+      "count": 8
+    },
+    {
+      "id": 2,
+      "name": "Best Practices",
+      "slug": "best-practices",
+      "description": "Tips and strategies for accounting professionals",
+      "count": 5
+    }
+  ],
+  "total_posts": 25
+}
+```
+
+### GET /api/blog/featured
+Get featured/recent blog posts for homepage display. No authentication required.
+
+**Query Parameters:**
+- `limit` (optional): Number of posts to return (default: 3, max: 6)
+
+**Response:**
+```json
+{
+  "posts": [
+    {
+      "id": 1,
+      "title": "The Future of Offshore Accounting",
+      "slug": "future-offshore-accounting-2024",
+      "excerpt": "Discover how technological advancements...",
+      "category": "Industry Insights",
+      "author": "Sarah Mitchell",
+      "image_url": "/storage/blog/future-accounting.jpg",
+      "published_at": "2024-01-10T09:00:00Z",
+      "reading_time": 5
+    }
+  ]
+}
+```
+
+### Laravel Controller Example
+
+```php
+// app/Http/Controllers/Api/PublicBlogController.php
+class PublicBlogController extends Controller
+{
+    public function index(Request $request)
+    {
+        $query = BlogPost::where('is_published', true);
+        
+        if ($request->search) {
+            $query->where(function ($q) use ($request) {
+                $q->where('title', 'like', "%{$request->search}%")
+                  ->orWhere('excerpt', 'like', "%{$request->search}%")
+                  ->orWhere('content', 'like', "%{$request->search}%");
+            });
+        }
+        
+        if ($request->category) {
+            $query->where(function ($q) use ($request) {
+                $q->where('category', $request->category)
+                  ->orWhereRaw("LOWER(REPLACE(category, ' ', '-')) = ?", [strtolower($request->category)]);
+            });
+        }
+        
+        if ($request->author) {
+            $query->where('author', $request->author);
+        }
+        
+        $posts = $query->orderBy('published_at', 'desc')
+                       ->paginate($request->per_page ?? 9);
+        
+        // Calculate reading time for each post
+        $posts->getCollection()->transform(function ($post) {
+            $post->reading_time = ceil(str_word_count(strip_tags($post->content)) / 200);
+            return $post;
+        });
+        
+        return response()->json([
+            'data' => $posts->items(),
+            'meta' => [...],
+            'filters' => [...],
+        ]);
+    }
+    
+    public function show($slug)
+    {
+        $post = BlogPost::where('is_published', true)
+                        ->where('slug', $slug)
+                        ->first();
+        
+        if (!$post) {
+            return response()->json(['message' => 'Post not found'], 404);
+        }
+        
+        // Calculate reading time
+        $post->reading_time = ceil(str_word_count(strip_tags($post->content)) / 200);
+        
+        // Generate table of contents from markdown headings
+        $post->table_of_contents = $this->generateTableOfContents($post->content);
+        
+        // Get related posts (same category, excluding current)
+        $relatedPosts = BlogPost::where('is_published', true)
+                                ->where('id', '!=', $post->id)
+                                ->where('category', $post->category)
+                                ->limit(3)
+                                ->get();
+        
+        return response()->json([
+            'post' => $post,
+            'related_posts' => $relatedPosts,
+        ]);
+    }
+    
+    private function generateTableOfContents($content)
+    {
+        preg_match_all('/^(#{2,3})\s+(.+)$/m', $content, $matches, PREG_SET_ORDER);
+        
+        return collect($matches)->map(fn($match) => [
+            'id' => Str::slug($match[2]),
+            'title' => $match[2],
+            'level' => strlen($match[1]),
+        ])->values()->all();
+    }
+}
+```
+
+### Laravel Routes Example
+
+```php
+// routes/api.php
+
+// Public blog routes (no auth required)
+Route::get('/blog', [PublicBlogController::class, 'index']);
+Route::get('/blog/categories', [PublicBlogController::class, 'categories']);
+Route::get('/blog/featured', [PublicBlogController::class, 'featured']);
+Route::get('/blog/{slug}', [PublicBlogController::class, 'show']);
+```
+
+---
 
 ### POST /api/admin/blog
 Create a new blog post. Requires `blog:create` permission (super_admin, editor).
