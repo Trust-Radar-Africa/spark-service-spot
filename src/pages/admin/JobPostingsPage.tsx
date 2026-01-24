@@ -78,6 +78,7 @@ import { SearchableSelect, SearchableSelectOption } from '@/components/ui/search
 import { BulkActionsBar } from '@/components/admin/BulkActionsBar';
 import { useBulkSelection } from '@/hooks/useBulkSelection';
 import { formatSalaryRange } from '@/utils/currencyUtils';
+import { format } from 'date-fns';
 
 import { COUNTRIES } from '@/data/countries';
 
@@ -121,6 +122,7 @@ export default function JobPostingsPage() {
   const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPageOption>(getStoredItemsPerPage);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingJob, setEditingJob] = useState<JobPosting | null>(null);
+  const [viewingJob, setViewingJob] = useState<JobPosting | null>(null);
   const [deletingJob, setDeletingJob] = useState<JobPosting | null>(null);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -861,12 +863,10 @@ export default function JobPostingsPage() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              asChild
-                              title="View posting"
+                              onClick={() => setViewingJob(job)}
+                              title="View details"
                             >
-                              <a href={`/careers#job-${job.id}`} target="_blank" rel="noopener noreferrer">
-                                <Eye className="h-4 w-4" />
-                              </a>
+                              <Eye className="h-4 w-4" />
                             </Button>
                             {canUpdate('jobs') && (
                               <Button
@@ -968,6 +968,138 @@ export default function JobPostingsPage() {
               isLoading={isSubmitting}
             />
           </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* View Job Details Sheet */}
+      <Sheet open={!!viewingJob} onOpenChange={() => setViewingJob(null)}>
+        <SheetContent className="sm:max-w-lg overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Job Posting Details</SheetTitle>
+            <SheetDescription>
+              {viewingJob?.is_active ? 'Active' : 'Inactive'} posting
+              {viewingJob?.created_at && ` • Created ${format(new Date(viewingJob.created_at), 'MMMM d, yyyy')}`}
+            </SheetDescription>
+          </SheetHeader>
+          {viewingJob && (
+            <div className="mt-6 space-y-6">
+              {/* Title and View Link */}
+              <div className="space-y-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h3 className="text-lg font-semibold">{viewingJob.title}</h3>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Badge variant={viewingJob.is_active ? 'default' : 'secondary'}>
+                        {viewingJob.is_active ? 'Active' : 'Inactive'}
+                      </Badge>
+                      <Badge variant="outline">{WORK_TYPE_LABELS[viewingJob.work_type]}</Badge>
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm" asChild>
+                    <a href={`/careers#job-${viewingJob.id}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5">
+                      View Posting <ExternalLink className="h-3.5 w-3.5" />
+                    </a>
+                  </Button>
+                </div>
+              </div>
+
+              {/* Location & Experience */}
+              <div className="space-y-4">
+                <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">
+                  Location & Requirements
+                </h4>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <Globe className="w-5 h-5 text-muted-foreground mt-0.5" />
+                    <div>
+                      <p className="font-medium">{viewingJob.country}</p>
+                      <p className="text-sm text-muted-foreground">Country</p>
+                    </div>
+                  </div>
+                  {viewingJob.location && (
+                    <div className="flex items-start gap-3">
+                      <MapPin className="w-5 h-5 text-muted-foreground mt-0.5" />
+                      <div>
+                        <p className="font-medium">{viewingJob.location}</p>
+                        <p className="text-sm text-muted-foreground">City/Region</p>
+                      </div>
+                    </div>
+                  )}
+                  <div className="flex items-start gap-3">
+                    <Clock className="w-5 h-5 text-muted-foreground mt-0.5" />
+                    <div>
+                      <p className="font-medium">{getExperienceLabel(viewingJob.experience_required)}</p>
+                      <p className="text-sm text-muted-foreground">Experience Required</p>
+                    </div>
+                  </div>
+                  {viewingJob.salary_range && (
+                    <div className="flex items-start gap-3">
+                      <Briefcase className="w-5 h-5 text-muted-foreground mt-0.5" />
+                      <div>
+                        <p className="font-medium">
+                          {formatSalaryRange(viewingJob.salary_range, viewingJob.country, viewingJob.currency_override)}
+                        </p>
+                        <p className="text-sm text-muted-foreground">Salary Range</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Description */}
+              <div className="space-y-4">
+                <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">
+                  Description
+                </h4>
+                <p className="text-sm bg-muted p-4 rounded-lg whitespace-pre-wrap">
+                  {viewingJob.description}
+                </p>
+              </div>
+
+              {/* Requirements */}
+              {viewingJob.requirements && (
+                <div className="space-y-4">
+                  <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">
+                    Requirements
+                  </h4>
+                  <p className="text-sm bg-muted p-4 rounded-lg whitespace-pre-wrap">
+                    {viewingJob.requirements}
+                  </p>
+                </div>
+              )}
+
+              {/* Benefits */}
+              {viewingJob.benefits && (
+                <div className="space-y-4">
+                  <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">
+                    Benefits
+                  </h4>
+                  <p className="text-sm bg-muted p-4 rounded-lg whitespace-pre-wrap">
+                    {viewingJob.benefits}
+                  </p>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="pt-4 border-t flex gap-2">
+                {canUpdate('jobs') && (
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setViewingJob(null);
+                      handleEdit(viewingJob);
+                    }}
+                  >
+                    <Pencil className="h-4 w-4 mr-2" />
+                    Edit Job
+                  </Button>
+                )}
+                <Button variant="outline" onClick={() => setViewingJob(null)}>
+                  Close
+                </Button>
+              </div>
+            </div>
+          )}
         </SheetContent>
       </Sheet>
 
