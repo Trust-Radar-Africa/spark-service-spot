@@ -259,6 +259,18 @@ export default function CandidatesPage() {
     });
   };
 
+  // Helper function to trigger file download
+  const triggerDownload = (url: string, filename: string) => {
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handleDownloadCV = async (candidate: CandidateApplication) => {
     if (!candidate.cv_url) {
       toast({
@@ -280,8 +292,10 @@ export default function CandidatesPage() {
       );
     }
     
-    // Open the CV URL in a new tab for download
-    window.open(candidate.cv_url, '_blank');
+    // Trigger actual download
+    const filename = `CV_${candidate.first_name}_${candidate.last_name}.docx`;
+    triggerDownload(candidate.cv_url, filename);
+    
     toast({
       title: 'Download started',
       description: `Downloading CV for ${candidate.first_name} ${candidate.last_name}`,
@@ -309,8 +323,10 @@ export default function CandidatesPage() {
       );
     }
     
-    // Open the cover letter URL in a new tab for download
-    window.open(candidate.cover_letter_url, '_blank');
+    // Trigger actual download
+    const filename = `CoverLetter_${candidate.first_name}_${candidate.last_name}.docx`;
+    triggerDownload(candidate.cover_letter_url, filename);
+    
     toast({
       title: 'Download started',
       description: `Downloading cover letter for ${candidate.first_name} ${candidate.last_name}`,
