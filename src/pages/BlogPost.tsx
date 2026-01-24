@@ -62,8 +62,8 @@ export default function BlogPost() {
 
       {/* Featured Image */}
       <section className="bg-background">
-        <div className="container mx-auto px-4 lg:px-8 -mt-4">
-          <div className="aspect-[21/9] rounded-2xl overflow-hidden shadow-xl max-w-5xl mx-auto">
+        <div className="container mx-auto px-4 lg:px-8">
+          <div className="aspect-[21/9] overflow-hidden shadow-xl max-w-5xl mx-auto -mt-8">
             <img src={post.image} alt={post.title} className="w-full h-full object-cover" />
           </div>
         </div>
@@ -76,7 +76,15 @@ export default function BlogPost() {
             {/* Main Content */}
             <article className="lg:col-span-8">
               <div
-                className="prose prose-lg max-w-none prose-headings:font-serif prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-a:text-accent hover:prose-a:text-accent/80 prose-ul:text-muted-foreground prose-li:marker:text-accent"
+                className="prose prose-lg max-w-none 
+                  prose-headings:font-serif prose-headings:text-foreground prose-headings:mt-8 prose-headings:mb-4
+                  prose-h2:text-2xl prose-h3:text-xl
+                  prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:mb-6
+                  prose-strong:text-foreground 
+                  prose-a:text-accent hover:prose-a:text-accent/80 prose-a:no-underline hover:prose-a:underline
+                  prose-ul:text-muted-foreground prose-ul:my-6 prose-ul:pl-6
+                  prose-li:marker:text-accent prose-li:mb-2
+                  prose-blockquote:border-l-4 prose-blockquote:border-accent prose-blockquote:pl-6 prose-blockquote:italic prose-blockquote:text-muted-foreground"
                 dangerouslySetInnerHTML={{ __html: formatContent(post.content) }}
               />
 
@@ -88,15 +96,33 @@ export default function BlogPost() {
                     Share this article:
                   </span>
                   <div className="flex gap-2">
-                    <button className="p-2 rounded-full bg-muted hover:bg-accent hover:text-accent-foreground transition-colors">
+                    <a 
+                      href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 rounded-full bg-muted hover:bg-accent hover:text-accent-foreground transition-colors"
+                      aria-label="Share on LinkedIn"
+                    >
                       <Linkedin className="w-4 h-4" />
-                    </button>
-                    <button className="p-2 rounded-full bg-muted hover:bg-accent hover:text-accent-foreground transition-colors">
+                    </a>
+                    <a 
+                      href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(post.title)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 rounded-full bg-muted hover:bg-accent hover:text-accent-foreground transition-colors"
+                      aria-label="Share on Twitter"
+                    >
                       <Twitter className="w-4 h-4" />
-                    </button>
-                    <button className="p-2 rounded-full bg-muted hover:bg-accent hover:text-accent-foreground transition-colors">
+                    </a>
+                    <a 
+                      href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 rounded-full bg-muted hover:bg-accent hover:text-accent-foreground transition-colors"
+                      aria-label="Share on Facebook"
+                    >
                       <Facebook className="w-4 h-4" />
-                    </button>
+                    </a>
                   </div>
                 </div>
               </div>
