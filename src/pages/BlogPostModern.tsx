@@ -21,8 +21,9 @@ import {
   Target,
   Zap,
   BookOpen,
+  Loader2,
 } from "lucide-react";
-import { useGetPostBySlug, useGetRelatedPosts } from "@/hooks/useBlogSearch";
+import { usePublicBlogPost } from "@/hooks/usePublicBlog";
 
 function ReadingProgressBar() {
   const [progress, setProgress] = useState(0);
@@ -69,8 +70,7 @@ function extractTableOfContents(content: string) {
 
 export default function BlogPostModern() {
   const { slug } = useParams<{ slug: string }>();
-  const post = useGetPostBySlug(slug);
-  const relatedPosts = useGetRelatedPosts(slug, 3);
+  const { post, relatedPosts, isLoading, error } = usePublicBlogPost(slug);
   const [activeSection, setActiveSection] = useState<string>("");
 
   useEffect(() => {
@@ -91,6 +91,20 @@ export default function BlogPostModern() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <LayoutModern>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <Loader2 className="w-10 h-10 text-primary mx-auto mb-4 animate-spin" />
+            <p className="text-muted-foreground">Loading article...</p>
+          </div>
+        </div>
+      </LayoutModern>
+    );
+  }
 
   if (!post) {
     return <Navigate to="/blog" replace />;
