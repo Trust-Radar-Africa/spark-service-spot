@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Mail, Globe, Building2, ArrowRight, Linkedin, Twitter, Facebook, Instagram, Youtube, ExternalLink, Phone, MapPin } from "lucide-react";
+import { Mail, Globe, Building2, ArrowRight, Linkedin, Twitter, Facebook, Instagram, Youtube, ExternalLink, Phone, MapPin, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSettingsStore } from "@/stores/settingsStore";
 
@@ -172,9 +172,18 @@ export function FooterModern() {
 
         {/* Bottom Bar */}
         <div className="border-t border-white/10 mt-10 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-white/40 text-sm">
-            © {new Date().getFullYear()} Multiverse CPA. All rights reserved.
-          </p>
+          <div className="flex items-center gap-4">
+            <p className="text-white/40 text-sm">
+              © {new Date().getFullYear()} Multiverse CPA. All rights reserved.
+            </p>
+            <Link
+              to="/admin/login"
+              className="text-white/40 hover:text-qx-orange transition-colors text-sm flex items-center gap-1"
+            >
+              <Lock className="w-3 h-3" />
+              Admin
+            </Link>
+          </div>
           <div className="flex items-center gap-6">
             {/* Social Links */}
             {enabledLinks.length > 0 && (
