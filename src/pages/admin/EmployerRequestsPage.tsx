@@ -48,7 +48,7 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination';
 import { useEmployerRequestsStore } from '@/stores/employerRequestsStore';
-import { EmployerRequest, ExperienceLevel } from '@/types/admin';
+import { EmployerRequest, ExperienceLevel, SALARY_RANGE_LABELS } from '@/types/admin';
 import {
   Building2,
   Search,
@@ -66,6 +66,7 @@ import {
   Download,
   SlidersHorizontal,
   Flag,
+  DollarSign,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
@@ -134,15 +135,36 @@ export default function EmployerRequestsPage() {
     localStorage.setItem('admin-employer-requests-items-per-page', String(value));
   };
 
-  // Handle CSV export
+  // Helper to format experience for CSV export (extract min years as number)
+  const formatExperienceForExport = (exp: ExperienceLevel): string => {
+    const mapping: Record<ExperienceLevel, string> = {
+      '0-3': '0',
+      '3-7': '3',
+      '7-10': '7',
+      '10+': '10',
+    };
+    return mapping[exp] || exp;
+  };
+
+  // Handle CSV export with formatted data
   const handleExportCSV = () => {
-    exportToCSV(filteredRequests, 'employer_requests', [
+    const exportData = filteredRequests.map(r => ({
+      ...r,
+      years_experience_min: formatExperienceForExport(r.years_experience),
+      budgeted_salary_label: SALARY_RANGE_LABELS[r.budgeted_salary] || r.budgeted_salary,
+    }));
+    
+    exportToCSV(exportData, 'employer_requests', [
       { key: 'firm_name', header: 'Company' },
       { key: 'email', header: 'Email' },
       { key: 'country', header: 'Country' },
       { key: 'position_title', header: 'Position' },
-      { key: 'location', header: 'Location' },
-      { key: 'years_experience', header: 'Experience Required' },
+      { key: 'preferred_location', header: 'Preferred Location' },
+      { key: 'preferred_nationality', header: 'Preferred Nationality' },
+      { key: 'budgeted_salary_label', header: 'Budgeted Salary' },
+      { key: 'years_experience_min', header: 'Min Years Experience' },
+      { key: 'years_experience', header: 'Experience Range' },
+      { key: 'other_qualifications', header: 'Additional Qualifications' },
       { key: 'created_at', header: 'Request Date' },
     ]);
     toast({
@@ -177,7 +199,7 @@ export default function EmployerRequestsPage() {
         request.position_title?.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesCountry = !countryFilter || request.country === countryFilter;
-      const matchesLocation = !locationFilter || request.location?.toLowerCase().includes(locationFilter.toLowerCase());
+      const matchesLocation = !locationFilter || request.preferred_location?.toLowerCase().includes(locationFilter.toLowerCase());
       const matchesNationality = !nationalityFilter || request.preferred_nationality === nationalityFilter;
       const matchesPosition = !positionFilter || request.position_title === positionFilter;
       const matchesExperience =
@@ -294,13 +316,23 @@ export default function EmployerRequestsPage() {
   };
 
   const handleBulkExport = () => {
-    exportToCSV(selectedItems, 'employer_requests_selected', [
+    const exportData = selectedItems.map(r => ({
+      ...r,
+      years_experience_min: formatExperienceForExport(r.years_experience),
+      budgeted_salary_label: SALARY_RANGE_LABELS[r.budgeted_salary] || r.budgeted_salary,
+    }));
+    
+    exportToCSV(exportData, 'employer_requests_selected', [
       { key: 'firm_name', header: 'Company' },
       { key: 'email', header: 'Email' },
       { key: 'country', header: 'Country' },
       { key: 'position_title', header: 'Position' },
-      { key: 'location', header: 'Location' },
-      { key: 'years_experience', header: 'Experience Required' },
+      { key: 'preferred_location', header: 'Preferred Location' },
+      { key: 'preferred_nationality', header: 'Preferred Nationality' },
+      { key: 'budgeted_salary_label', header: 'Budgeted Salary' },
+      { key: 'years_experience_min', header: 'Min Years Experience' },
+      { key: 'years_experience', header: 'Experience Range' },
+      { key: 'other_qualifications', header: 'Additional Qualifications' },
       { key: 'created_at', header: 'Request Date' },
     ]);
     toast({
@@ -464,7 +496,7 @@ export default function EmployerRequestsPage() {
                   <div>
                     <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
                       <MapPin className="h-3 w-3" />
-                      City/Location
+                      Pref. Location
                     </label>
                     <Input
                       placeholder="Filter by location..."
@@ -599,13 +631,22 @@ export default function EmployerRequestsPage() {
                   Country
                 </SortableTableHead>
                 <SortableTableHead
-                  sortKey="location"
+                  sortKey="preferred_location"
                   currentSortKey={sortKey}
                   currentSortDirection={sortDirection}
                   onSort={handleSort}
                   className="hidden xl:table-cell"
                 >
-                  Location
+                  Pref. Location
+                </SortableTableHead>
+                <SortableTableHead
+                  sortKey="budgeted_salary"
+                  currentSortKey={sortKey}
+                  currentSortDirection={sortDirection}
+                  onSort={handleSort}
+                  className="hidden xl:table-cell"
+                >
+                  Budget
                 </SortableTableHead>
                 <SortableTableHead
                   sortKey="years_experience"
@@ -684,8 +725,13 @@ export default function EmployerRequestsPage() {
                     <TableCell className="hidden xl:table-cell">
                       <div className="flex items-center gap-1">
                         <MapPin className="w-3 h-3 text-muted-foreground" />
-                        <span className="text-sm truncate max-w-[100px]">{request.location}</span>
+                        <span className="text-sm truncate max-w-[100px]">{request.preferred_location}</span>
                       </div>
+                    </TableCell>
+                    <TableCell className="hidden xl:table-cell">
+                      <span className="text-sm text-muted-foreground">
+                        {SALARY_RANGE_LABELS[request.budgeted_salary] || request.budgeted_salary || '—'}
+                      </span>
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
                       <Badge variant="secondary">
@@ -831,8 +877,17 @@ export default function EmployerRequestsPage() {
                     <div className="flex items-start gap-3">
                       <MapPin className="w-5 h-5 text-muted-foreground mt-0.5" />
                       <div>
-                        <p className="font-medium">{selectedRequest.location}</p>
-                        <p className="text-sm text-muted-foreground">Location</p>
+                        <p className="font-medium">{selectedRequest.preferred_location}</p>
+                        <p className="text-sm text-muted-foreground">Preferred Work Location</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <DollarSign className="w-5 h-5 text-muted-foreground mt-0.5" />
+                      <div>
+                        <p className="font-medium">
+                          {SALARY_RANGE_LABELS[selectedRequest.budgeted_salary] || selectedRequest.budgeted_salary || 'Not specified'}
+                        </p>
+                        <p className="text-sm text-muted-foreground">Budgeted Salary</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
