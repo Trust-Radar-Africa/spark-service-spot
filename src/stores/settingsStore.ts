@@ -152,8 +152,8 @@ const defaultExperienceLevels: ExperienceLevel[] = [
 ];
 
 const defaultSocialLinks: SocialLink[] = [
-  { id: '1', platform: 'LinkedIn', url: 'https://linkedin.com/company/goa', icon: 'linkedin', enabled: true },
-  { id: '2', platform: 'Twitter', url: 'https://twitter.com/goa', icon: 'twitter', enabled: true },
+  { id: '1', platform: 'LinkedIn', url: 'https://www.linkedin.com/company/multiversecpa', icon: 'linkedin', enabled: true },
+  { id: '2', platform: 'Twitter', url: 'https://x.com/CPAMULTIVERSE', icon: 'twitter', enabled: true },
   { id: '3', platform: 'Facebook', url: 'https://facebook.com/goa', icon: 'facebook', enabled: false },
 ];
 
