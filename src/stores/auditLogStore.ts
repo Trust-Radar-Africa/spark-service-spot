@@ -24,6 +24,7 @@ export interface AuditLogEntry {
 interface AuditLogState {
   logs: AuditLogEntry[];
   isLoading: boolean;
+  error: string | null;
   fetchLogs: () => Promise<void>;
   addLog: (entry: Omit<AuditLogEntry, 'id' | 'timestamp'>) => Promise<void>;
   getLogsByModule: (module: AuditLogEntry['module']) => AuditLogEntry[];
@@ -36,15 +37,13 @@ export const useAuditLogStore = create<AuditLogState>()(
   persist(
     (set, get) => ({
       logs: [],
-      
       isLoading: false,
+      error: null,
 
       fetchLogs: async () => {
-        const { isLiveMode, getApiUrl } = useApiConfigStore.getState();
+        const { getApiUrl } = useApiConfigStore.getState();
 
-        if (!isLiveMode()) return;
-
-        set({ isLoading: true });
+        set({ isLoading: true, error: null });
 
         try {
           const token = localStorage.getItem('admin_token');
@@ -60,14 +59,15 @@ export const useAuditLogStore = create<AuditLogState>()(
             set({ logs: data.data || data, isLoading: false });
             return;
           }
+          set({ error: 'Failed to fetch audit logs', isLoading: false });
         } catch (error) {
           console.error('Failed to fetch audit logs from API:', error);
+          set({ error: 'Failed to connect to server', isLoading: false });
         }
-        set({ isLoading: false });
       },
 
       addLog: async (entry) => {
-        const { isLiveMode, getApiUrl } = useApiConfigStore.getState();
+        const { getApiUrl } = useApiConfigStore.getState();
 
         const newEntry: AuditLogEntry = {
           ...entry,
@@ -80,22 +80,20 @@ export const useAuditLogStore = create<AuditLogState>()(
           logs: [newEntry, ...state.logs].slice(0, 1000), // Keep last 1000 logs
         }));
 
-        // Sync to API if in live mode
-        if (isLiveMode()) {
-          try {
-            const token = localStorage.getItem('admin_token');
-            await fetch(getApiUrl('/api/admin/audit-logs'), {
-              method: 'POST',
-              headers: {
-                Authorization: `Bearer ${token}`,
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(newEntry),
-            });
-          } catch (error) {
-            console.error('Failed to sync audit log to API:', error);
-          }
+        // Sync to API
+        try {
+          const token = localStorage.getItem('admin_token');
+          await fetch(getApiUrl('/api/admin/audit-logs'), {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newEntry),
+          });
+        } catch (error) {
+          console.error('Failed to sync audit log to API:', error);
         }
       },
 
