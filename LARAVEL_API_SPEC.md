@@ -1250,6 +1250,184 @@ Schema::create('experience_levels', function (Blueprint $table) {
 
 ---
 
+## Admin Notifications
+
+Real-time notifications for admin users about new candidates, employer requests, and system events.
+
+### GET /api/admin/notifications
+List notifications for the authenticated admin user. Requires authentication.
+
+**Query Parameters:**
+- `unread_only` (optional): Filter to only unread notifications (boolean)
+- `limit` (optional): Maximum number to return (default: 50)
+
+**Response:**
+```json
+{
+  "data": [
+    {
+      "id": "notif_abc123",
+      "type": "candidate",
+      "title": "New Application",
+      "message": "John Doe applied for Senior Accountant",
+      "timestamp": "2024-01-15T10:30:00Z",
+      "read": false,
+      "link": "/admin/candidates"
+    },
+    {
+      "id": "notif_def456",
+      "type": "employer",
+      "title": "New Employer Request",
+      "message": "ABC Accounting submitted a request",
+      "timestamp": "2024-01-15T09:15:00Z",
+      "read": true,
+      "link": "/admin/employers"
+    }
+  ],
+  "unread_count": 5
+}
+```
+
+**Notification Types:**
+| Type | Description |
+|------|-------------|
+| candidate | New candidate application received |
+| employer | New employer request received |
+| job | Job posting status change |
+| blog | Blog post published/updated |
+
+### POST /api/admin/notifications
+Create a new notification (typically called internally by the system). Requires authentication.
+
+**Request:**
+```json
+{
+  "type": "candidate",
+  "title": "New Application",
+  "message": "John Doe applied for Senior Accountant",
+  "link": "/admin/candidates"
+}
+```
+
+**Response:**
+```json
+{
+  "notification": {
+    "id": "notif_abc123",
+    "type": "candidate",
+    "title": "New Application",
+    "message": "John Doe applied for Senior Accountant",
+    "timestamp": "2024-01-15T10:30:00Z",
+    "read": false,
+    "link": "/admin/candidates"
+  }
+}
+```
+
+### PATCH /api/admin/notifications/{id}/read
+Mark a single notification as read. Requires authentication.
+
+**Response:**
+```json
+{
+  "message": "Notification marked as read"
+}
+```
+
+### POST /api/admin/notifications/mark-all-read
+Mark all notifications as read for the authenticated user. Requires authentication.
+
+**Response:**
+```json
+{
+  "message": "All notifications marked as read",
+  "updated_count": 5
+}
+```
+
+### DELETE /api/admin/notifications/{id}
+Delete a single notification. Requires authentication.
+
+**Response:**
+```json
+{
+  "message": "Notification deleted"
+}
+```
+
+### DELETE /api/admin/notifications/clear
+Clear all notifications for the authenticated user. Requires authentication.
+
+**Response:**
+```json
+{
+  "message": "All notifications cleared",
+  "deleted_count": 15
+}
+```
+
+### Notifications Migration
+
+```php
+Schema::create('admin_notifications', function (Blueprint $table) {
+    $table->uuid('id')->primary();
+    $table->foreignId('user_id')->constrained('admin_users')->cascadeOnDelete();
+    $table->enum('type', ['candidate', 'employer', 'job', 'blog']);
+    $table->string('title');
+    $table->text('message');
+    $table->string('link')->nullable();
+    $table->boolean('read')->default(false);
+    $table->timestamp('timestamp');
+    $table->timestamps();
+    
+    $table->index(['user_id', 'read']);
+    $table->index(['user_id', 'timestamp']);
+});
+```
+
+### Real-Time Notifications (Optional)
+
+For real-time notification delivery, consider implementing Laravel Broadcasting with Pusher or Laravel WebSockets:
+
+```php
+// Event: NewNotificationEvent.php
+class NewNotificationEvent implements ShouldBroadcast
+{
+    public $notification;
+    
+    public function __construct($notification)
+    {
+        $this->notification = $notification;
+    }
+    
+    public function broadcastOn()
+    {
+        return new PrivateChannel('admin.notifications.' . $this->notification->user_id);
+    }
+    
+    public function broadcastAs()
+    {
+        return 'notification.created';
+    }
+}
+
+// Usage in CandidateController after new application:
+event(new NewNotificationEvent($notification));
+```
+
+### Auto-Triggering Notifications
+
+Notifications should be automatically created when:
+
+| Event | Notification Type | Recipients |
+|-------|------------------|------------|
+| New candidate application | candidate | All admins |
+| New employer request | employer | All admins |
+| Job posting expires soon | job | Job creator + super_admin |
+| Blog post published | blog | All admins |
+
+---
+
 ## Audit Logs
 
 ### GET /api/admin/audit-logs
