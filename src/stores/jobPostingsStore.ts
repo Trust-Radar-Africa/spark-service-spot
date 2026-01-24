@@ -194,7 +194,7 @@ export const useJobPostingsStore = create<JobPostingsState>()(
       isLoading: false,
       
       fetchJobs: async () => {
-        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+        const { isLiveMode, getApiUrl } = useApiConfigStore.getState();
         
         set({ isLoading: true });
         
@@ -207,7 +207,7 @@ export const useJobPostingsStore = create<JobPostingsState>()(
         
         try {
           const token = localStorage.getItem('admin_token');
-          const response = await fetch(`${apiBaseUrl}/api/admin/jobs`, {
+          const response = await fetch(getApiUrl('/api/admin/jobs'), {
             headers: {
               Authorization: `Bearer ${token}`,
               Accept: 'application/json',
@@ -231,12 +231,12 @@ export const useJobPostingsStore = create<JobPostingsState>()(
       },
       
       addJob: async (data: JobPostingFormData) => {
-        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+        const { isLiveMode, getApiUrl } = useApiConfigStore.getState();
 
         if (isLiveMode()) {
           try {
             const token = localStorage.getItem('admin_token');
-            const response = await fetch(`${apiBaseUrl}/api/admin/jobs`, {
+            const response = await fetch(getApiUrl('/api/admin/jobs'), {
               method: 'POST',
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -269,7 +269,7 @@ export const useJobPostingsStore = create<JobPostingsState>()(
       },
       
       updateJob: async (id: number, data: JobPostingFormData) => {
-        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+        const { isLiveMode, getApiUrl } = useApiConfigStore.getState();
 
         // Optimistically update UI
         set(state => ({
@@ -283,7 +283,7 @@ export const useJobPostingsStore = create<JobPostingsState>()(
         if (isLiveMode()) {
           try {
             const token = localStorage.getItem('admin_token');
-            await fetch(`${apiBaseUrl}/api/admin/jobs/${id}`, {
+            await fetch(getApiUrl(`/api/admin/jobs/${id}`), {
               method: 'PUT',
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -299,7 +299,7 @@ export const useJobPostingsStore = create<JobPostingsState>()(
       },
 
       deleteJob: async (id: number) => {
-        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+        const { isLiveMode, getApiUrl } = useApiConfigStore.getState();
 
         // Optimistically update UI
         set(state => ({
@@ -309,7 +309,7 @@ export const useJobPostingsStore = create<JobPostingsState>()(
         if (isLiveMode()) {
           try {
             const token = localStorage.getItem('admin_token');
-            await fetch(`${apiBaseUrl}/api/admin/jobs/${id}`, {
+            await fetch(getApiUrl(`/api/admin/jobs/${id}`), {
               method: 'DELETE',
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -323,7 +323,7 @@ export const useJobPostingsStore = create<JobPostingsState>()(
       },
 
       toggleJobStatus: async (id: number) => {
-        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+        const { isLiveMode, getApiUrl } = useApiConfigStore.getState();
         const job = get().jobs.find(j => j.id === id);
         const newStatus = job ? !job.is_active : false;
 
@@ -339,7 +339,7 @@ export const useJobPostingsStore = create<JobPostingsState>()(
         if (isLiveMode()) {
           try {
             const token = localStorage.getItem('admin_token');
-            await fetch(`${apiBaseUrl}/api/admin/jobs/${id}/toggle-status`, {
+            await fetch(getApiUrl(`/api/admin/jobs/${id}/toggle-status`), {
               method: 'PATCH',
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -355,7 +355,7 @@ export const useJobPostingsStore = create<JobPostingsState>()(
       },
       
       archiveJob: async (id: number) => {
-        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+        const { isLiveMode, getApiUrl } = useApiConfigStore.getState();
 
         // Optimistically update UI
         set(state => ({
@@ -369,7 +369,7 @@ export const useJobPostingsStore = create<JobPostingsState>()(
         if (isLiveMode()) {
           try {
             const token = localStorage.getItem('admin_token');
-            await fetch(`${apiBaseUrl}/api/admin/jobs/${id}/toggle-status`, {
+            await fetch(getApiUrl(`/api/admin/jobs/${id}/toggle-status`), {
               method: 'PATCH',
               headers: {
                 Authorization: `Bearer ${token}`,

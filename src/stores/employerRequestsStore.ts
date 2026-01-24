@@ -205,7 +205,7 @@ export const useEmployerRequestsStore = create<EmployerRequestsState>((set, get)
   isLoading: false,
 
   fetchRequests: async () => {
-    const { apiBaseUrl, isLiveMode } = useApiConfigStore.getState();
+    const { isLiveMode, getApiUrl } = useApiConfigStore.getState();
 
     set({ isLoading: true });
 
@@ -218,7 +218,7 @@ export const useEmployerRequestsStore = create<EmployerRequestsState>((set, get)
 
     try {
       const token = localStorage.getItem('admin_token');
-      const response = await fetch(`${apiBaseUrl}/api/admin/employer-requests`, {
+      const response = await fetch(getApiUrl('/api/admin/employer-requests'), {
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: 'application/json',
@@ -242,7 +242,7 @@ export const useEmployerRequestsStore = create<EmployerRequestsState>((set, get)
   },
 
   deleteRequest: async (id: number) => {
-    const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+    const { isLiveMode, getApiUrl } = useApiConfigStore.getState();
 
     // Optimistically update UI
     set((state) => ({
@@ -253,7 +253,7 @@ export const useEmployerRequestsStore = create<EmployerRequestsState>((set, get)
     if (isLiveMode()) {
       try {
         const token = localStorage.getItem('admin_token');
-        await fetch(`${apiBaseUrl}/api/admin/employer-requests/${id}`, {
+        await fetch(getApiUrl(`/api/admin/employer-requests/${id}`), {
           method: 'DELETE',
           headers: {
             Authorization: `Bearer ${token}`,

@@ -167,7 +167,7 @@ export const useCandidatesStore = create<CandidatesState>((set) => ({
   isLoading: false,
 
   fetchCandidates: async () => {
-    const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+    const { isLiveMode, getApiUrl } = useApiConfigStore.getState();
 
     set({ isLoading: true });
 
@@ -180,7 +180,7 @@ export const useCandidatesStore = create<CandidatesState>((set) => ({
 
     try {
       const token = localStorage.getItem('admin_token');
-      const response = await fetch(`${apiBaseUrl}/api/admin/candidates`, {
+      const response = await fetch(getApiUrl('/api/admin/candidates'), {
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: 'application/json',
@@ -204,7 +204,7 @@ export const useCandidatesStore = create<CandidatesState>((set) => ({
   },
 
   deleteCandidate: async (id: number) => {
-    const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+    const { isLiveMode, getApiUrl } = useApiConfigStore.getState();
 
     // Optimistically update UI
     set((state) => ({
@@ -215,7 +215,7 @@ export const useCandidatesStore = create<CandidatesState>((set) => ({
     if (isLiveMode()) {
       try {
         const token = localStorage.getItem('admin_token');
-        await fetch(`${apiBaseUrl}/api/admin/candidates/${id}`, {
+        await fetch(getApiUrl(`/api/admin/candidates/${id}`), {
           method: 'DELETE',
           headers: {
             Authorization: `Bearer ${token}`,
