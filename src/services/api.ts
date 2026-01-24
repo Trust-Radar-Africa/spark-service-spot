@@ -1,11 +1,25 @@
 /**
  * Laravel API Service
  * 
- * Configure VITE_LARAVEL_API_URL in your .env file
- * Example: VITE_LARAVEL_API_URL=https://your-laravel-api.com
+ * Configure via environment variables:
+ * - VITE_API_BACKEND: 'laravel' or 'json-server'
+ * - VITE_LARAVEL_API_URL: Laravel API URL
+ * - VITE_JSON_SERVER_URL: JSON Server URL
+ * - VITE_DATA_MODE: 'demo' or 'live'
  */
 
-const API_BASE_URL = import.meta.env.VITE_LARAVEL_API_URL || 'http://localhost:8000';
+import { useApiConfigStore } from '@/stores/apiConfigStore';
+
+// Get API configuration from store
+const getApiConfig = () => {
+  const store = useApiConfigStore.getState();
+  return {
+    isLiveMode: store.isLiveMode(),
+    isJsonServer: store.isJsonServer(),
+    getApiUrl: store.getApiUrl,
+    baseUrl: store.apiBaseUrl,
+  };
+};
 
 class ApiService {
   private token: string | null = null;
@@ -31,6 +45,8 @@ class ApiService {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
+    const { baseUrl } = getApiConfig();
+    
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
@@ -41,7 +57,7 @@ class ApiService {
       (headers as Record<string, string>)['Authorization'] = `Bearer ${this.token}`;
     }
 
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    const response = await fetch(`${baseUrl}${endpoint}`, {
       ...options,
       headers,
       credentials: 'include', // For Sanctum cookie-based auth
@@ -70,12 +86,11 @@ class ApiService {
 
   // Auth endpoints
   async login(email: string, password: string) {
-    // Demo mode - bypass API if no backend URL is set or using demo credentials
-    const isDemoMode = !import.meta.env.VITE_LARAVEL_API_URL || 
-                       API_BASE_URL === 'http://localhost:8000';
+    const { isLiveMode, baseUrl } = getApiConfig();
     
+    // Demo mode check - use demo credentials without API call
     const demoUser = this.demoUsers[email];
-    if (isDemoMode && demoUser && password === 'demo123') {
+    if (!isLiveMode && demoUser && password === 'demo123') {
       const demoToken = `demo-token-${demoUser.role}-` + Date.now();
       this.setToken(demoToken);
       return {
@@ -84,10 +99,15 @@ class ApiService {
       };
     }
 
-    // Real API call
+    // If in demo mode but credentials don't match demo users
+    if (!isLiveMode) {
+      throw new Error('Invalid credentials. Use demo@demo.com / demo123');
+    }
+
+    // Real API call (only in live mode)
     try {
       // First, get CSRF cookie for Sanctum
-      await fetch(`${API_BASE_URL}/sanctum/csrf-cookie`, {
+      await fetch(`${baseUrl}/sanctum/csrf-cookie`, {
         credentials: 'include',
       });
 
@@ -99,7 +119,7 @@ class ApiService {
       this.setToken(response.token);
       return response;
     } catch (error) {
-      // If API fails and using demo credentials, allow demo login
+      // If API fails and using demo credentials, allow demo login as fallback
       const fallbackUser = this.demoUsers[email];
       if (fallbackUser && password === 'demo123') {
         const demoToken = `demo-token-${fallbackUser.role}-` + Date.now();
@@ -166,7 +186,8 @@ class ApiService {
   }
 
   async downloadCV(candidateId: number) {
-    const response = await fetch(`${API_BASE_URL}/api/admin/candidates/${candidateId}/cv`, {
+    const { baseUrl } = getApiConfig();
+    const response = await fetch(`${baseUrl}/api/admin/candidates/${candidateId}/cv`, {
       headers: {
         Authorization: `Bearer ${this.token}`,
       },
@@ -185,7 +206,8 @@ class ApiService {
   }
 
   async downloadCoverLetter(candidateId: number) {
-    const response = await fetch(`${API_BASE_URL}/api/admin/candidates/${candidateId}/cover-letter`, {
+    const { baseUrl } = getApiConfig();
+    const response = await fetch(`${baseUrl}/api/admin/candidates/${candidateId}/cover-letter`, {
       headers: {
         Authorization: `Bearer ${this.token}`,
       },
