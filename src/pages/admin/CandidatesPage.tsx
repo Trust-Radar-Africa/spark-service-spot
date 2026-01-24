@@ -81,6 +81,9 @@ import { useCandidatesStore } from '@/stores/candidatesStore';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { useAuditLogger } from '@/stores/auditLogStore';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
+import { ApiErrorState } from '@/components/admin/ApiErrorState';
+import { TableLoadingSkeleton, CardsLoadingSkeleton } from '@/components/admin/LoadingState';
+import { NoCandidatesState, NoResultsState } from '@/components/admin/EmptyState';
 
 const experienceLevels: { value: ExperienceLevel; label: string }[] = [
   { value: '0-3', label: '0-3 years' },
@@ -105,7 +108,7 @@ const getStoredItemsPerPage = (): ItemsPerPageOption => {
 };
 
 export default function CandidatesPage() {
-  const { candidates, isLoading, fetchCandidates, deleteCandidate } = useCandidatesStore();
+  const { candidates, isLoading, error, fetchCandidates, deleteCandidate } = useCandidatesStore();
   const { canDelete, isViewer } = useAdminPermissions();
   const { user } = useAdminAuth();
   const { logAction } = useAuditLogger();
@@ -784,43 +787,20 @@ export default function CandidatesPage() {
 
         {/* Table */}
         <div className="bg-card rounded-lg border overflow-hidden">
-          {isLoading ? (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[40px]"><div className="h-4 w-4 bg-muted animate-pulse rounded" /></TableHead>
-                    <TableHead><div className="h-4 w-16 bg-muted animate-pulse rounded" /></TableHead>
-                    <TableHead><div className="h-4 w-24 bg-muted animate-pulse rounded" /></TableHead>
-                    <TableHead><div className="h-4 w-20 bg-muted animate-pulse rounded" /></TableHead>
-                    <TableHead><div className="h-4 w-24 bg-muted animate-pulse rounded" /></TableHead>
-                    <TableHead><div className="h-4 w-16 bg-muted animate-pulse rounded" /></TableHead>
-                    <TableHead><div className="h-4 w-16 bg-muted animate-pulse rounded" /></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <TableRow key={i}>
-                      <TableCell><div className="h-4 w-4 bg-muted animate-pulse rounded" /></TableCell>
-                      <TableCell><div className="h-4 w-28 bg-muted animate-pulse rounded" /></TableCell>
-                      <TableCell><div className="h-4 w-32 bg-muted animate-pulse rounded" /></TableCell>
-                      <TableCell><div className="h-4 w-24 bg-muted animate-pulse rounded" /></TableCell>
-                      <TableCell><div className="h-6 w-20 bg-muted animate-pulse rounded-full" /></TableCell>
-                      <TableCell><div className="h-4 w-20 bg-muted animate-pulse rounded" /></TableCell>
-                      <TableCell><div className="flex gap-2"><div className="h-8 w-8 bg-muted animate-pulse rounded" /></div></TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+          {error ? (
+            <ApiErrorState
+              title="Failed to load candidates"
+              message={error}
+              onRetry={fetchCandidates}
+            />
+          ) : isLoading ? (
+            <div className="p-4">
+              <TableLoadingSkeleton rows={5} columns={7} />
             </div>
+          ) : candidates.length === 0 ? (
+            <NoCandidatesState onRefresh={fetchCandidates} />
           ) : paginatedCandidates.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <Users className="h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-medium">No candidates found</h3>
-              <p className="text-muted-foreground">
-                Try adjusting your filters or wait for new applications.
-              </p>
-            </div>
+            <NoResultsState onClearFilters={() => setFilters({})} />
           ) : (
             <div className="overflow-x-auto">
               <Table>
