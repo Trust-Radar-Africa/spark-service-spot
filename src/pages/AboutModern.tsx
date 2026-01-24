@@ -9,7 +9,7 @@ const benefits = [
   "Handle back office tasks at a fraction of local staff costs",
   "No compromise on quality or professionalism",
   "Staff assigned exclusively under your operational control",
-  "Candidates with experience from USA, Canada, Australia and Europe",
+  "Candidates with experience in US, Canada, Australia and Europe financial reporting regimes",
   "Interview candidates to ensure best fit for your firm",
   "Licensed professional firm guaranteeing ethical standards",
   "Expertise in bookkeeping, tax, audit, compilation and financial analysis",
