@@ -414,7 +414,7 @@ export default function Careers() {
 
                             <div className="flex flex-wrap gap-4 pt-5 border-t border-border">
                               <Button variant="gold" size="lg" asChild>
-                                <Link to={`/apply?job=${encodeURIComponent(job.title)}`}>
+                                <Link to={`/apply?job=${job.id}`}>
                                   Apply Now
                                   <ArrowRight className="ml-2 h-4 w-4" />
                                 </Link>

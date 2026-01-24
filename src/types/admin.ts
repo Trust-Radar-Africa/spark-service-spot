@@ -37,6 +37,7 @@ export interface CandidateFilters {
   country?: string;
   location?: string;
   job_applied?: string;
+  expected_salary?: string;
   search?: string;
 }
 

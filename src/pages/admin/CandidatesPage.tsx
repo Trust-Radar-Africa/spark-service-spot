@@ -59,6 +59,7 @@ import {
   Briefcase,
   Mail,
   Calendar,
+  DollarSign,
 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { BulkActionsBar } from '@/components/admin/BulkActionsBar';
@@ -119,8 +120,8 @@ export default function CandidatesPage() {
   const { toast } = useToast();
   const { sortKey, sortDirection, handleSort, sortData } = useSorting<CandidateApplication>();
 
-  const hasActiveFilters = !!(filters.search || filters.nationality || filters.country || filters.location || filters.experience || filters.job_applied);
-  const activeFilterCount = [filters.nationality, filters.country, filters.location, filters.experience, filters.job_applied].filter(Boolean).length;
+  const hasActiveFilters = !!(filters.search || filters.nationality || filters.country || filters.location || filters.experience || filters.job_applied || filters.expected_salary);
+  const activeFilterCount = [filters.nationality, filters.country, filters.location, filters.experience, filters.job_applied, filters.expected_salary].filter(Boolean).length;
 
   // Get unique job titles for filter
   const jobOptions = useMemo(() => {
@@ -203,6 +204,9 @@ export default function CandidatesPage() {
     }
     if (filters.job_applied) {
       filtered = filtered.filter((c) => c.job_applied === filters.job_applied);
+    }
+    if (filters.expected_salary) {
+      filtered = filtered.filter((c) => c.expected_salary === filters.expected_salary);
     }
     if (filters.search) {
       const search = filters.search.toLowerCase();
@@ -582,6 +586,34 @@ export default function CandidatesPage() {
                         {experienceLevels.map((level) => (
                           <SelectItem key={level.value} value={level.value}>
                             {level.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
+                      <DollarSign className="h-3 w-3" />
+                      Expected Salary
+                    </label>
+                    <Select
+                      value={filters.expected_salary || 'all'}
+                      onValueChange={(value) =>
+                        setFilters({
+                          ...filters,
+                          expected_salary: value === 'all' ? undefined : value,
+                        })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="All Ranges" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Ranges</SelectItem>
+                        {Object.entries(CANDIDATE_SALARY_LABELS).map(([value, label]) => (
+                          <SelectItem key={value} value={value}>
+                            {label}
                           </SelectItem>
                         ))}
                       </SelectContent>

@@ -435,7 +435,7 @@ export default function CareersModern() {
                                 className="bg-qx-orange hover:bg-qx-orange-dark text-white rounded-full"
                                 asChild
                               >
-                                <Link to={`/apply?job=${encodeURIComponent(job.title)}`}>
+                                <Link to={`/apply?job=${job.id}`}>
                                   Apply Now
                                   <ArrowRight className="ml-2 h-4 w-4" />
                                 </Link>
