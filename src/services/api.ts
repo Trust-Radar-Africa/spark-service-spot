@@ -106,10 +106,15 @@ class ApiService {
 
     // JSON Server mode - use demo auth with db.json users
     if (isJsonServer) {
+      let jsonServerAvailable = false;
+      
       try {
         // Check against db.json users
-        const response = await fetch(`${baseUrl}/users?email=${email}`);
+        const response = await fetch(`${baseUrl}/users?email=${email}`, {
+          signal: AbortSignal.timeout(3000), // 3 second timeout
+        });
         if (response.ok) {
+          jsonServerAvailable = true;
           const users = await response.json();
           const user = users[0];
           
@@ -118,14 +123,18 @@ class ApiService {
             this.setToken(token);
             return { user, token };
           }
+          // JSON Server responded but credentials don't match
+          throw new Error('Invalid credentials');
         }
-      } catch {
-        // JSON Server not running - fall back to demo credentials
-        console.warn('JSON Server not available, using demo credentials');
+      } catch (error) {
+        // JSON Server not running or timeout - fall back to demo credentials
+        if (!jsonServerAvailable) {
+          console.warn('JSON Server not available, using demo credentials');
+        }
       }
       
-      // Fallback to demo users when JSON Server is not available
-      if (demoUser && password === 'demo123') {
+      // Fallback to demo users when JSON Server is not available or credentials failed
+      if (!jsonServerAvailable && demoUser && password === 'demo123') {
         const demoToken = `demo-token-${demoUser.role}-` + Date.now();
         this.setToken(demoToken);
         return { user: demoUser, token: demoToken };
