@@ -888,6 +888,94 @@ Public endpoint for candidates to submit their application.
 
 ---
 
+## Contact Messages (Public)
+
+### POST /api/contact
+Public endpoint for visitors to submit contact form messages.
+
+**Request:**
+```json
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "company": "ABC Accounting",
+  "subject": "Inquiry about outsourcing services",
+  "message": "I would like to learn more about your bookkeeping services..."
+}
+```
+
+**Field Validation:**
+| Field | Required | Max Length | Notes |
+|-------|----------|------------|-------|
+| name | Yes | 100 chars | Full name |
+| email | Yes | 255 chars | Valid email format |
+| company | No | 100 chars | Company/Firm name |
+| subject | Yes | 200 chars | Message subject |
+| message | Yes | 2000 chars | Message body |
+
+**Response (Success):**
+```json
+{
+  "message": "Thank you for contacting us! We will get back to you as soon as possible."
+}
+```
+
+**Response (Validation Error):**
+```json
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "email": ["The email field must be a valid email address."],
+    "message": ["The message field is required."]
+  }
+}
+```
+
+### Contact Messages Migration
+
+```php
+Schema::create('contact_messages', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->string('email');
+    $table->string('company')->nullable();
+    $table->string('subject');
+    $table->text('message');
+    $table->boolean('is_read')->default(false);
+    $table->timestamps();
+});
+```
+
+### Laravel Controller Example
+
+```php
+// app/Http/Controllers/Api/ContactController.php
+class ContactController extends Controller
+{
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:100',
+            'email' => 'required|email|max:255',
+            'company' => 'nullable|string|max:100',
+            'subject' => 'required|string|max:200',
+            'message' => 'required|string|max:2000',
+        ]);
+        
+        $contact = ContactMessage::create($validated);
+        
+        // Send notification to admin
+        Mail::to(config('mail.admin_email'))->send(new NewContactMessage($contact));
+        
+        return response()->json([
+            'message' => 'Thank you for contacting us! We will get back to you as soon as possible.'
+        ]);
+    }
+}
+```
+
+---
+
 ## Email Notifications
 
 When a candidate submits an application, send:
