@@ -15,9 +15,9 @@ import auditImg from "@/assets/audit-service.jpg";
 
 const slides = [
   {
-    tagline: "Your Premier Outsourced Accounting Partner",
+    tagline: "Your Trusted Offshore Remote Accountants",
     subtitle: "Exceptional offshore accounting solutions trusted by firms across the US, Canada, Australia and Europe.",
-    highlight: "Multiverse CPA",
+    highlight: "Offshore Remote Accountants",
     image: heroBg,
   },
   {
@@ -33,15 +33,15 @@ const slides = [
     image: auditImg,
   },
   {
-    tagline: "Audit, Review & Financial Analysis",
+    tagline: "Audit, Review and Compilation Engagements",
     subtitle: "Thorough audit, review and compilation of financial statements with in-depth analysis.",
-    highlight: "Audit & Review",
+    highlight: "Engagements",
     image: heroBg,
   },
   {
-    tagline: "One-Stop Shop for Financial Needs",
-    subtitle: "Reduce complexity with a single partner for all your accounting outsourcing requirements.",
-    highlight: "Full-Service",
+    tagline: "Setting the Standards in Consulting Practice",
+    subtitle: "Your trusted partner for comprehensive accounting outsourcing requirements.",
+    highlight: "Consulting Practice",
     image: teamImg,
   },
 ];
@@ -108,7 +108,7 @@ export function HeroCarousel({ variant = "classic" }: HeroCarouselProps) {
                       <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 mb-4 backdrop-blur-sm">
                         <Sparkles className="w-3 h-3 text-qx-orange" />
                         <span className="text-xs text-white/90 uppercase tracking-wider">
-                          IFAC Affiliate Member
+                          Offshore Remote Accountants
                         </span>
                       </div>
 

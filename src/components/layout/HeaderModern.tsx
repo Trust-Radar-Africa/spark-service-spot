@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import { cn } from "@/lib/utils";
+import logoImg from "@/assets/logo.png";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,9 +44,11 @@ export function HeaderModern() {
         <div className="flex min-h-[100px] items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-qx-blue to-qx-blue-dark flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
-              <span className="text-2xl font-bold text-white font-heading">M</span>
-            </div>
+            <img 
+              src={logoImg} 
+              alt="Multiverse CPA Logo" 
+              className="h-14 w-auto object-contain"
+            />
             <div className="flex flex-col leading-tight">
               <span className="text-xl font-bold text-qx-blue font-heading tracking-tight">
                 Multiverse
@@ -77,8 +79,6 @@ export function HeaderModern() {
 
           {/* Right side */}
           <div className="hidden lg:flex items-center gap-3">
-            <ThemeSwitcher />
-            
             {/* Language Chooser */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -133,7 +133,6 @@ export function HeaderModern() {
               </DropdownMenuContent>
             </DropdownMenu>
             
-            <ThemeSwitcher />
             <button
               type="button"
               className="p-2 rounded-md text-qx-blue"
