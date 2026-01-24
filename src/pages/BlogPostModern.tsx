@@ -94,8 +94,8 @@ export default function BlogPostModern() {
       {/* Featured Image */}
       <section className="pt-10 pb-6 bg-white">
         <div className="container mx-auto px-4 lg:px-8">
-          <div className="max-w-4xl">
-            <div className="aspect-[16/9] overflow-hidden shadow-lg">
+          <div className="max-w-6xl">
+            <div className="aspect-[21/9] overflow-hidden shadow-lg">
               <img src={post.image} alt={post.title} className="w-full h-full object-cover" />
             </div>
           </div>
@@ -105,9 +105,9 @@ export default function BlogPostModern() {
       {/* Article Content */}
       <section className="py-8 bg-white">
         <div className="container mx-auto px-4 lg:px-8">
-          <div className="max-w-4xl">
+          <div className="grid lg:grid-cols-12 gap-8 max-w-6xl">
             {/* Main Content */}
-            <article>
+            <article className="lg:col-span-8">
               <div
                 className="prose prose-lg max-w-none 
                   prose-headings:font-montserrat prose-headings:text-qx-blue prose-headings:mt-8 prose-headings:mb-4
@@ -161,15 +161,15 @@ export default function BlogPostModern() {
               </div>
             </article>
 
-            {/* Author & Newsletter Section */}
-            <div className="grid md:grid-cols-2 gap-6 mt-12">
+            {/* Sidebar */}
+            <aside className="lg:col-span-4">
               {/* Author Bio */}
-              <div className="bg-qx-light-gray rounded-xl p-6">
+              <div className="bg-qx-light-gray rounded-xl p-6 mb-6">
                 <h3 className="text-job-title text-qx-blue mb-4">
                   About the Author
                 </h3>
                 <div className="flex items-start gap-4">
-                  <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
+                  <div className="w-14 h-14 rounded-full overflow-hidden flex-shrink-0">
                     <img
                       src={post.author.avatar}
                       alt={post.author.name}
@@ -181,13 +181,13 @@ export default function BlogPostModern() {
                     <p className="text-job-meta text-qx-orange mb-2">{post.author.role}</p>
                   </div>
                 </div>
-                <p className="text-body-paragraph text-qx-gray mt-4">{post.author.bio}</p>
+                <p className="text-body-paragraph text-qx-gray mt-4 text-sm">{post.author.bio}</p>
               </div>
 
               {/* Newsletter Signup */}
               <div className="bg-qx-blue rounded-xl p-6">
                 <h3 className="text-job-title text-white mb-2">Stay Updated</h3>
-                <p className="text-body-paragraph text-white/70 mb-4">
+                <p className="text-body-paragraph text-white/70 mb-4 text-sm">
                   Get the latest insights delivered to your inbox.
                 </p>
                 <input
@@ -199,7 +199,7 @@ export default function BlogPostModern() {
                   Subscribe
                 </Button>
               </div>
-            </div>
+            </aside>
           </div>
         </div>
       </section>
