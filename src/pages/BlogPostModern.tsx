@@ -61,18 +61,20 @@ export default function BlogPostModern() {
       </section>
 
       {/* Featured Image */}
-      <section className="bg-white">
+      <section className="pt-10 pb-6 bg-white">
         <div className="container mx-auto px-4 lg:px-8">
-          <div className="aspect-[21/9] overflow-hidden shadow-xl max-w-5xl mx-auto -mt-8">
-            <img src={post.image} alt={post.title} className="w-full h-full object-cover" />
+          <div className="max-w-4xl">
+            <div className="aspect-[16/9] overflow-hidden shadow-lg">
+              <img src={post.image} alt={post.title} className="w-full h-full object-cover" />
+            </div>
           </div>
         </div>
       </section>
 
       {/* Article Content */}
-      <section className="py-12 bg-white">
+      <section className="py-8 bg-white">
         <div className="container mx-auto px-4 lg:px-8">
-          <div className="grid lg:grid-cols-12 gap-12 max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-12 gap-12 max-w-4xl">
             {/* Main Content */}
             <article className="lg:col-span-8">
               <div
