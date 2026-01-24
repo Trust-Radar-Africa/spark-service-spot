@@ -40,7 +40,7 @@ export const useAuditLogStore = create<AuditLogState>()(
       isLoading: false,
 
       fetchLogs: async () => {
-        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+        const { isLiveMode, getApiUrl } = useApiConfigStore.getState();
 
         if (!isLiveMode()) return;
 
@@ -48,7 +48,7 @@ export const useAuditLogStore = create<AuditLogState>()(
 
         try {
           const token = localStorage.getItem('admin_token');
-          const response = await fetch(`${apiBaseUrl}/api/admin/audit-logs`, {
+          const response = await fetch(getApiUrl('/api/admin/audit-logs'), {
             headers: {
               Authorization: `Bearer ${token}`,
               Accept: 'application/json',
@@ -67,7 +67,7 @@ export const useAuditLogStore = create<AuditLogState>()(
       },
 
       addLog: async (entry) => {
-        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+        const { isLiveMode, getApiUrl } = useApiConfigStore.getState();
 
         const newEntry: AuditLogEntry = {
           ...entry,
@@ -84,7 +84,7 @@ export const useAuditLogStore = create<AuditLogState>()(
         if (isLiveMode()) {
           try {
             const token = localStorage.getItem('admin_token');
-            await fetch(`${apiBaseUrl}/api/admin/audit-logs`, {
+            await fetch(getApiUrl('/api/admin/audit-logs'), {
               method: 'POST',
               headers: {
                 Authorization: `Bearer ${token}`,
