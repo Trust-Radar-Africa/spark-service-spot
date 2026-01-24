@@ -57,6 +57,7 @@ const ACTION_LABELS: Record<AuditLogEntry['action'], string> = {
   activate: 'Activated',
   publish: 'Published',
   unpublish: 'Unpublished',
+  download: 'Downloaded',
 };
 
 const ACTION_COLORS: Record<AuditLogEntry['action'], string> = {
@@ -68,6 +69,7 @@ const ACTION_COLORS: Record<AuditLogEntry['action'], string> = {
   activate: 'bg-emerald-500/10 text-emerald-600',
   publish: 'bg-purple-500/10 text-purple-600',
   unpublish: 'bg-orange-500/10 text-orange-600',
+  download: 'bg-cyan-500/10 text-cyan-600',
 };
 
 const MODULE_LABELS: Record<AuditLogEntry['module'], string> = {

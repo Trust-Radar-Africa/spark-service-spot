@@ -260,6 +260,28 @@ export default function CandidatesPage() {
   };
 
   const handleDownloadCV = async (candidate: CandidateApplication) => {
+    if (!candidate.cv_url) {
+      toast({
+        title: 'No CV available',
+        description: `${candidate.first_name} ${candidate.last_name} has not uploaded a CV.`,
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    // Log the download action
+    if (user) {
+      logAction(
+        'download',
+        'candidates',
+        candidate.id,
+        `CV: ${candidate.first_name} ${candidate.last_name}`,
+        { id: String(user.id), name: user.name, email: user.email, role: user.role || 'super_admin' }
+      );
+    }
+    
+    // Open the CV URL in a new tab for download
+    window.open(candidate.cv_url, '_blank');
     toast({
       title: 'Download started',
       description: `Downloading CV for ${candidate.first_name} ${candidate.last_name}`,
@@ -267,9 +289,67 @@ export default function CandidatesPage() {
   };
 
   const handleDownloadCoverLetter = async (candidate: CandidateApplication) => {
+    if (!candidate.cover_letter_url) {
+      toast({
+        title: 'No cover letter available',
+        description: `${candidate.first_name} ${candidate.last_name} has not uploaded a cover letter.`,
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    // Log the download action
+    if (user) {
+      logAction(
+        'download',
+        'candidates',
+        candidate.id,
+        `Cover Letter: ${candidate.first_name} ${candidate.last_name}`,
+        { id: String(user.id), name: user.name, email: user.email, role: user.role || 'super_admin' }
+      );
+    }
+    
+    // Open the cover letter URL in a new tab for download
+    window.open(candidate.cover_letter_url, '_blank');
     toast({
       title: 'Download started',
       description: `Downloading cover letter for ${candidate.first_name} ${candidate.last_name}`,
+    });
+  };
+
+  const handleBulkDownloadCVs = () => {
+    const candidatesWithCV = selectedItems.filter(c => c.cv_url);
+    if (candidatesWithCV.length === 0) {
+      toast({
+        title: 'No CVs available',
+        description: 'None of the selected candidates have uploaded CVs.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    candidatesWithCV.forEach((c) => handleDownloadCV(c));
+    toast({
+      title: 'Bulk download started',
+      description: `Downloading ${candidatesWithCV.length} CVs.`,
+    });
+  };
+
+  const handleBulkDownloadCoverLetters = () => {
+    const candidatesWithCL = selectedItems.filter(c => c.cover_letter_url);
+    if (candidatesWithCL.length === 0) {
+      toast({
+        title: 'No cover letters available',
+        description: 'None of the selected candidates have uploaded cover letters.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    candidatesWithCL.forEach((c) => handleDownloadCoverLetter(c));
+    toast({
+      title: 'Bulk download started',
+      description: `Downloading ${candidatesWithCL.length} cover letters.`,
     });
   };
 
@@ -662,34 +742,26 @@ export default function CandidatesPage() {
 
         {/* Bulk Download Actions */}
         {selectedCount > 0 && !isViewer && (
-          <div className="flex gap-2 p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
+          <div className="flex flex-wrap gap-2 p-3 bg-accent/50 rounded-lg border">
+            <span className="text-sm text-muted-foreground flex items-center mr-2">
+              <Download className="h-4 w-4 mr-1.5" />
+              Bulk Downloads:
+            </span>
             <Button
               variant="outline"
               size="sm"
-              onClick={() => {
-                selectedItems.forEach((c) => handleDownloadCV(c));
-                toast({
-                  title: 'Bulk download started',
-                  description: `Downloading ${selectedCount} CVs.`,
-                });
-              }}
+              onClick={handleBulkDownloadCVs}
             >
               <Download className="h-4 w-4 mr-2" />
-              Download CVs ({selectedCount})
+              Download CVs ({selectedItems.filter(c => c.cv_url).length}/{selectedCount})
             </Button>
             <Button
               variant="outline"
               size="sm"
-              onClick={() => {
-                selectedItems.forEach((c) => handleDownloadCoverLetter(c));
-                toast({
-                  title: 'Bulk download started',
-                  description: `Downloading ${selectedCount} cover letters.`,
-                });
-              }}
+              onClick={handleBulkDownloadCoverLetters}
             >
               <FileText className="h-4 w-4 mr-2" />
-              Download Cover Letters ({selectedCount})
+              Download Cover Letters ({selectedItems.filter(c => c.cover_letter_url).length}/{selectedCount})
             </Button>
           </div>
         )}
