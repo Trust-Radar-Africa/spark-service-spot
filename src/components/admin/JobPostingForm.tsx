@@ -216,26 +216,25 @@ export default function JobPostingForm({
           />
         </div>
 
-        {/* Row 4: Currency Override */}
+        {/* Row 4: Currency Selection */}
         <FormField
           control={form.control}
           name="currency_override"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Currency</FormLabel>
+              {/* Note: Auto-detection code preserved but hidden from UI */}
+              {/* detectedCurrency from location: {detectedCurrency} */}
               <Select 
-                onValueChange={(value) => field.onChange(value === 'auto' ? '' : value)} 
-                defaultValue={field.value || 'auto'}
+                onValueChange={field.onChange} 
+                defaultValue={field.value || 'USD'}
               >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Auto-detect from location" />
+                    <SelectValue placeholder="Select currency" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent className="bg-popover border shadow-lg z-50 max-h-60">
-                  <SelectItem value="auto">
-                    Auto-detect ({detectedCurrency})
-                  </SelectItem>
                   {AVAILABLE_CURRENCIES.map((currency) => (
                     <SelectItem key={currency.value} value={currency.value}>
                       {currency.label}
@@ -244,7 +243,7 @@ export default function JobPostingForm({
                 </SelectContent>
               </Select>
               <FormDescription>
-                Currency is auto-detected from country. Override if detection is wrong.
+                Select the currency for the salary range
               </FormDescription>
               <FormMessage />
             </FormItem>
