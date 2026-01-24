@@ -303,3 +303,134 @@ export function convertApiBlogToFrontend(post: PublicBlogPost): BlogPost {
     slug: post.slug,
   };
 }
+
+// ============================================
+// PUBLIC CONTACT API
+// ============================================
+
+export interface ContactFormData {
+  name: string;
+  email: string;
+  company?: string;
+  subject: string;
+  message: string;
+}
+
+export async function submitContactForm(data: ContactFormData): Promise<{ message: string }> {
+  const { apiBaseUrl, isLiveMode } = getApiConfig();
+  
+  if (!isLiveMode) {
+    throw new Error('Not in live mode');
+  }
+
+  const response = await fetch(`${apiBaseUrl}/api/contact`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to submit contact form');
+  }
+
+  return response.json();
+}
+
+// ============================================
+// PUBLIC CANDIDATE APPLICATION API
+// ============================================
+
+export interface CandidateApplicationData {
+  first_name: string;
+  last_name: string;
+  email: string;
+  nationality: string;
+  country: string;
+  expected_salary: string;
+  experience: string;
+  cv: File;
+  cover_letter: File;
+  job_title?: string;
+  job_id?: number;
+}
+
+export async function submitCandidateApplication(data: CandidateApplicationData): Promise<{ message: string }> {
+  const { apiBaseUrl, isLiveMode } = getApiConfig();
+  
+  if (!isLiveMode) {
+    throw new Error('Not in live mode');
+  }
+
+  const formData = new FormData();
+  formData.append('first_name', data.first_name);
+  formData.append('last_name', data.last_name);
+  formData.append('email', data.email);
+  formData.append('nationality', data.nationality);
+  formData.append('country', data.country);
+  formData.append('expected_salary', data.expected_salary);
+  formData.append('experience', data.experience);
+  formData.append('cv', data.cv);
+  formData.append('cover_letter', data.cover_letter);
+  if (data.job_title) {
+    formData.append('job_title', data.job_title);
+  }
+  if (data.job_id) {
+    formData.append('job_id', data.job_id.toString());
+  }
+
+  const response = await fetch(`${apiBaseUrl}/api/candidates/apply`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to submit application');
+  }
+
+  return response.json();
+}
+
+// ============================================
+// PUBLIC EMPLOYER REQUEST API
+// ============================================
+
+export interface EmployerRequestData {
+  firm_name: string;
+  email: string;
+  country: string;
+  position_title?: string;
+  preferred_location: string;
+  preferred_nationality: string;
+  budgeted_salary: string;
+  years_experience: string;
+  other_qualifications?: string;
+}
+
+export async function submitEmployerRequest(data: EmployerRequestData): Promise<{ message: string }> {
+  const { apiBaseUrl, isLiveMode } = getApiConfig();
+  
+  if (!isLiveMode) {
+    throw new Error('Not in live mode');
+  }
+
+  const response = await fetch(`${apiBaseUrl}/api/employer-requests`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to submit employer request');
+  }
+
+  return response.json();
+}

@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Mail, Calendar, Send, CheckCircle2, Phone, MapPin, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { AnimatedSection } from "@/components/AnimatedSection";
+import { submitContactForm } from "@/services/publicApi";
+import { useApiConfigStore } from "@/stores/apiConfigStore";
 
 export default function ContactModern() {
   const [formData, setFormData] = useState({
@@ -17,25 +19,40 @@ export default function ContactModern() {
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { isLiveMode } = useApiConfigStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      if (isLiveMode()) {
+        await submitContactForm(formData);
+        toast.success("Message sent successfully!", {
+          description: "We will get back to you as soon as possible.",
+        });
+      } else {
+        // Demo mode - simulate API delay
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        toast.success("Message sent successfully!", {
+          description: "We will get back to you as soon as possible.",
+        });
+      }
 
-    toast.success("Message sent successfully!", {
-      description: "We will get back to you as soon as possible.",
-    });
-
-    setFormData({
-      name: "",
-      email: "",
-      company: "",
-      subject: "",
-      message: "",
-    });
-    setIsSubmitting(false);
+      setFormData({
+        name: "",
+        email: "",
+        company: "",
+        subject: "",
+        message: "",
+      });
+    } catch (error) {
+      toast.error("Failed to send message", {
+        description: error instanceof Error ? error.message : "Please try again later.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (

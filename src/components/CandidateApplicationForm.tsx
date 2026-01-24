@@ -25,6 +25,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, Upload, FileText, CheckCircle2, X, AlertCircle } from 'lucide-react';
 import { ExperienceLevel } from '@/types/admin';
 import { getCountryOptions, getNationalityOptions } from '@/data/countries';
+import { submitCandidateApplication } from '@/services/publicApi';
+import { useApiConfigStore } from '@/stores/apiConfigStore';
 
 const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB for longer CVs
 const ACCEPTED_FILE_TYPE = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
@@ -101,6 +103,7 @@ export default function CandidateApplicationForm({ jobTitle, onSuccess }: Candid
   const [coverLetterFile, setCoverLetterFile] = useState<File | null>(null);
   const [fileErrors, setFileErrors] = useState<{ cv?: string; cover_letter?: string }>({});
   const { toast } = useToast();
+  const { isLiveMode } = useApiConfigStore();
 
   const form = useForm<CandidateFormData>({
     resolver: zodResolver(candidateFormSchema),
@@ -161,37 +164,23 @@ export default function CandidateApplicationForm({ jobTitle, onSuccess }: Candid
     setIsSubmitting(true);
 
     try {
-      // Create FormData for file upload
-      const formData = new FormData();
-      formData.append('first_name', data.first_name);
-      formData.append('last_name', data.last_name);
-      formData.append('email', data.email);
-      formData.append('nationality', data.nationality);
-      formData.append('country', data.country);
-      formData.append('expected_salary', data.expected_salary);
-      formData.append('experience', data.experience);
-      formData.append('cv', data.cv);
-      formData.append('cover_letter', data.cover_letter);
-      if (jobTitle) {
-        formData.append('job_title', jobTitle);
-      }
-
-      // API call to Laravel backend
-      const apiUrl = import.meta.env.VITE_LARAVEL_API_URL || 'http://localhost:8000';
-      
-      try {
-        const response = await fetch(`${apiUrl}/api/candidates/apply`, {
-          method: 'POST',
-          body: formData,
+      if (isLiveMode()) {
+        // Use the centralized API service for live mode
+        await submitCandidateApplication({
+          first_name: data.first_name,
+          last_name: data.last_name,
+          email: data.email,
+          nationality: data.nationality,
+          country: data.country,
+          expected_salary: data.expected_salary,
+          experience: data.experience,
+          cv: data.cv,
+          cover_letter: data.cover_letter,
+          job_title: jobTitle,
         });
-
-        if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.message || 'Submission failed');
-        }
-      } catch (fetchError) {
-        // If API is not available, simulate success for demo
-        console.log('API not available, simulating success for demo');
+      } else {
+        // Demo mode - simulate API delay
+        console.log('Demo mode: simulating application submission');
         await new Promise((resolve) => setTimeout(resolve, 1500));
       }
 

@@ -25,6 +25,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, CheckCircle2, Building2 } from 'lucide-react';
 import { ExperienceLevel } from '@/types/admin';
 import { getCountryOptions, getNationalityOptions } from '@/data/countries';
+import { submitEmployerRequest } from '@/services/publicApi';
+import { useApiConfigStore } from '@/stores/apiConfigStore';
 
 const SALARY_RANGES = [
   { value: '500-1000', label: 'USD 500 - 1,000 per month' },
@@ -94,6 +96,7 @@ export default function EmployerRequestForm({ onSuccess }: EmployerRequestFormPr
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const { toast } = useToast();
+  const { isLiveMode } = useApiConfigStore();
 
   const form = useForm<EmployerRequestFormData>({
     resolver: zodResolver(employerRequestSchema),
@@ -114,25 +117,22 @@ export default function EmployerRequestForm({ onSuccess }: EmployerRequestFormPr
     setIsSubmitting(true);
 
     try {
-      const apiUrl = import.meta.env.VITE_LARAVEL_API_URL || 'http://localhost:8000';
-
-      try {
-        const response = await fetch(`${apiUrl}/api/employer-requests`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-          },
-          body: JSON.stringify(data),
+      if (isLiveMode()) {
+        // Use the centralized API service for live mode
+        await submitEmployerRequest({
+          firm_name: data.firm_name,
+          email: data.email,
+          country: data.country,
+          position_title: data.position_title,
+          preferred_location: data.preferred_location,
+          preferred_nationality: data.preferred_nationality,
+          budgeted_salary: data.budgeted_salary,
+          years_experience: data.years_experience,
+          other_qualifications: data.other_qualifications,
         });
-
-        if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.message || 'Submission failed');
-        }
-      } catch (fetchError) {
-        // If API is not available, simulate success for demo
-        console.log('API not available, simulating success for demo');
+      } else {
+        // Demo mode - simulate API delay
+        console.log('Demo mode: simulating employer request submission');
         await new Promise((resolve) => setTimeout(resolve, 1500));
       }
 
