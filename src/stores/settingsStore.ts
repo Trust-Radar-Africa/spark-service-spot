@@ -94,6 +94,7 @@ export const ROLE_PERMISSIONS: Record<AdminRole, {
 interface SettingsState {
   // Loading state
   isLoading: boolean;
+  error: string | null;
 
   // Branding
   branding: BrandingSettings;
@@ -126,44 +127,24 @@ interface SettingsState {
   notifications: NotificationPreferences;
   setNotifications: (prefs: Partial<NotificationPreferences>) => Promise<void>;
 
-  // Admin Users (for display, managed by Laravel)
+  // Admin Users (for display, managed by backend)
   adminUsers: AdminUser[];
   setAdminUsers: (users: AdminUser[]) => void;
 
-  // Live mode functions
+  // API functions
   fetchSettings: () => Promise<void>;
   fetchAdminUsers: () => Promise<void>;
   saveSettingsToApi: () => Promise<void>;
 }
-
-const defaultBlogCategories: BlogCategory[] = [
-  { id: '1', name: 'Industry News', slug: 'industry-news', description: 'Latest accounting industry updates', isDefault: true },
-  { id: '2', name: 'Tips & Tricks', slug: 'tips-tricks', description: 'Helpful tips for professionals', isDefault: true },
-  { id: '3', name: 'Compliance', slug: 'compliance', description: 'Regulatory and compliance updates', isDefault: true },
-  { id: '4', name: 'Career Advice', slug: 'career-advice', description: 'Career development tips', isDefault: true },
-  { id: '5', name: 'Technology', slug: 'technology', description: 'Tech in accounting', isDefault: true },
-];
-
-const defaultExperienceLevels: ExperienceLevel[] = [
-  { id: '1', value: '0-3', label: '0-3 years', isDefault: true },
-  { id: '2', value: '3-7', label: '3-7 years', isDefault: true },
-  { id: '3', value: '7-10', label: '7-10 years', isDefault: true },
-  { id: '4', value: '10+', label: '10+ years', isDefault: true },
-];
-
-const defaultSocialLinks: SocialLink[] = [
-  { id: '1', platform: 'LinkedIn', url: 'https://www.linkedin.com/company/multiversecpa', icon: 'linkedin', enabled: true },
-  { id: '2', platform: 'Twitter', url: 'https://x.com/CPAMULTIVERSE', icon: 'twitter', enabled: true },
-  { id: '3', platform: 'Facebook', url: 'https://facebook.com/goa', icon: 'facebook', enabled: false },
-];
 
 export const useSettingsStore = create<SettingsState>()(
   persist(
     (set, get) => ({
       // Loading state
       isLoading: false,
+      error: null,
 
-      // Branding
+      // Branding - defaults
       branding: {
         logoUrl: null,
         companyName: 'Global Outsourced Accounting',
@@ -175,15 +156,10 @@ export const useSettingsStore = create<SettingsState>()(
         set((state) => ({
           branding: { ...state.branding, ...branding },
         }));
-
-        // Save to API if in live mode
-        const { isLiveMode } = useApiConfigStore.getState();
-        if (isLiveMode()) {
-          await get().saveSettingsToApi();
-        }
+        await get().saveSettingsToApi();
       },
 
-      // General Settings
+      // General Settings - defaults
       general: {
         themeMode: 'light',
         itemsPerPage: 10,
@@ -197,16 +173,11 @@ export const useSettingsStore = create<SettingsState>()(
         set((state) => ({
           general: { ...state.general, ...settings },
         }));
-
-        // Save to API if in live mode
-        const { isLiveMode } = useApiConfigStore.getState();
-        if (isLiveMode()) {
-          await get().saveSettingsToApi();
-        }
+        await get().saveSettingsToApi();
       },
 
-      // Social Links
-      socialLinks: defaultSocialLinks,
+      // Social Links - start empty, fetch from API
+      socialLinks: [],
       addSocialLink: (link) =>
         set((state) => ({
           socialLinks: [...state.socialLinks, { ...link, id: crypto.randomUUID() }],
@@ -223,8 +194,8 @@ export const useSettingsStore = create<SettingsState>()(
         })),
       reorderSocialLinks: (links) => set({ socialLinks: links }),
 
-      // Blog Categories
-      blogCategories: defaultBlogCategories,
+      // Blog Categories - start empty, fetch from API
+      blogCategories: [],
       addBlogCategory: (category) =>
         set((state) => ({
           blogCategories: [
@@ -243,8 +214,8 @@ export const useSettingsStore = create<SettingsState>()(
           blogCategories: state.blogCategories.filter((c) => c.id !== id),
         })),
 
-      // Experience Levels
-      experienceLevels: defaultExperienceLevels,
+      // Experience Levels - start empty, fetch from API
+      experienceLevels: [],
       addExperienceLevel: (level) =>
         set((state) => ({
           experienceLevels: [
@@ -263,7 +234,7 @@ export const useSettingsStore = create<SettingsState>()(
           experienceLevels: state.experienceLevels.filter((l) => l.id !== id),
         })),
 
-      // Notification Preferences
+      // Notification Preferences - defaults
       notifications: {
         emailNewCandidates: true,
         emailNewEmployerRequests: true,
@@ -276,50 +247,18 @@ export const useSettingsStore = create<SettingsState>()(
         set((state) => ({
           notifications: { ...state.notifications, ...prefs },
         }));
-
-        // Save to API if in live mode
-        const { isLiveMode } = useApiConfigStore.getState();
-        if (isLiveMode()) {
-          await get().saveSettingsToApi();
-        }
+        await get().saveSettingsToApi();
       },
 
-      // Admin Users - includes test users for different roles
-      adminUsers: [
-        {
-          id: '1',
-          email: 'admin@demo.com',
-          name: 'Demo Admin',
-          role: 'super_admin',
-          createdAt: '2024-01-01T00:00:00Z',
-          lastLogin: new Date().toISOString(),
-        },
-        {
-          id: '2',
-          email: 'editor@demo.com',
-          name: 'Test Editor',
-          role: 'editor',
-          createdAt: '2024-01-01T00:00:00Z',
-          lastLogin: new Date().toISOString(),
-        },
-        {
-          id: '3',
-          email: 'viewer@demo.com',
-          name: 'Test Viewer',
-          role: 'viewer',
-          createdAt: '2024-01-01T00:00:00Z',
-          lastLogin: new Date().toISOString(),
-        },
-      ],
+      // Admin Users - start empty, fetch from API
+      adminUsers: [],
       setAdminUsers: (users) => set({ adminUsers: users }),
 
-      // Live mode functions
+      // API functions
       fetchSettings: async () => {
-        const { isLiveMode, getApiUrl } = useApiConfigStore.getState();
+        const { getApiUrl } = useApiConfigStore.getState();
 
-        if (!isLiveMode()) return;
-
-        set({ isLoading: true });
+        set({ isLoading: true, error: null });
 
         try {
           const token = localStorage.getItem('admin_token');
@@ -353,18 +292,18 @@ export const useSettingsStore = create<SettingsState>()(
             if (settings.experienceLevels) {
               set({ experienceLevels: settings.experienceLevels });
             }
+            set({ isLoading: false });
+            return;
           }
+          set({ error: 'Failed to fetch settings', isLoading: false });
         } catch (error) {
           console.error('Failed to fetch settings from API:', error);
-        } finally {
-          set({ isLoading: false });
+          set({ error: 'Failed to connect to server', isLoading: false });
         }
       },
 
       fetchAdminUsers: async () => {
-        const { isLiveMode, getApiUrl } = useApiConfigStore.getState();
-
-        if (!isLiveMode()) return;
+        const { getApiUrl } = useApiConfigStore.getState();
 
         try {
           const token = localStorage.getItem('admin_token');
@@ -385,9 +324,7 @@ export const useSettingsStore = create<SettingsState>()(
       },
 
       saveSettingsToApi: async () => {
-        const { isLiveMode, getApiUrl } = useApiConfigStore.getState();
-
-        if (!isLiveMode()) return;
+        const { getApiUrl } = useApiConfigStore.getState();
 
         try {
           const token = localStorage.getItem('admin_token');
