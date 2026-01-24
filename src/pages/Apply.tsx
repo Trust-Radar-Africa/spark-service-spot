@@ -1,12 +1,18 @@
 import { useSearchParams, Link } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
-import { Button } from '@/components/ui/button';
 import CandidateApplicationForm from '@/components/CandidateApplicationForm';
 import { ArrowLeft, Briefcase } from 'lucide-react';
+import { useJobPostingsStore } from '@/stores/jobPostingsStore';
 
 export default function Apply() {
   const [searchParams] = useSearchParams();
-  const jobTitle = searchParams.get('job') || undefined;
+  const jobParam = searchParams.get('job') || undefined;
+  const { getJobById } = useJobPostingsStore();
+
+  // Try to get job by ID first, fallback to treating param as title for backwards compatibility
+  const jobId = jobParam ? parseInt(jobParam, 10) : undefined;
+  const job = jobId && !isNaN(jobId) ? getJobById(jobId) : undefined;
+  const jobTitle = job?.title || (jobParam && isNaN(parseInt(jobParam, 10)) ? jobParam : undefined);
 
   return (
     <Layout>
