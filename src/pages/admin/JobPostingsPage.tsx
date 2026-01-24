@@ -817,17 +817,21 @@ export default function JobPostingsPage() {
                         )}
                         <div className="md:hidden text-xs text-muted-foreground mt-1">
                           <MapPin className="h-3 w-3 inline mr-1" />
-                          {job.country} - {job.location}
+                          {job.country}{job.location ? ` - ${job.location}` : ''}
                         </div>
                       </TableCell>
                       <TableCell className="hidden lg:table-cell">
                         <span className="truncate max-w-[120px]">{job.country}</span>
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        <div className="flex items-center gap-1.5">
-                          <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-                          <span className="truncate max-w-[120px]">{job.location}</span>
-                        </div>
+                        {job.location ? (
+                          <div className="flex items-center gap-1.5">
+                            <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+                            <span className="truncate max-w-[120px]">{job.location}</span>
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
                       </TableCell>
                       <TableCell className="hidden lg:table-cell">
                         <Badge variant={job.work_type === 'remote' ? 'default' : 'secondary'}>
@@ -854,6 +858,16 @@ export default function JobPostingsPage() {
                       </TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              asChild
+                              title="View posting"
+                            >
+                              <a href={`/careers#job-${job.id}`} target="_blank" rel="noopener noreferrer">
+                                <Eye className="h-4 w-4" />
+                              </a>
+                            </Button>
                             {canUpdate('jobs') && (
                               <Button
                                 variant="ghost"

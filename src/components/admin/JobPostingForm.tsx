@@ -41,7 +41,7 @@ const jobPostingSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters').max(100),
   description: z.string().min(20, 'Description must be at least 20 characters').max(5000),
   country: z.string().min(2, 'Country is required'),
-  location: z.string().min(2, 'Specific location is required').max(100),
+  location: z.string().max(100).optional(),
   work_type: z.enum(['remote', 'hybrid', 'on-site', 'flexible'] as const),
   experience_required: z.enum(['0-3', '3-7', '7-10', '10+'] as const),
   requirements: z.string().max(2000).optional(),
@@ -160,11 +160,11 @@ export default function JobPostingForm({
             name="location"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>City/Region *</FormLabel>
+                <FormLabel>City/Region</FormLabel>
                 <FormControl>
-                  <Input placeholder="e.g., London, Dublin, Atlanta" {...field} />
+                  <Input placeholder="e.g., London, Dublin, Atlanta (optional)" {...field} />
                 </FormControl>
-                <FormDescription>City or region within the selected country</FormDescription>
+                <FormDescription>City or region within the selected country (optional)</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
