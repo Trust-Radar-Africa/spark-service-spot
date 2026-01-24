@@ -9,7 +9,7 @@ export interface AuditLogEntry {
   userName: string;
   userEmail: string;
   userRole: string;
-  action: 'create' | 'update' | 'delete' | 'archive' | 'deactivate' | 'activate' | 'publish' | 'unpublish';
+  action: 'create' | 'update' | 'delete' | 'archive' | 'deactivate' | 'activate' | 'publish' | 'unpublish' | 'download';
   module: 'candidates' | 'jobs' | 'employer_requests' | 'blog';
   resourceId: number | string;
   resourceName: string;
