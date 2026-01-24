@@ -4,10 +4,59 @@ This document outlines the API endpoints required for the admin panel to functio
 
 ## Configuration
 
-Set the following environment variable in your React app:
+### Environment Variables
+
+The frontend uses environment variables to configure the data source and API connection:
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `VITE_LARAVEL_API_URL` | Yes (for live mode) | Your Laravel API base URL |
+| `VITE_DATA_MODE` | No | Force `demo` or `live` mode (overrides auto-detection) |
+
+### Data Source Modes
+
+The application supports two data modes:
+
+1. **Demo Mode** (default): Uses local mock data from Zustand stores. No backend required.
+2. **Live Mode**: Connects to your Laravel backend API for real data.
+
+### Mode Detection Logic
+
 ```
-VITE_LARAVEL_API_URL=https://your-laravel-api.com
+1. If VITE_DATA_MODE is set to 'demo' or 'live' → use that mode
+2. Else if VITE_LARAVEL_API_URL is set → use 'live' mode
+3. Else → use 'demo' mode
 ```
+
+### Example Configurations
+
+```bash
+# Demo mode (default - no env vars needed)
+# Application uses local mock data
+
+# Live mode (auto-detected)
+VITE_LARAVEL_API_URL=https://api.yoursite.com
+
+# Force demo mode even with API URL configured (useful for testing)
+VITE_LARAVEL_API_URL=https://api.yoursite.com
+VITE_DATA_MODE=demo
+
+# Force live mode explicitly
+VITE_LARAVEL_API_URL=https://api.yoursite.com
+VITE_DATA_MODE=live
+```
+
+### Laravel .env Configuration
+
+```bash
+# Required for Sanctum SPA authentication
+SANCTUM_STATEFUL_DOMAINS=localhost:5173,your-frontend.com
+SESSION_DOMAIN=.yourdomain.com
+
+# CORS origins
+CORS_ALLOWED_ORIGINS=http://localhost:5173,https://your-frontend.com
+```
+
 
 ## Authentication (Laravel Sanctum)
 
