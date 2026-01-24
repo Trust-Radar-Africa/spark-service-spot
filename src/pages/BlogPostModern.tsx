@@ -74,9 +74,9 @@ export default function BlogPostModern() {
       {/* Article Content */}
       <section className="py-8 bg-white">
         <div className="container mx-auto px-4 lg:px-8">
-          <div className="grid lg:grid-cols-12 gap-12 max-w-4xl">
+          <div className="max-w-4xl">
             {/* Main Content */}
-            <article className="lg:col-span-8">
+            <article>
               <div
                 className="prose prose-lg max-w-none 
                   prose-headings:font-montserrat prose-headings:text-qx-blue prose-headings:mt-8 prose-headings:mb-4
@@ -130,10 +130,10 @@ export default function BlogPostModern() {
               </div>
             </article>
 
-            {/* Sidebar */}
-            <aside className="lg:col-span-4">
+            {/* Author & Newsletter Section */}
+            <div className="grid md:grid-cols-2 gap-6 mt-12">
               {/* Author Bio */}
-              <div className="bg-qx-light-gray rounded-xl p-6 mb-8">
+              <div className="bg-qx-light-gray rounded-xl p-6">
                 <h3 className="text-job-title text-qx-blue mb-4">
                   About the Author
                 </h3>
@@ -154,7 +154,7 @@ export default function BlogPostModern() {
               </div>
 
               {/* Newsletter Signup */}
-              <div className="bg-qx-blue rounded-xl p-6 mb-8">
+              <div className="bg-qx-blue rounded-xl p-6">
                 <h3 className="text-job-title text-white mb-2">Stay Updated</h3>
                 <p className="text-body-paragraph text-white/70 mb-4">
                   Get the latest insights delivered to your inbox.
@@ -168,7 +168,7 @@ export default function BlogPostModern() {
                   Subscribe
                 </Button>
               </div>
-            </aside>
+            </div>
           </div>
         </div>
       </section>
