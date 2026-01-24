@@ -26,17 +26,29 @@ import { Loader2, Upload, FileText, CheckCircle2, X, AlertCircle } from 'lucide-
 import { ExperienceLevel } from '@/types/admin';
 import { getCountryOptions, getNationalityOptions } from '@/data/countries';
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB for longer CVs
 const ACCEPTED_FILE_TYPE = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
 // Validation for Word documents only
 const fileSchema = z
   .instanceof(File)
-  .refine((file) => file.size <= MAX_FILE_SIZE, 'File size must be less than 5MB')
+  .refine((file) => file.size <= MAX_FILE_SIZE, 'File size must be less than 20MB')
   .refine(
     (file) => file.type === ACCEPTED_FILE_TYPE || file.name.endsWith('.docx'),
     'Only Word documents (.docx) are accepted'
   );
+
+// Expected salary ranges in USD per month
+const SALARY_RANGES = [
+  { value: '500-1000', label: 'USD 500 - 1,000 PM' },
+  { value: '1001-1500', label: 'USD 1,001 - 1,500 PM' },
+  { value: '1501-2000', label: 'USD 1,501 - 2,000 PM' },
+  { value: '2001-2500', label: 'USD 2,001 - 2,500 PM' },
+  { value: '2501-3000', label: 'USD 2,501 - 3,000 PM' },
+  { value: '3001-3500', label: 'USD 3,001 - 3,500 PM' },
+  { value: '3501-4000', label: 'USD 3,501 - 4,000 PM' },
+  { value: 'above-4001', label: 'Above USD 4,001 PM' },
+];
 
 const candidateFormSchema = z.object({
   first_name: z
@@ -55,7 +67,9 @@ const candidateFormSchema = z.object({
     .min(2, 'Nationality is required')
     .max(50, 'Nationality must be less than 50 characters'),
   country: z.string().min(2, 'Country is required'),
-  location: z.string().max(100, 'Location must be less than 100 characters').optional(),
+  expected_salary: z.string({
+    required_error: 'Please select your expected salary range',
+  }).min(1, 'Please select your expected salary range'),
   experience: z.enum(['0-3', '3-7', '7-10', '10+'] as const, {
     required_error: 'Please select your experience level',
   }),
@@ -96,14 +110,14 @@ export default function CandidateApplicationForm({ jobTitle, onSuccess }: Candid
       email: '',
       nationality: '',
       country: '',
-      location: '',
+      expected_salary: '',
       experience: undefined,
     },
   });
 
   const validateFile = (file: File, fieldName: 'cv' | 'cover_letter'): boolean => {
     if (file.size > MAX_FILE_SIZE) {
-      setFileErrors((prev) => ({ ...prev, [fieldName]: 'File size must be less than 5MB' }));
+      setFileErrors((prev) => ({ ...prev, [fieldName]: 'File size must be less than 20MB' }));
       return false;
     }
     if (file.type !== ACCEPTED_FILE_TYPE && !file.name.endsWith('.docx')) {
@@ -154,7 +168,7 @@ export default function CandidateApplicationForm({ jobTitle, onSuccess }: Candid
       formData.append('email', data.email);
       formData.append('nationality', data.nationality);
       formData.append('country', data.country);
-      if (data.location) formData.append('location', data.location);
+      formData.append('expected_salary', data.expected_salary);
       formData.append('experience', data.experience);
       formData.append('cv', data.cv);
       formData.append('cover_letter', data.cover_letter);
@@ -200,10 +214,10 @@ export default function CandidateApplicationForm({ jobTitle, onSuccess }: Candid
         <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
           <CheckCircle2 className="w-8 h-8 text-green-600" />
         </div>
-        <h3 className="text-2xl font-bold text-foreground mb-2">Successfully Submitted</h3>
+        <h3 className="text-2xl font-bold text-foreground mb-2">Thank You for Your Application!</h3>
         <p className="text-muted-foreground max-w-md mx-auto">
-          Thank you for your application! We have received your CV and cover letter. 
-          You will receive a confirmation email shortly with further instructions.
+          We have received your CV and cover letter. You will receive a confirmation email shortly 
+          with further instructions. Please be sure to check your spam folder as well.
         </p>
       </div>
     );
@@ -309,20 +323,24 @@ export default function CandidateApplicationForm({ jobTitle, onSuccess }: Candid
 
           <FormField
             control={form.control}
-            name="location"
+            name="expected_salary"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>City / Location</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="e.g., Dublin, London, New York"
-                    {...field}
-                    disabled={isSubmitting}
-                  />
-                </FormControl>
-                <FormDescription className="text-xs">
-                  Your current city or preferred work location
-                </FormDescription>
+                <FormLabel>Expected Annual Salary (USD) *</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isSubmitting}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select salary range" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {SALARY_RANGES.map((range) => (
+                      <SelectItem key={range.value} value={range.value}>
+                        {range.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}
@@ -388,7 +406,7 @@ export default function CandidateApplicationForm({ jobTitle, onSuccess }: Candid
               <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-muted-foreground/25 rounded-lg hover:border-primary/50 transition-colors">
                 <Upload className="w-8 h-8 text-muted-foreground mb-2" />
                 <p className="text-sm font-medium">Click to upload your CV</p>
-                <p className="text-xs text-muted-foreground">Word document (.docx) only, max 5MB</p>
+                <p className="text-xs text-muted-foreground">Word document (.docx) only, max 20MB</p>
               </div>
             </div>
           )}
@@ -440,7 +458,7 @@ export default function CandidateApplicationForm({ jobTitle, onSuccess }: Candid
               <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-muted-foreground/25 rounded-lg hover:border-primary/50 transition-colors">
                 <Upload className="w-8 h-8 text-muted-foreground mb-2" />
                 <p className="text-sm font-medium">Click to upload your Cover Letter</p>
-                <p className="text-xs text-muted-foreground">Word document (.docx) only, max 5MB</p>
+                <p className="text-xs text-muted-foreground">Word document (.docx) only, max 20MB</p>
               </div>
             </div>
           )}
