@@ -1,0 +1,872 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Demo Admin",
+      "email": "admin@demo.com",
+      "password": "demo123",
+      "role": "super_admin",
+      "created_at": "2024-01-01T00:00:00Z",
+      "last_login": "2024-01-24T10:30:00Z"
+    },
+    {
+      "id": 2,
+      "name": "Test Editor",
+      "email": "editor@demo.com",
+      "password": "demo123",
+      "role": "editor",
+      "created_at": "2024-01-05T00:00:00Z",
+      "last_login": "2024-01-23T14:20:00Z"
+    },
+    {
+      "id": 3,
+      "name": "Test Viewer",
+      "email": "viewer@demo.com",
+      "password": "demo123",
+      "role": "viewer",
+      "created_at": "2024-01-10T00:00:00Z",
+      "last_login": "2024-01-22T09:15:00Z"
+    }
+  ],
+
+  "jobs": [
+    {
+      "id": 1,
+      "title": "Senior Accountant",
+      "description": "We are looking for an experienced Senior Accountant to join our team. The ideal candidate will have a strong background in financial reporting, tax preparation, and audit procedures. You will be responsible for managing a portfolio of clients and ensuring compliance with accounting standards.",
+      "country": "United Kingdom",
+      "location": "London",
+      "work_type": "hybrid",
+      "experience_required": "7-10",
+      "requirements": "CPA or ACCA qualified\n5+ years of experience in public accounting\nStrong knowledge of IFRS and GAAP\nExcellent analytical and problem-solving skills\nProficiency in accounting software (QuickBooks, Xero, Sage)",
+      "benefits": "Competitive salary package\nHealth and dental insurance\nFlexible working arrangements\n25 days annual leave\nProfessional development opportunities",
+      "salary_range": "55000-70000",
+      "currency": "GBP",
+      "is_active": true,
+      "created_at": "2024-01-10T09:00:00Z",
+      "updated_at": "2024-01-10T09:00:00Z"
+    },
+    {
+      "id": 2,
+      "title": "Tax Manager",
+      "description": "Join our dynamic tax team as a Tax Manager. You will oversee tax compliance, planning, and advisory services for our diverse client base. This role offers significant growth opportunities and exposure to complex international tax matters.",
+      "country": "United Arab Emirates",
+      "location": "Dubai",
+      "work_type": "on-site",
+      "experience_required": "10+",
+      "requirements": "CPA/CA/ACCA qualified\n8+ years of tax experience\nExperience with UAE VAT and corporate tax\nStrong leadership skills\nExcellent client communication",
+      "benefits": "Tax-free salary\nAnnual flight allowance\nHealth insurance for family\nEnd of service gratuity\nRelocation package",
+      "salary_range": "180000-220000",
+      "currency": "AED",
+      "is_active": true,
+      "created_at": "2024-01-08T14:30:00Z",
+      "updated_at": "2024-01-08T14:30:00Z"
+    },
+    {
+      "id": 3,
+      "title": "Junior Bookkeeper",
+      "description": "Entry-level position for a motivated individual looking to start their career in accounting. You will assist with day-to-day bookkeeping tasks, bank reconciliations, and data entry.",
+      "country": "Australia",
+      "location": "Sydney",
+      "work_type": "remote",
+      "experience_required": "0-3",
+      "requirements": "Bachelor's degree in Accounting or related field\nBasic knowledge of accounting principles\nProficiency in Microsoft Excel\nStrong attention to detail\nEager to learn and grow",
+      "benefits": "Work from home flexibility\nMentorship program\nStudy leave for certifications\nSuperannuation contributions\nCareer progression path",
+      "salary_range": "45000-55000",
+      "currency": "AUD",
+      "is_active": true,
+      "created_at": "2024-01-15T11:00:00Z",
+      "updated_at": "2024-01-15T11:00:00Z"
+    },
+    {
+      "id": 4,
+      "title": "Financial Controller",
+      "description": "We are seeking a Financial Controller to lead our finance department. This senior role involves overseeing all financial operations, budgeting, forecasting, and strategic financial planning.",
+      "country": "United States",
+      "location": "New York",
+      "work_type": "hybrid",
+      "experience_required": "10+",
+      "requirements": "CPA required\n10+ years of progressive accounting experience\nExperience in a multinational corporation\nStrong leadership and team management skills\nAdvanced Excel and ERP systems knowledge",
+      "benefits": "Competitive base salary\n401(k) with company match\nComprehensive health benefits\nEquity participation\nExecutive coaching program",
+      "salary_range": "150000-200000",
+      "currency": "USD",
+      "is_active": true,
+      "created_at": "2024-01-05T08:00:00Z",
+      "updated_at": "2024-01-05T08:00:00Z"
+    },
+    {
+      "id": 5,
+      "title": "Audit Associate",
+      "description": "Join our audit team and gain exposure to diverse industries and clients. You will participate in audit engagements, from planning to completion, working alongside experienced professionals.",
+      "country": "Canada",
+      "location": "Toronto",
+      "work_type": "flexible",
+      "experience_required": "3-7",
+      "requirements": "CPA designation or in progress\n2+ years of audit experience\nStrong analytical skills\nAbility to work in a team\nWillingness to travel",
+      "benefits": "Flexible work arrangements\nProfessional development budget\nHealth and wellness programs\nPaid overtime\nClear promotion path",
+      "salary_range": "65000-85000",
+      "currency": "CAD",
+      "is_active": true,
+      "created_at": "2024-01-12T10:30:00Z",
+      "updated_at": "2024-01-12T10:30:00Z"
+    },
+    {
+      "id": 6,
+      "title": "Payroll Specialist",
+      "description": "We need a detail-oriented Payroll Specialist to manage our payroll operations. You will ensure accurate and timely processing of payroll for multiple entities.",
+      "country": "United Kingdom",
+      "location": "Manchester",
+      "work_type": "remote",
+      "experience_required": "3-7",
+      "requirements": "CIPP qualification preferred\n3+ years payroll experience\nKnowledge of UK payroll legislation\nExperience with payroll software\nStrong organizational skills",
+      "benefits": "Remote work setup allowance\nFlexible hours\n28 days holiday\nPension scheme\nTraining opportunities",
+      "salary_range": "35000-45000",
+      "currency": "GBP",
+      "is_active": true,
+      "created_at": "2024-01-18T09:00:00Z",
+      "updated_at": "2024-01-18T09:00:00Z"
+    },
+    {
+      "id": 7,
+      "title": "Management Accountant",
+      "description": "We are looking for a Management Accountant to provide financial insights and support business decision-making. This role is crucial for our strategic planning and performance monitoring.",
+      "country": "Singapore",
+      "location": "Singapore",
+      "work_type": "hybrid",
+      "experience_required": "3-7",
+      "requirements": "ACCA/CIMA qualified\n3+ years management accounting experience\nAdvanced Excel and data analysis skills\nExperience with budgeting and forecasting\nStrong business acumen",
+      "benefits": "Competitive salary\nAnnual bonus\nMedical and dental coverage\nTraining sponsorship\nCentral location",
+      "salary_range": "72000-96000",
+      "currency": "SGD",
+      "is_active": true,
+      "created_at": "2024-01-20T08:00:00Z",
+      "updated_at": "2024-01-20T08:00:00Z"
+    },
+    {
+      "id": 8,
+      "title": "Forensic Accountant",
+      "description": "Exciting opportunity for a Forensic Accountant to investigate financial irregularities and fraud. You will work on complex cases involving litigation support and expert witness testimony.",
+      "country": "United States",
+      "location": "Chicago",
+      "work_type": "on-site",
+      "experience_required": "7-10",
+      "requirements": "CPA and CFE certifications\n5+ years forensic accounting experience\nStrong investigative skills\nExperience with e-discovery tools\nExcellent report writing abilities",
+      "benefits": "High earning potential\nBonus structure\nPremium health insurance\nPaid certifications\nInteresting case work",
+      "salary_range": "120000-160000",
+      "currency": "USD",
+      "is_active": false,
+      "created_at": "2023-12-01T10:00:00Z",
+      "updated_at": "2024-01-15T10:00:00Z"
+    }
+  ],
+
+  "candidates": [
+    {
+      "id": 1,
+      "first_name": "John",
+      "last_name": "Smith",
+      "email": "john.smith@email.com",
+      "nationality": "British",
+      "country": "United Kingdom",
+      "location": "London",
+      "experience": "3-7",
+      "expected_salary": "3001-4000",
+      "job_applied": "Senior Accountant",
+      "job_id": 1,
+      "cv_url": "/storage/cvs/cv-1.docx",
+      "cover_letter_url": "/storage/cover-letters/cl-1.docx",
+      "created_at": "2024-01-15T10:30:00Z",
+      "updated_at": "2024-01-15T10:30:00Z"
+    },
+    {
+      "id": 2,
+      "first_name": "Sarah",
+      "last_name": "Johnson",
+      "email": "sarah.johnson@email.com",
+      "nationality": "American",
+      "country": "United States",
+      "location": "New York",
+      "experience": "7-10",
+      "expected_salary": "4001+",
+      "job_applied": "Financial Controller",
+      "job_id": 4,
+      "cv_url": "/storage/cvs/cv-2.docx",
+      "cover_letter_url": "/storage/cover-letters/cl-2.docx",
+      "created_at": "2024-01-14T14:20:00Z",
+      "updated_at": "2024-01-14T14:20:00Z"
+    },
+    {
+      "id": 3,
+      "first_name": "Mohammed",
+      "last_name": "Al-Rahman",
+      "email": "mohammed.ar@email.com",
+      "nationality": "Emirati",
+      "country": "United Arab Emirates",
+      "location": "Dubai",
+      "experience": "10+",
+      "expected_salary": "4001+",
+      "job_applied": "Tax Manager",
+      "job_id": 2,
+      "cv_url": "/storage/cvs/cv-3.docx",
+      "cover_letter_url": "/storage/cover-letters/cl-3.docx",
+      "created_at": "2024-01-13T09:15:00Z",
+      "updated_at": "2024-01-13T09:15:00Z"
+    },
+    {
+      "id": 4,
+      "first_name": "Emily",
+      "last_name": "Chen",
+      "email": "emily.chen@email.com",
+      "nationality": "Australian",
+      "country": "Australia",
+      "location": "Sydney",
+      "experience": "0-3",
+      "expected_salary": "2001-3000",
+      "job_applied": "Junior Bookkeeper",
+      "job_id": 3,
+      "cv_url": "/storage/cvs/cv-4.docx",
+      "cover_letter_url": "/storage/cover-letters/cl-4.docx",
+      "created_at": "2024-01-16T11:45:00Z",
+      "updated_at": "2024-01-16T11:45:00Z"
+    },
+    {
+      "id": 5,
+      "first_name": "Michael",
+      "last_name": "O'Brien",
+      "email": "michael.obrien@email.com",
+      "nationality": "Canadian",
+      "country": "Canada",
+      "location": "Toronto",
+      "experience": "3-7",
+      "expected_salary": "3001-4000",
+      "job_applied": "Audit Associate",
+      "job_id": 5,
+      "cv_url": "/storage/cvs/cv-5.docx",
+      "cover_letter_url": "/storage/cover-letters/cl-5.docx",
+      "created_at": "2024-01-17T08:30:00Z",
+      "updated_at": "2024-01-17T08:30:00Z"
+    },
+    {
+      "id": 6,
+      "first_name": "Fatima",
+      "last_name": "Hassan",
+      "email": "fatima.hassan@email.com",
+      "nationality": "Pakistani",
+      "country": "United Arab Emirates",
+      "location": "Abu Dhabi",
+      "experience": "7-10",
+      "expected_salary": "4001+",
+      "job_applied": "Tax Manager",
+      "job_id": 2,
+      "cv_url": "/storage/cvs/cv-6.docx",
+      "cover_letter_url": "/storage/cover-letters/cl-6.docx",
+      "created_at": "2024-01-18T15:00:00Z",
+      "updated_at": "2024-01-18T15:00:00Z"
+    },
+    {
+      "id": 7,
+      "first_name": "James",
+      "last_name": "Wilson",
+      "email": "james.wilson@email.com",
+      "nationality": "British",
+      "country": "United Kingdom",
+      "location": "Manchester",
+      "experience": "3-7",
+      "expected_salary": "2001-3000",
+      "job_applied": "Payroll Specialist",
+      "job_id": 6,
+      "cv_url": "/storage/cvs/cv-7.docx",
+      "cover_letter_url": "/storage/cover-letters/cl-7.docx",
+      "created_at": "2024-01-19T10:00:00Z",
+      "updated_at": "2024-01-19T10:00:00Z"
+    },
+    {
+      "id": 8,
+      "first_name": "Priya",
+      "last_name": "Sharma",
+      "email": "priya.sharma@email.com",
+      "nationality": "Indian",
+      "country": "Singapore",
+      "location": "Singapore",
+      "experience": "3-7",
+      "expected_salary": "3001-4000",
+      "job_applied": "Management Accountant",
+      "job_id": 7,
+      "cv_url": "/storage/cvs/cv-8.docx",
+      "cover_letter_url": "/storage/cover-letters/cl-8.docx",
+      "created_at": "2024-01-20T12:30:00Z",
+      "updated_at": "2024-01-20T12:30:00Z"
+    },
+    {
+      "id": 9,
+      "first_name": "David",
+      "last_name": "Mueller",
+      "email": "david.mueller@email.com",
+      "nationality": "German",
+      "country": "Germany",
+      "location": "Frankfurt",
+      "experience": "10+",
+      "expected_salary": "4001+",
+      "job_applied": null,
+      "job_id": null,
+      "cv_url": "/storage/cvs/cv-9.docx",
+      "cover_letter_url": "/storage/cover-letters/cl-9.docx",
+      "created_at": "2024-01-21T09:00:00Z",
+      "updated_at": "2024-01-21T09:00:00Z"
+    },
+    {
+      "id": 10,
+      "first_name": "Lisa",
+      "last_name": "Anderson",
+      "email": "lisa.anderson@email.com",
+      "nationality": "American",
+      "country": "United States",
+      "location": "Chicago",
+      "experience": "7-10",
+      "expected_salary": "4001+",
+      "job_applied": "Forensic Accountant",
+      "job_id": 8,
+      "cv_url": "/storage/cvs/cv-10.docx",
+      "cover_letter_url": "/storage/cover-letters/cl-10.docx",
+      "created_at": "2024-01-22T14:15:00Z",
+      "updated_at": "2024-01-22T14:15:00Z"
+    }
+  ],
+
+  "employer-requests": [
+    {
+      "id": 1,
+      "firm_name": "ABC Accounting Firm",
+      "email": "hr@abcaccounting.com",
+      "country": "United Arab Emirates",
+      "preferred_location": "Dubai",
+      "preferred_nationality": "Arab",
+      "budgeted_salary": "4001+",
+      "years_experience": "7-10",
+      "notes": "CPA/CA certified, Big 4 experience preferred. Must have strong knowledge of UAE tax regulations.",
+      "created_at": "2024-01-15T10:30:00Z",
+      "updated_at": "2024-01-15T10:30:00Z"
+    },
+    {
+      "id": 2,
+      "firm_name": "Global Finance Partners",
+      "email": "recruitment@gfp.com",
+      "country": "United Kingdom",
+      "preferred_location": "London",
+      "preferred_nationality": "European",
+      "budgeted_salary": "3001-4000",
+      "years_experience": "3-7",
+      "notes": "Looking for ACCA qualified professionals for our expanding team.",
+      "created_at": "2024-01-14T14:00:00Z",
+      "updated_at": "2024-01-14T14:00:00Z"
+    },
+    {
+      "id": 3,
+      "firm_name": "TaxPro Solutions",
+      "email": "careers@taxpro.com.au",
+      "country": "Australia",
+      "preferred_location": "Sydney",
+      "preferred_nationality": "Any",
+      "budgeted_salary": "3001-4000",
+      "years_experience": "3-7",
+      "notes": "Seeking tax specialists with experience in Australian tax law.",
+      "created_at": "2024-01-13T09:00:00Z",
+      "updated_at": "2024-01-13T09:00:00Z"
+    },
+    {
+      "id": 4,
+      "firm_name": "Northern CPA Group",
+      "email": "jobs@northerncpa.ca",
+      "country": "Canada",
+      "preferred_location": "Toronto",
+      "preferred_nationality": "North American",
+      "budgeted_salary": "2001-3000",
+      "years_experience": "0-3",
+      "notes": "Entry-level positions available. Training provided.",
+      "created_at": "2024-01-16T11:00:00Z",
+      "updated_at": "2024-01-16T11:00:00Z"
+    },
+    {
+      "id": 5,
+      "firm_name": "Singapore Audit Associates",
+      "email": "hr@sga.sg",
+      "country": "Singapore",
+      "preferred_location": "Singapore",
+      "preferred_nationality": "Asian",
+      "budgeted_salary": "4001+",
+      "years_experience": "10+",
+      "notes": "Senior audit partners needed for regional expansion.",
+      "created_at": "2024-01-17T08:30:00Z",
+      "updated_at": "2024-01-17T08:30:00Z"
+    },
+    {
+      "id": 6,
+      "firm_name": "Smith & Associates",
+      "email": "recruiting@smithassoc.com",
+      "country": "United States",
+      "preferred_location": "New York",
+      "preferred_nationality": "Any",
+      "budgeted_salary": "4001+",
+      "years_experience": "7-10",
+      "notes": "CPA required. Experience with multinational clients a plus.",
+      "created_at": "2024-01-18T15:30:00Z",
+      "updated_at": "2024-01-18T15:30:00Z"
+    }
+  ],
+
+  "blog": [
+    {
+      "id": 1,
+      "title": "The Future of Offshore Accounting in 2024",
+      "slug": "future-offshore-accounting-2024",
+      "excerpt": "Discover how technological advancements and changing regulations are reshaping the offshore accounting landscape in 2024 and beyond.",
+      "content": "# The Future of Offshore Accounting in 2024\n\nThe offshore accounting industry is undergoing a significant transformation. As we move further into 2024, several key trends are shaping the future of this sector.\n\n## Technology Integration\n\nCloud-based accounting platforms have become the norm, enabling seamless collaboration between offshore teams and their clients. AI-powered automation is reducing manual data entry while improving accuracy.\n\n## Regulatory Changes\n\nGlobal tax regulations continue to evolve, with increased transparency requirements affecting how offshore accounting services operate. Staying compliant while delivering value to clients remains a top priority.\n\n## The Human Element\n\nDespite technological advances, the human element remains crucial. Skilled accountants who can interpret data, provide strategic advice, and build client relationships will always be in demand.\n\n## Conclusion\n\nThe future of offshore accounting is bright for firms that embrace technology while maintaining high professional standards.",
+      "category": "Industry Insights",
+      "author": "Sarah Mitchell",
+      "image_url": "/storage/blog/future-accounting.jpg",
+      "is_published": true,
+      "published_at": "2024-01-10T09:00:00Z",
+      "reading_time": 5,
+      "created_at": "2024-01-10T08:00:00Z",
+      "updated_at": "2024-01-10T09:00:00Z"
+    },
+    {
+      "id": 2,
+      "title": "Best Practices for Remote Bookkeeping Teams",
+      "slug": "best-practices-remote-bookkeeping",
+      "excerpt": "Learn the proven strategies for managing successful remote bookkeeping operations and maintaining quality standards across distributed teams.",
+      "content": "# Best Practices for Remote Bookkeeping Teams\n\nManaging a remote bookkeeping team requires careful planning and the right tools. Here are the best practices we've developed over years of experience.\n\n## Communication is Key\n\nEstablish clear communication channels and regular check-ins. Use video calls for complex discussions and instant messaging for quick questions.\n\n## Standardize Processes\n\nCreate detailed SOPs for all common tasks. This ensures consistency regardless of who completes the work.\n\n## Quality Control\n\nImplement multi-level review processes. Every piece of work should be reviewed before delivery to the client.\n\n## Technology Stack\n\nInvest in reliable cloud software, secure VPNs, and collaboration tools. The right technology makes remote work seamless.\n\n## Team Development\n\nProvide ongoing training and career development opportunities to keep your team engaged and skilled.",
+      "category": "Best Practices",
+      "author": "James Thompson",
+      "image_url": "/storage/blog/remote-bookkeeping.jpg",
+      "is_published": true,
+      "published_at": "2024-01-08T14:00:00Z",
+      "reading_time": 7,
+      "created_at": "2024-01-08T13:00:00Z",
+      "updated_at": "2024-01-08T14:00:00Z"
+    },
+    {
+      "id": 3,
+      "title": "Understanding UAE Corporate Tax: A Complete Guide",
+      "slug": "uae-corporate-tax-guide",
+      "excerpt": "Everything you need to know about the new UAE corporate tax regime, including rates, exemptions, and compliance requirements.",
+      "content": "# Understanding UAE Corporate Tax: A Complete Guide\n\nThe introduction of corporate tax in the UAE marks a significant shift in the region's business landscape. This guide covers everything you need to know.\n\n## Tax Rates\n\nThe standard corporate tax rate is 9% on taxable income exceeding AED 375,000. Small businesses benefit from the 0% rate on income below this threshold.\n\n## Exemptions\n\nCertain entities are exempt, including government entities, qualifying public benefit organizations, and natural resource extraction activities.\n\n## Compliance Requirements\n\nBusinesses must register, maintain proper records, file annual returns, and pay tax within the specified deadlines.\n\n## Free Zone Benefits\n\nQualifying free zone businesses can maintain 0% corporate tax on qualifying income if they meet substance requirements.\n\n## Preparing Your Business\n\nStart planning now by reviewing your corporate structure, intercompany transactions, and record-keeping practices.",
+      "category": "Tax Advisory",
+      "author": "Sarah Mitchell",
+      "image_url": "/storage/blog/uae-tax.jpg",
+      "is_published": true,
+      "published_at": "2024-01-05T10:00:00Z",
+      "reading_time": 10,
+      "created_at": "2024-01-05T09:00:00Z",
+      "updated_at": "2024-01-05T10:00:00Z"
+    },
+    {
+      "id": 4,
+      "title": "Data Security in Offshore Accounting",
+      "slug": "data-security-offshore-accounting",
+      "excerpt": "How to protect sensitive financial data when working with offshore accounting teams, including best practices and essential security measures.",
+      "content": "# Data Security in Offshore Accounting\n\nData security is paramount when outsourcing accounting functions. This article outlines essential security measures.\n\n## Encryption Standards\n\nAll data should be encrypted both in transit and at rest. Use industry-standard encryption protocols like AES-256.\n\n## Access Controls\n\nImplement role-based access controls. Staff should only access data necessary for their specific tasks.\n\n## Secure Infrastructure\n\nWork with providers who maintain ISO 27001 certification and conduct regular security audits.\n\n## Employee Training\n\nRegular security awareness training helps prevent social engineering and phishing attacks.\n\n## Incident Response\n\nHave a clear incident response plan in place. Know what to do if a breach occurs.\n\n## Compliance\n\nEnsure your security practices meet regulatory requirements like GDPR, SOC 2, and industry-specific standards.",
+      "category": "Best Practices",
+      "author": "Michael Roberts",
+      "image_url": "/storage/blog/data-security.jpg",
+      "is_published": true,
+      "published_at": "2024-01-03T11:00:00Z",
+      "reading_time": 6,
+      "created_at": "2024-01-03T10:00:00Z",
+      "updated_at": "2024-01-03T11:00:00Z"
+    },
+    {
+      "id": 5,
+      "title": "Choosing the Right Accounting Software for Your Firm",
+      "slug": "choosing-accounting-software",
+      "excerpt": "A comprehensive comparison of popular accounting software options to help you make the right choice for your firm's needs.",
+      "content": "# Choosing the Right Accounting Software for Your Firm\n\nSelecting the right accounting software can significantly impact your firm's efficiency. Here's our guide to making the best choice.\n\n## Key Considerations\n\nConsider your firm size, client types, integration needs, and budget when evaluating options.\n\n## Popular Options\n\n### QuickBooks\nIdeal for small to medium businesses. User-friendly with extensive app integrations.\n\n### Xero\nCloud-native with excellent collaboration features. Great for firms with remote teams.\n\n### Sage\nRobust features for larger enterprises. Strong reporting capabilities.\n\n## Integration Capabilities\n\nEnsure your chosen software integrates with your other tools: payroll, CRM, document management, etc.\n\n## Training and Support\n\nConsider the learning curve and available support resources when making your decision.",
+      "category": "Technical",
+      "author": "James Thompson",
+      "image_url": "/storage/blog/accounting-software.jpg",
+      "is_published": true,
+      "published_at": "2024-01-01T09:00:00Z",
+      "reading_time": 8,
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T09:00:00Z"
+    },
+    {
+      "id": 6,
+      "title": "Draft: AI in Accounting - The Next Frontier",
+      "slug": "ai-accounting-next-frontier",
+      "excerpt": "Exploring how artificial intelligence is transforming the accounting profession and what it means for practitioners.",
+      "content": "# AI in Accounting - The Next Frontier\n\nThis is a draft article about AI in accounting.\n\n## Introduction\n\nArtificial intelligence is revolutionizing many industries, and accounting is no exception.\n\n## Current Applications\n\n- Automated data entry\n- Fraud detection\n- Predictive analytics\n- Natural language processing for document analysis\n\n## Future Possibilities\n\nMore content to be added...",
+      "category": "Industry Insights",
+      "author": "Sarah Mitchell",
+      "image_url": null,
+      "is_published": false,
+      "published_at": null,
+      "reading_time": 3,
+      "created_at": "2024-01-22T10:00:00Z",
+      "updated_at": "2024-01-22T10:00:00Z"
+    }
+  ],
+
+  "contact-messages": [
+    {
+      "id": 1,
+      "name": "Robert Thompson",
+      "email": "robert.t@company.com",
+      "company": "Thompson Industries",
+      "subject": "Inquiry about outsourcing services",
+      "message": "We are a mid-sized manufacturing company looking to outsource our bookkeeping operations. Could you please provide information about your services and pricing?",
+      "is_read": true,
+      "created_at": "2024-01-20T09:00:00Z",
+      "updated_at": "2024-01-20T15:00:00Z"
+    },
+    {
+      "id": 2,
+      "name": "Jennifer Lee",
+      "email": "jlee@startupxyz.com",
+      "company": "StartupXYZ",
+      "subject": "Partnership opportunity",
+      "message": "We're a fast-growing startup and need scalable accounting support. Would love to discuss a potential partnership.",
+      "is_read": false,
+      "created_at": "2024-01-22T14:30:00Z",
+      "updated_at": "2024-01-22T14:30:00Z"
+    },
+    {
+      "id": 3,
+      "name": "Ahmed Hassan",
+      "email": "ahmed@hassangroup.ae",
+      "company": "Hassan Group",
+      "subject": "UAE Tax Advisory Services",
+      "message": "We need assistance with UAE corporate tax compliance for our group of companies. Please contact me to discuss your tax advisory services.",
+      "is_read": false,
+      "created_at": "2024-01-23T08:15:00Z",
+      "updated_at": "2024-01-23T08:15:00Z"
+    }
+  ],
+
+  "notifications": [
+    {
+      "id": "notif_001",
+      "user_id": 1,
+      "type": "candidate",
+      "title": "New Application",
+      "message": "John Smith applied for Senior Accountant",
+      "timestamp": "2024-01-24T10:30:00Z",
+      "read": false,
+      "link": "/admin/candidates"
+    },
+    {
+      "id": "notif_002",
+      "user_id": 1,
+      "type": "employer",
+      "title": "New Employer Request",
+      "message": "ABC Accounting Firm submitted a hiring request",
+      "timestamp": "2024-01-24T09:15:00Z",
+      "read": false,
+      "link": "/admin/employers"
+    },
+    {
+      "id": "notif_003",
+      "user_id": 1,
+      "type": "candidate",
+      "title": "New Application",
+      "message": "Sarah Johnson applied for Financial Controller",
+      "timestamp": "2024-01-23T14:20:00Z",
+      "read": true,
+      "link": "/admin/candidates"
+    },
+    {
+      "id": "notif_004",
+      "user_id": 1,
+      "type": "blog",
+      "title": "Blog Post Published",
+      "message": "\"The Future of Offshore Accounting\" is now live",
+      "timestamp": "2024-01-23T10:00:00Z",
+      "read": true,
+      "link": "/admin/blog"
+    },
+    {
+      "id": "notif_005",
+      "user_id": 2,
+      "type": "candidate",
+      "title": "New Application",
+      "message": "Emily Chen applied for Junior Bookkeeper",
+      "timestamp": "2024-01-22T11:45:00Z",
+      "read": false,
+      "link": "/admin/candidates"
+    }
+  ],
+
+  "audit-logs": [
+    {
+      "id": "log_001",
+      "timestamp": "2024-01-24T10:30:00Z",
+      "user_id": 1,
+      "user_name": "Demo Admin",
+      "user_email": "admin@demo.com",
+      "user_role": "super_admin",
+      "action": "update",
+      "module": "jobs",
+      "resource_id": "1",
+      "resource_name": "Senior Accountant",
+      "changes": [
+        {
+          "field": "salary_range",
+          "old_value": "50000-65000",
+          "new_value": "55000-70000"
+        }
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "log_002",
+      "timestamp": "2024-01-23T14:00:00Z",
+      "user_id": 2,
+      "user_name": "Test Editor",
+      "user_email": "editor@demo.com",
+      "user_role": "editor",
+      "action": "create",
+      "module": "blog",
+      "resource_id": "6",
+      "resource_name": "AI in Accounting - The Next Frontier",
+      "changes": null,
+      "metadata": {
+        "status": "draft"
+      }
+    },
+    {
+      "id": "log_003",
+      "timestamp": "2024-01-22T09:00:00Z",
+      "user_id": 1,
+      "user_name": "Demo Admin",
+      "user_email": "admin@demo.com",
+      "user_role": "super_admin",
+      "action": "delete",
+      "module": "candidates",
+      "resource_id": "15",
+      "resource_name": "Old Application",
+      "changes": null,
+      "metadata": {
+        "reason": "duplicate"
+      }
+    },
+    {
+      "id": "log_004",
+      "timestamp": "2024-01-21T16:30:00Z",
+      "user_id": 1,
+      "user_name": "Demo Admin",
+      "user_email": "admin@demo.com",
+      "user_role": "super_admin",
+      "action": "deactivate",
+      "module": "jobs",
+      "resource_id": "8",
+      "resource_name": "Forensic Accountant",
+      "changes": [
+        {
+          "field": "is_active",
+          "old_value": "true",
+          "new_value": "false"
+        }
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "log_005",
+      "timestamp": "2024-01-20T11:00:00Z",
+      "user_id": 2,
+      "user_name": "Test Editor",
+      "user_email": "editor@demo.com",
+      "user_role": "editor",
+      "action": "publish",
+      "module": "blog",
+      "resource_id": "5",
+      "resource_name": "Choosing the Right Accounting Software",
+      "changes": [
+        {
+          "field": "is_published",
+          "old_value": "false",
+          "new_value": "true"
+        }
+      ],
+      "metadata": {}
+    }
+  ],
+
+  "settings": {
+    "branding": {
+      "logo_url": "/storage/branding/logo.png",
+      "company_name": "Global Outsourced Accounting",
+      "tagline": "Global Outsourced Offshore Accounting Solutions",
+      "primary_color": "222 47% 11%",
+      "accent_color": "45 93% 47%"
+    },
+    "general": {
+      "theme_mode": "light",
+      "items_per_page": 10,
+      "date_format": "MM/DD/YYYY",
+      "time_format": "12h",
+      "currency_format": "USD",
+      "auto_archive_days": 90,
+      "auto_archive_enabled": false
+    },
+    "notifications": {
+      "email_new_candidates": true,
+      "email_new_employer_requests": true,
+      "email_digest_frequency": "daily",
+      "candidate_threshold": 10,
+      "employer_threshold": 5,
+      "threshold_alert_enabled": true
+    }
+  },
+
+  "social-links": [
+    {
+      "id": 1,
+      "platform": "LinkedIn",
+      "url": "https://linkedin.com/company/goa",
+      "icon": "linkedin",
+      "enabled": true,
+      "order": 1
+    },
+    {
+      "id": 2,
+      "platform": "Twitter",
+      "url": "https://twitter.com/goa_accounting",
+      "icon": "twitter",
+      "enabled": true,
+      "order": 2
+    },
+    {
+      "id": 3,
+      "platform": "Facebook",
+      "url": "https://facebook.com/goaaccounting",
+      "icon": "facebook",
+      "enabled": false,
+      "order": 3
+    }
+  ],
+
+  "blog-categories": [
+    {
+      "id": 1,
+      "name": "Industry Insights",
+      "slug": "industry-insights",
+      "description": "Latest trends and news from the accounting industry",
+      "is_default": true
+    },
+    {
+      "id": 2,
+      "name": "Best Practices",
+      "slug": "best-practices",
+      "description": "Tips and strategies for accounting professionals",
+      "is_default": true
+    },
+    {
+      "id": 3,
+      "name": "Tax Advisory",
+      "slug": "tax-advisory",
+      "description": "Tax guidance and regulatory updates",
+      "is_default": false
+    },
+    {
+      "id": 4,
+      "name": "Technical",
+      "slug": "technical",
+      "description": "Software and technology guides",
+      "is_default": false
+    }
+  ],
+
+  "experience-levels": [
+    {
+      "id": 1,
+      "value": "0-3",
+      "label": "0-3 years",
+      "is_default": true
+    },
+    {
+      "id": 2,
+      "value": "3-7",
+      "label": "3-7 years",
+      "is_default": true
+    },
+    {
+      "id": 3,
+      "value": "7-10",
+      "label": "7-10 years",
+      "is_default": true
+    },
+    {
+      "id": 4,
+      "value": "10+",
+      "label": "10+ years",
+      "is_default": true
+    }
+  ],
+
+  "nationalities": [
+    "American",
+    "Australian",
+    "British",
+    "Canadian",
+    "Chinese",
+    "Emirati",
+    "Filipino",
+    "French",
+    "German",
+    "Indian",
+    "Irish",
+    "Italian",
+    "Japanese",
+    "Korean",
+    "Malaysian",
+    "Nigerian",
+    "Pakistani",
+    "Singaporean",
+    "South African",
+    "Spanish"
+  ],
+
+  "dashboard": {
+    "stats": {
+      "total_candidates": 156,
+      "candidates_this_week": 12,
+      "candidates_in_range": 45,
+      "total_jobs": 25,
+      "active_jobs": 18,
+      "jobs_in_range": 8,
+      "total_employer_requests": 42,
+      "employer_requests_this_week": 5,
+      "employer_requests_in_range": 12,
+      "total_blog_posts": 15,
+      "published_blog_posts": 12,
+      "blog_posts_in_range": 4
+    },
+    "charts": {
+      "candidates_by_experience": {
+        "0-3": 45,
+        "3-7": 62,
+        "7-10": 32,
+        "10+": 17
+      },
+      "candidates_by_date": [
+        { "date": "2024-01-18", "count": 5 },
+        { "date": "2024-01-19", "count": 8 },
+        { "date": "2024-01-20", "count": 3 },
+        { "date": "2024-01-21", "count": 6 },
+        { "date": "2024-01-22", "count": 4 },
+        { "date": "2024-01-23", "count": 7 },
+        { "date": "2024-01-24", "count": 9 }
+      ],
+      "jobs_by_status": {
+        "active": 18,
+        "inactive": 7
+      },
+      "blog_by_category": {
+        "Industry Insights": 5,
+        "Best Practices": 4,
+        "Technical": 3,
+        "Tax Advisory": 3
+      }
+    }
+  }
+}
