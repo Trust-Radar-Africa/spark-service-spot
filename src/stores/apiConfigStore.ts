@@ -76,21 +76,20 @@ const initialApiBackend = getApiBackend();
 /**
  * Build the correct API URL path based on backend type
  * - Laravel: /api/admin/endpoint or /api/endpoint
- * - JSON Server: /endpoint (strips /api and /api/admin prefixes)
+ * - JSON Server: /api/endpoint (when started with --base /api)
+ *   For admin routes, strips /admin/ since JSON Server serves flat resources
  */
 const buildApiPath = (path: string, backend: ApiBackend, baseUrl: string): string => {
   // Normalize path (remove leading slash if present)
   let normalizedPath = path.startsWith('/') ? path.slice(1) : path;
   
   if (backend === 'json-server') {
-    // JSON Server doesn't use /api or /api/admin prefixes
-    // Strip common prefixes to get the resource name
+    // JSON Server with --base /api serves /api/resource
+    // Strip /admin/ from paths since JSON Server has flat resources
     if (normalizedPath.startsWith('api/admin/')) {
-      normalizedPath = normalizedPath.slice(10); // Remove 'api/admin/'
-    } else if (normalizedPath.startsWith('api/')) {
-      normalizedPath = normalizedPath.slice(4); // Remove 'api/'
+      normalizedPath = 'api/' + normalizedPath.slice(10); // /api/admin/candidates -> /api/candidates
     } else if (normalizedPath.startsWith('admin/')) {
-      normalizedPath = normalizedPath.slice(6); // Remove 'admin/'
+      normalizedPath = normalizedPath.slice(6); // admin/candidates -> candidates
     }
     return `${baseUrl}/${normalizedPath}`;
   }
