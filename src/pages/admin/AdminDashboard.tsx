@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -42,9 +42,10 @@ import { format, subDays, startOfDay, isAfter, isBefore, isWithinInterval, start
 import { useJobPostingsStore } from '@/stores/jobPostingsStore';
 import { useBlogPostsStore } from '@/stores/blogPostsStore';
 import { useEmployerRequestsStore } from '@/stores/employerRequestsStore';
+import { useCandidatesStore } from '@/stores/candidatesStore';
 import { useAuditLogStore, AuditLogEntry } from '@/stores/auditLogStore';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
-import { CandidateApplication, ExperienceLevel } from '@/types/admin';
+import { ExperienceLevel } from '@/types/admin';
 import { cn } from '@/lib/utils';
 import { DateRange } from 'react-day-picker';
 
@@ -79,16 +80,6 @@ const MODULE_LABELS: Record<AuditLogEntry['module'], string> = {
   blog: 'Blog',
 };
 
-// Mock candidates data
-const mockCandidates: CandidateApplication[] = [
-  { id: 1, first_name: 'John', last_name: 'Smith', email: 'john.smith@example.com', nationality: 'British', country: 'United Kingdom', location: 'London', experience: '3-7', cv_url: '/uploads/cv-1.docx', cover_letter_url: '/uploads/cl-1.docx', created_at: '2024-01-15T10:30:00Z', updated_at: '2024-01-15T10:30:00Z' },
-  { id: 2, first_name: 'Sarah', last_name: 'Johnson', email: 'sarah.j@example.com', nationality: 'American', country: 'United States', location: 'New York', experience: '7-10', cv_url: '/uploads/cv-2.docx', cover_letter_url: '/uploads/cl-2.docx', created_at: '2024-01-14T14:20:00Z', updated_at: '2024-01-14T14:20:00Z' },
-  { id: 3, first_name: 'Michael', last_name: 'Chen', email: 'mchen@example.com', nationality: 'Canadian', country: 'Canada', location: 'Toronto', experience: '0-3', cv_url: '/uploads/cv-3.docx', cover_letter_url: '/uploads/cl-3.docx', created_at: '2024-01-13T09:15:00Z', updated_at: '2024-01-13T09:15:00Z' },
-  { id: 4, first_name: 'Emma', last_name: 'Wilson', email: 'emma.w@example.com', nationality: 'Australian', country: 'Australia', location: 'Sydney', experience: '10+', cv_url: '/uploads/cv-4.docx', cover_letter_url: '/uploads/cl-4.docx', created_at: '2024-01-12T16:45:00Z', updated_at: '2024-01-12T16:45:00Z' },
-  { id: 5, first_name: 'David', last_name: 'Brown', email: 'david.b@example.com', nationality: 'British', country: 'United Kingdom', location: 'Manchester', experience: '3-7', cv_url: '/uploads/cv-5.docx', cover_letter_url: '/uploads/cl-5.docx', created_at: '2024-01-11T11:00:00Z', updated_at: '2024-01-11T11:00:00Z' },
-  { id: 6, first_name: 'Lisa', last_name: 'Taylor', email: 'lisa.t@example.com', nationality: 'American', country: 'United States', location: 'Los Angeles', experience: '0-3', cv_url: '/uploads/cv-6.docx', cover_letter_url: '/uploads/cl-6.docx', created_at: '2024-01-10T09:30:00Z', updated_at: '2024-01-10T09:30:00Z' },
-  { id: 7, first_name: 'James', last_name: 'Anderson', email: 'james.a@example.com', nationality: 'Canadian', country: 'Canada', location: 'Vancouver', experience: '7-10', cv_url: '/uploads/cv-7.docx', cover_letter_url: '/uploads/cl-7.docx', created_at: '2024-01-09T14:15:00Z', updated_at: '2024-01-09T14:15:00Z' },
-];
 
 const COLORS = ['hsl(var(--primary))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))'];
 
@@ -103,12 +94,23 @@ const datePresets: { value: DatePreset; label: string }[] = [
 ];
 
 export default function AdminDashboard() {
-  const { jobs } = useJobPostingsStore();
-  const { posts } = useBlogPostsStore();
-  const { requests } = useEmployerRequestsStore();
-  const { getRecentLogs } = useAuditLogStore();
+  const { jobs, fetchJobs } = useJobPostingsStore();
+  const { posts, fetchPosts } = useBlogPostsStore();
+  const { requests, fetchRequests } = useEmployerRequestsStore();
+  const { candidates, fetchCandidates } = useCandidatesStore();
+  const { getRecentLogs, fetchLogs } = useAuditLogStore();
   const { isAdmin, isViewer } = useAdminPermissions();
-  const candidates = mockCandidates;
+
+  // Fetch all data on mount
+  useEffect(() => {
+    fetchCandidates();
+    fetchJobs();
+    fetchRequests();
+    fetchPosts();
+    if (isAdmin) {
+      fetchLogs();
+    }
+  }, [fetchCandidates, fetchJobs, fetchRequests, fetchPosts, fetchLogs, isAdmin]);
 
   // Get recent audit logs (only for super admins)
   const recentAuditLogs = useMemo(() => {
