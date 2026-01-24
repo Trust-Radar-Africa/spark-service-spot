@@ -186,7 +186,7 @@ export default function SettingsPage() {
     fetchAdminUsers,
   } = useSettingsStore();
 
-  const { dataMode, apiBaseUrl, setDataMode, setApiBaseUrl, isLiveMode } = useApiConfigStore();
+  const { dataMode, isLiveMode } = useApiConfigStore();
 
   const [activeTab, setActiveTab] = useState('branding');
 
@@ -744,48 +744,30 @@ export default function SettingsPage() {
               </CardContent>
             </Card>
 
-            {/* API Configuration - Only show in development */}
-            {import.meta.env.DEV && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Server className="h-5 w-5" />
-                    Data Source (Development Only)
-                  </CardTitle>
-                  <CardDescription>
-                    Switch between demo data and live backend. This setting is only available in development mode.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Use Live Data</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Connect to your backend API instead of demo data
-                      </p>
-                    </div>
-                    <Switch
-                      checked={dataMode === 'live'}
-                      onCheckedChange={(checked) => setDataMode(checked ? 'live' : 'demo')}
-                    />
-                  </div>
-                  {dataMode === 'live' && (
-                    <div className="space-y-2">
-                      <Label htmlFor="api-url">API Base URL</Label>
-                      <Input
-                        id="api-url"
-                        value={apiBaseUrl}
-                        onChange={(e) => setApiBaseUrl(e.target.value)}
-                        placeholder="https://your-api.com"
-                      />
-                    </div>
-                  )}
+            {/* Data Mode Indicator - Read only, configured via environment */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Server className="h-5 w-5" />
+                  Data Source
+                </CardTitle>
+                <CardDescription>
+                  Data source is configured via environment variables. See documentation for details.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center gap-3">
                   <Badge variant={dataMode === 'demo' ? 'secondary' : 'default'}>
-                    {dataMode === 'demo' ? 'Using Demo Data' : 'Using Live Data'}
+                    {dataMode === 'demo' ? 'Demo Mode' : 'Live Mode'}
                   </Badge>
-                </CardContent>
-              </Card>
-            )}
+                  <span className="text-sm text-muted-foreground">
+                    {dataMode === 'demo' 
+                      ? 'Using local demo data' 
+                      : 'Connected to backend API'}
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
           <TabsContent value="notifications" className="space-y-6">
             <Card>
