@@ -473,6 +473,202 @@ Export selected jobs to CSV.
 
 ---
 
+## Public Jobs API (Careers Page)
+
+Public endpoints for the careers page to display active job postings.
+
+### GET /api/jobs
+List all active job postings for the public careers page. No authentication required.
+
+**Query Parameters:**
+- `search` (optional): Search by title or description
+- `country` (optional): Filter by country
+- `location` (optional): Filter by location/city
+- `work_type` (optional): Filter by work type (remote, hybrid, on-site, flexible)
+- `experience` (optional): Filter by experience level (0-3, 3-7, 7-10, 10+)
+- `page` (optional): Page number for pagination
+- `per_page` (optional): Items per page (default: 12)
+
+**Response:**
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "title": "Senior Accountant",
+      "description": "We are looking for an experienced Senior Accountant...",
+      "country": "United Kingdom",
+      "location": "London",
+      "work_type": "hybrid",
+      "experience_required": "7-10",
+      "requirements": "CPA or ACCA qualified...",
+      "benefits": "Competitive salary...",
+      "salary_range": "55000-70000",
+      "currency": "GBP",
+      "created_at": "2024-01-10T09:00:00Z"
+    }
+  ],
+  "meta": {
+    "current_page": 1,
+    "last_page": 3,
+    "per_page": 12,
+    "total": 25
+  },
+  "filters": {
+    "countries": ["United Kingdom", "United Arab Emirates", "Australia"],
+    "locations": ["London", "Dubai", "Sydney"],
+    "work_types": ["remote", "hybrid", "on-site"]
+  }
+}
+```
+
+**Note:** Only returns jobs where `is_active = true`. The `filters` object provides available filter options based on current active jobs.
+
+### GET /api/jobs/{id}
+Get a single active job posting by ID. No authentication required.
+
+**Response:**
+```json
+{
+  "job": {
+    "id": 1,
+    "title": "Senior Accountant",
+    "description": "Full job description with all details...",
+    "country": "United Kingdom",
+    "location": "London",
+    "work_type": "hybrid",
+    "experience_required": "7-10",
+    "requirements": "CPA or ACCA qualified...",
+    "benefits": "Competitive salary, health insurance...",
+    "salary_range": "55000-70000",
+    "currency": "GBP",
+    "created_at": "2024-01-10T09:00:00Z"
+  }
+}
+```
+
+**Error (Job not found or inactive):**
+```json
+{
+  "message": "Job not found"
+}
+```
+Status: 404
+
+### GET /api/jobs/filters
+Get available filter options for the careers page. No authentication required.
+
+**Response:**
+```json
+{
+  "countries": [
+    { "value": "United Kingdom", "label": "United Kingdom", "count": 8 },
+    { "value": "United Arab Emirates", "label": "United Arab Emirates", "count": 5 },
+    { "value": "Australia", "label": "Australia", "count": 3 }
+  ],
+  "locations": [
+    { "value": "London", "label": "London", "count": 5 },
+    { "value": "Dubai", "label": "Dubai", "count": 4 },
+    { "value": "Sydney", "label": "Sydney", "count": 3 }
+  ],
+  "work_types": [
+    { "value": "remote", "label": "Remote", "count": 6 },
+    { "value": "hybrid", "label": "Hybrid", "count": 10 },
+    { "value": "on-site", "label": "On-site", "count": 5 },
+    { "value": "flexible", "label": "Flexible", "count": 4 }
+  ],
+  "experience_levels": [
+    { "value": "0-3", "label": "0-3 years", "count": 4 },
+    { "value": "3-7", "label": "3-7 years", "count": 8 },
+    { "value": "7-10", "label": "7-10 years", "count": 6 },
+    { "value": "10+", "label": "10+ years", "count": 3 }
+  ],
+  "total_jobs": 25
+}
+```
+
+### Laravel Controller Example
+
+```php
+// app/Http/Controllers/Api/PublicJobController.php
+class PublicJobController extends Controller
+{
+    public function index(Request $request)
+    {
+        $query = JobPosting::where('is_active', true);
+        
+        if ($request->search) {
+            $query->where(function ($q) use ($request) {
+                $q->where('title', 'like', "%{$request->search}%")
+                  ->orWhere('description', 'like', "%{$request->search}%");
+            });
+        }
+        
+        if ($request->country) {
+            $query->where('country', $request->country);
+        }
+        
+        if ($request->location) {
+            $query->where('location', $request->location);
+        }
+        
+        if ($request->work_type) {
+            $query->where('work_type', $request->work_type);
+        }
+        
+        if ($request->experience) {
+            $query->where('experience_required', $request->experience);
+        }
+        
+        $jobs = $query->orderBy('created_at', 'desc')
+                      ->paginate($request->per_page ?? 12);
+        
+        // Get filter options from active jobs
+        $activeJobs = JobPosting::where('is_active', true);
+        $filters = [
+            'countries' => $activeJobs->distinct()->pluck('country'),
+            'locations' => $activeJobs->distinct()->pluck('location'),
+            'work_types' => $activeJobs->distinct()->pluck('work_type'),
+        ];
+        
+        return response()->json([
+            'data' => $jobs->items(),
+            'meta' => [
+                'current_page' => $jobs->currentPage(),
+                'last_page' => $jobs->lastPage(),
+                'per_page' => $jobs->perPage(),
+                'total' => $jobs->total(),
+            ],
+            'filters' => $filters,
+        ]);
+    }
+    
+    public function show($id)
+    {
+        $job = JobPosting::where('is_active', true)->find($id);
+        
+        if (!$job) {
+            return response()->json(['message' => 'Job not found'], 404);
+        }
+        
+        return response()->json(['job' => $job]);
+    }
+}
+```
+
+### Laravel Routes Example
+
+```php
+// routes/api.php
+
+// Public routes (no auth required)
+Route::get('/jobs', [PublicJobController::class, 'index']);
+Route::get('/jobs/filters', [PublicJobController::class, 'filters']);
+Route::get('/jobs/{id}', [PublicJobController::class, 'show']);
+```
+
+---
+
 ## Employer Requests
 
 ### POST /api/employer-requests
