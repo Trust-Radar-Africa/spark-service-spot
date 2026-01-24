@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
 import { LayoutModern } from "@/components/layout/LayoutModern";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,33 @@ import {
 } from "lucide-react";
 import { useGetPostBySlug, useGetRelatedPosts } from "@/hooks/useBlogSearch";
 
+function ReadingProgressBar() {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const updateProgress = () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      setProgress(Math.min(100, Math.max(0, scrollPercent)));
+    };
+
+    window.addEventListener('scroll', updateProgress);
+    updateProgress();
+    
+    return () => window.removeEventListener('scroll', updateProgress);
+  }, []);
+
+  return (
+    <div className="fixed top-0 left-0 right-0 z-50 h-1 bg-qx-light-gray">
+      <div 
+        className="h-full bg-gradient-to-r from-qx-orange to-amber-500 transition-all duration-150 ease-out"
+        style={{ width: `${progress}%` }}
+      />
+    </div>
+  );
+}
+
 export default function BlogPostModern() {
   const { slug } = useParams<{ slug: string }>();
   const post = useGetPostBySlug(slug);
@@ -24,6 +52,9 @@ export default function BlogPostModern() {
 
   return (
     <LayoutModern>
+      {/* Reading Progress Indicator */}
+      <ReadingProgressBar />
+      
       {/* Hero Section */}
       <section className="pt-28 pb-8 bg-qx-blue">
         <div className="container mx-auto px-4 lg:px-8">
