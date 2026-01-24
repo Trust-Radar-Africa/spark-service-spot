@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { HeaderModern } from "./HeaderModern";
 import { FooterModern } from "./FooterModern";
+import { ScrollIndicator } from "@/components/ScrollIndicator";
 
 interface LayoutModernProps {
   children: ReactNode;
@@ -12,6 +13,7 @@ export function LayoutModern({ children }: LayoutModernProps) {
       <HeaderModern />
       <main className="flex-1 pt-16">{children}</main>
       <FooterModern />
+      <ScrollIndicator variant="modern" />
     </div>
   );
 }
