@@ -315,7 +315,7 @@ export const useSettingsStore = create<SettingsState>()(
 
       // Live mode functions
       fetchSettings: async () => {
-        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+        const { isLiveMode, getApiUrl } = useApiConfigStore.getState();
 
         if (!isLiveMode()) return;
 
@@ -323,7 +323,7 @@ export const useSettingsStore = create<SettingsState>()(
 
         try {
           const token = localStorage.getItem('admin_token');
-          const response = await fetch(`${apiBaseUrl}/api/admin/settings`, {
+          const response = await fetch(getApiUrl('/api/admin/settings'), {
             headers: {
               Authorization: `Bearer ${token}`,
               Accept: 'application/json',
@@ -362,13 +362,13 @@ export const useSettingsStore = create<SettingsState>()(
       },
 
       fetchAdminUsers: async () => {
-        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+        const { isLiveMode, getApiUrl } = useApiConfigStore.getState();
 
         if (!isLiveMode()) return;
 
         try {
           const token = localStorage.getItem('admin_token');
-          const response = await fetch(`${apiBaseUrl}/api/admin/users`, {
+          const response = await fetch(getApiUrl('/api/admin/users'), {
             headers: {
               Authorization: `Bearer ${token}`,
               Accept: 'application/json',
@@ -385,7 +385,7 @@ export const useSettingsStore = create<SettingsState>()(
       },
 
       saveSettingsToApi: async () => {
-        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+        const { isLiveMode, getApiUrl } = useApiConfigStore.getState();
 
         if (!isLiveMode()) return;
 
@@ -393,7 +393,7 @@ export const useSettingsStore = create<SettingsState>()(
           const token = localStorage.getItem('admin_token');
           const state = get();
 
-          await fetch(`${apiBaseUrl}/api/admin/settings`, {
+          await fetch(getApiUrl('/api/admin/settings'), {
             method: 'PUT',
             headers: {
               Authorization: `Bearer ${token}`,

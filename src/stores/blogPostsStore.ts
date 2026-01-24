@@ -227,7 +227,7 @@ export const useBlogPostsStore = create<BlogPostsState>()(
       isLoading: false,
 
       fetchPosts: async () => {
-        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+        const { isLiveMode, getApiUrl } = useApiConfigStore.getState();
 
         set({ isLoading: true });
 
@@ -240,7 +240,7 @@ export const useBlogPostsStore = create<BlogPostsState>()(
 
         try {
           const token = localStorage.getItem('admin_token');
-          const response = await fetch(`${apiBaseUrl}/api/admin/blog`, {
+          const response = await fetch(getApiUrl('/api/admin/blog'), {
             headers: {
               Authorization: `Bearer ${token}`,
               Accept: 'application/json',
@@ -265,12 +265,12 @@ export const useBlogPostsStore = create<BlogPostsState>()(
       },
 
       addPost: async (postData) => {
-        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+        const { isLiveMode, getApiUrl } = useApiConfigStore.getState();
 
         if (isLiveMode()) {
           try {
             const token = localStorage.getItem('admin_token');
-            const response = await fetch(`${apiBaseUrl}/api/admin/blog`, {
+            const response = await fetch(getApiUrl('/api/admin/blog'), {
               method: 'POST',
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -312,7 +312,7 @@ export const useBlogPostsStore = create<BlogPostsState>()(
       },
 
       updatePost: async (id, data) => {
-        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+        const { isLiveMode, getApiUrl } = useApiConfigStore.getState();
 
         // Optimistically update UI
         set((state) => ({
@@ -331,7 +331,7 @@ export const useBlogPostsStore = create<BlogPostsState>()(
         if (isLiveMode()) {
           try {
             const token = localStorage.getItem('admin_token');
-            await fetch(`${apiBaseUrl}/api/admin/blog/${id}`, {
+            await fetch(getApiUrl(`/api/admin/blog/${id}`), {
               method: 'PUT',
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -347,7 +347,7 @@ export const useBlogPostsStore = create<BlogPostsState>()(
       },
 
       deletePost: async (id) => {
-        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+        const { isLiveMode, getApiUrl } = useApiConfigStore.getState();
 
         // Optimistically update UI
         set((state) => ({
@@ -357,7 +357,7 @@ export const useBlogPostsStore = create<BlogPostsState>()(
         if (isLiveMode()) {
           try {
             const token = localStorage.getItem('admin_token');
-            await fetch(`${apiBaseUrl}/api/admin/blog/${id}`, {
+            await fetch(getApiUrl(`/api/admin/blog/${id}`), {
               method: 'DELETE',
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -371,7 +371,7 @@ export const useBlogPostsStore = create<BlogPostsState>()(
       },
 
       togglePublish: async (id) => {
-        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+        const { isLiveMode, getApiUrl } = useApiConfigStore.getState();
         const post = get().posts.find(p => p.id === id);
         const newPublishState = post ? !post.is_published : false;
 
@@ -392,7 +392,7 @@ export const useBlogPostsStore = create<BlogPostsState>()(
         if (isLiveMode()) {
           try {
             const token = localStorage.getItem('admin_token');
-            await fetch(`${apiBaseUrl}/api/admin/blog/${id}/toggle-publish`, {
+            await fetch(getApiUrl(`/api/admin/blog/${id}/toggle-publish`), {
               method: 'PATCH',
               headers: {
                 Authorization: `Bearer ${token}`,
