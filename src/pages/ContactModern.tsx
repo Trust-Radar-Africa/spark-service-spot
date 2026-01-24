@@ -93,7 +93,12 @@ export default function ContactModern() {
                   className="bg-gradient-to-r from-qx-orange to-amber-500 hover:from-qx-orange-dark hover:to-amber-600 text-white rounded-full w-full mt-auto"
                   onClick={(e) => {
                     e.preventDefault();
-                    document.getElementById('calendly-section')?.scrollIntoView({ behavior: 'smooth' });
+                    const element = document.getElementById('calendly-section');
+                    if (element) {
+                      const offset = 80; // pixels of padding from top
+                      const elementPosition = element.getBoundingClientRect().top + window.scrollY;
+                      window.scrollTo({ top: elementPosition - offset, behavior: 'smooth' });
+                    }
                   }}
                 >
                   Book Now
