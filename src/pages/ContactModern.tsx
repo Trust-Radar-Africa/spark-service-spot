@@ -69,7 +69,7 @@ export default function ContactModern() {
               <span className="text-qx-orange">Chat!</span>
             </h1>
             <p className="text-sm md:text-base text-white/80 max-w-xl mx-auto">
-              We'd love to hear from you. Schedule a meeting, give us a call, or send us an email.
+              We would love to hear from you. Schedule a meeting, give us a call, or send us an email.
             </p>
           </div>
         </div>
@@ -278,6 +278,7 @@ export default function ContactModern() {
                       "Request a candidate referral",
                       "Learn about our audit support",
                       "Explore bookkeeping solutions",
+                      "Inquire about taxation services",
                       "Inquire about consulting services",
                       "Submit your resume for careers",
                     ].map((item) => (
