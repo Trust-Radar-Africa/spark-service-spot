@@ -363,12 +363,8 @@ export default function CareersModern() {
                               <h3 className="text-job-title text-qx-blue mb-2">{job.title}</h3>
                               <div className="flex flex-wrap gap-2">
                                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-qx-light-gray text-job-meta text-qx-gray">
-                                  <Globe className="w-3 h-3" />
-                                  {job.country}
-                                </span>
-                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-qx-light-gray text-job-meta text-qx-gray">
                                   <MapPin className="w-3 h-3" />
-                                  {job.location}
+                                  {job.country}
                                 </span>
                                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-qx-light-gray text-job-meta text-qx-gray">
                                   <Clock className="w-3 h-3" />

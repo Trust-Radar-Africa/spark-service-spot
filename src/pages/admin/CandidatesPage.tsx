@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { CandidateFilters, ExperienceLevel, CandidateApplication } from '@/types/admin';
+import { CandidateFilters, ExperienceLevel, CandidateApplication, CANDIDATE_SALARY_LABELS } from '@/types/admin';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -138,16 +138,41 @@ export default function CandidatesPage() {
     localStorage.setItem('admin-candidates-items-per-page', String(value));
   };
 
-  // Handle CSV export
+  // Format experience for export (e.g., "3-7" -> "3-7 years")
+  const formatExperienceForExport = (exp: ExperienceLevel): string => {
+    const labels: Record<ExperienceLevel, string> = {
+      '0-3': '0-3 years',
+      '3-7': '3-7 years',
+      '7-10': '7-10 years',
+      '10+': 'Over 10 years',
+    };
+    return labels[exp] || exp;
+  };
+
+  // Handle CSV export with all candidate fields
   const handleExportCSV = () => {
-    exportToCSV(filteredCandidates, 'candidates', [
+    const exportData = filteredCandidates.map((c) => ({
+      first_name: c.first_name,
+      last_name: c.last_name,
+      email: c.email,
+      nationality: c.nationality,
+      country: c.country,
+      expected_salary_label: c.expected_salary ? CANDIDATE_SALARY_LABELS[c.expected_salary] || c.expected_salary : '',
+      experience_label: formatExperienceForExport(c.experience),
+      cv_url: c.cv_url || '',
+      cover_letter_url: c.cover_letter_url || '',
+    }));
+
+    exportToCSV(exportData, 'candidates', [
       { key: 'first_name', header: 'First Name' },
       { key: 'last_name', header: 'Last Name' },
-      { key: 'email', header: 'Email' },
+      { key: 'email', header: 'Email Address' },
       { key: 'nationality', header: 'Nationality' },
-      { key: 'job_applied', header: 'Job Applied' },
-      { key: 'experience', header: 'Experience' },
-      { key: 'created_at', header: 'Applied Date' },
+      { key: 'country', header: 'Country of Residence' },
+      { key: 'expected_salary_label', header: 'Expected Annual Salary (USD)' },
+      { key: 'experience_label', header: 'Years of Experience' },
+      { key: 'cv_url', header: 'CV / Resume' },
+      { key: 'cover_letter_url', header: 'Cover Letter' },
     ]);
     toast({
       title: 'Export successful',
@@ -312,14 +337,28 @@ export default function CandidatesPage() {
   };
 
   const handleBulkExport = () => {
-    exportToCSV(selectedItems, 'candidates_selected', [
+    const exportData = selectedItems.map((c) => ({
+      first_name: c.first_name,
+      last_name: c.last_name,
+      email: c.email,
+      nationality: c.nationality,
+      country: c.country,
+      expected_salary_label: c.expected_salary ? CANDIDATE_SALARY_LABELS[c.expected_salary] || c.expected_salary : '',
+      experience_label: formatExperienceForExport(c.experience),
+      cv_url: c.cv_url || '',
+      cover_letter_url: c.cover_letter_url || '',
+    }));
+
+    exportToCSV(exportData, 'candidates_selected', [
       { key: 'first_name', header: 'First Name' },
       { key: 'last_name', header: 'Last Name' },
-      { key: 'email', header: 'Email' },
+      { key: 'email', header: 'Email Address' },
       { key: 'nationality', header: 'Nationality' },
-      { key: 'job_applied', header: 'Job Applied' },
-      { key: 'experience', header: 'Experience' },
-      { key: 'created_at', header: 'Applied Date' },
+      { key: 'country', header: 'Country of Residence' },
+      { key: 'expected_salary_label', header: 'Expected Annual Salary (USD)' },
+      { key: 'experience_label', header: 'Years of Experience' },
+      { key: 'cv_url', header: 'CV / Resume' },
+      { key: 'cover_letter_url', header: 'Cover Letter' },
     ]);
     toast({
       title: 'Export successful',
