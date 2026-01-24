@@ -73,7 +73,7 @@ export default function Employers() {
                 Submit Your Recruitment Request
               </h2>
               <p className="text-muted-foreground">
-                Tell us about your hiring needs and we'll match you with qualified candidates
+                Tell us about your hiring needs and we will match you with qualified candidates
               </p>
             </div>
 

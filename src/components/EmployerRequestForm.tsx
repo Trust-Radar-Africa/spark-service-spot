@@ -26,6 +26,17 @@ import { Loader2, CheckCircle2, Building2 } from 'lucide-react';
 import { ExperienceLevel } from '@/types/admin';
 import { getCountryOptions, getNationalityOptions } from '@/data/countries';
 
+const SALARY_RANGES = [
+  { value: '500-1000', label: 'USD 500 - 1,000 per month' },
+  { value: '1001-1500', label: 'USD 1,001 - 1,500 per month' },
+  { value: '1501-2000', label: 'USD 1,501 - 2,000 per month' },
+  { value: '2001-2500', label: 'USD 2,001 - 2,500 per month' },
+  { value: '2501-3000', label: 'USD 2,501 - 3,000 per month' },
+  { value: '3001-3500', label: 'USD 3,001 - 3,500 per month' },
+  { value: '3501-4000', label: 'USD 3,501 - 4,000 per month' },
+  { value: 'above-4001', label: 'USD 4,001 and above per month' },
+];
+
 const employerRequestSchema = z.object({
   firm_name: z
     .string()
@@ -42,12 +53,15 @@ const employerRequestSchema = z.object({
     .optional(),
   preferred_location: z
     .string()
-    .min(2, 'Preferred location is required')
-    .max(100, 'Preferred location must be less than 100 characters'),
+    .min(2, 'Preferred work location is required')
+    .max(100, 'Preferred work location must be less than 100 characters'),
   preferred_nationality: z
     .string()
     .min(2, 'Preferred nationality is required')
     .max(50, 'Preferred nationality must be less than 50 characters'),
+  budgeted_salary: z.string({
+    required_error: 'Please select a budgeted salary range',
+  }).min(1, 'Please select a budgeted salary range'),
   years_experience: z.enum(['0-3', '3-7', '7-10', '10+'] as const, {
     required_error: 'Please select required experience level',
   }),
@@ -90,6 +104,7 @@ export default function EmployerRequestForm({ onSuccess }: EmployerRequestFormPr
       position_title: '',
       preferred_location: '',
       preferred_nationality: '',
+      budgeted_salary: '',
       years_experience: undefined,
       other_qualifications: '',
     },
@@ -143,7 +158,7 @@ export default function EmployerRequestForm({ onSuccess }: EmployerRequestFormPr
         <h3 className="text-2xl font-bold text-foreground mb-2">Request Submitted</h3>
         <p className="text-muted-foreground max-w-md mx-auto">
           Thank you for your recruitment request! Our team will review your requirements
-          and contact you within 24-48 hours with suitable candidate profiles.
+          and contact you within 24-48 hours with suitable candidate profiles. Please be sure to check your spam folder as well.
         </p>
       </div>
     );
@@ -241,7 +256,14 @@ export default function EmployerRequestForm({ onSuccess }: EmployerRequestFormPr
                 <FormItem>
                   <FormLabel>Preferred Work Location *</FormLabel>
                   <FormControl>
-                    <Input placeholder="Dubai, UAE" {...field} disabled={isSubmitting} />
+                    <SearchableSelect
+                      options={countryOptions}
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      placeholder="Select country"
+                      searchPlaceholder="Search country..."
+                      disabled={isSubmitting}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -270,30 +292,57 @@ export default function EmployerRequestForm({ onSuccess }: EmployerRequestFormPr
             />
           </div>
 
-          <FormField
-            control={form.control}
-            name="years_experience"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Required Years of Experience *</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isSubmitting}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select experience level" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {experienceLevels.map((level) => (
-                      <SelectItem key={level.value} value={level.value}>
-                        {level.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="budgeted_salary"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Budgeted Salary (USD) *</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isSubmitting}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select salary range" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {SALARY_RANGES.map((range) => (
+                        <SelectItem key={range.value} value={range.value}>
+                          {range.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="years_experience"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Required Years of Experience *</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isSubmitting}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select experience level" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {experienceLevels.map((level) => (
+                        <SelectItem key={level.value} value={level.value}>
+                          {level.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
 
         {/* Additional Qualifications */}

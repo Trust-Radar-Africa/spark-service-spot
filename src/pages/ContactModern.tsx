@@ -25,7 +25,7 @@ export default function ContactModern() {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     toast.success("Message sent successfully!", {
-      description: "We'll get back to you as soon as possible.",
+      description: "We will get back to you as soon as possible.",
     });
 
     setFormData({
@@ -205,7 +205,7 @@ export default function ContactModern() {
                   Send Us a Message
                 </h3>
                 <p className="text-body-paragraph text-qx-gray mb-6">
-                  Have a question or want to learn more? Fill out the form below and we'll get back to you promptly.
+                  Have a question or want to learn more? Fill out the form below and we will get back to you promptly.
                 </p>
 
                 <form onSubmit={handleSubmit} className="space-y-5">
