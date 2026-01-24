@@ -780,6 +780,15 @@ export default function CandidatesPage() {
                       Experience
                     </SortableTableHead>
                     <SortableTableHead
+                      sortKey="expected_salary"
+                      currentSortKey={sortKey}
+                      currentSortDirection={sortDirection}
+                      onSort={handleSort}
+                      className="hidden md:table-cell"
+                    >
+                      Expected Salary
+                    </SortableTableHead>
+                    <SortableTableHead
                       sortKey="created_at"
                       currentSortKey={sortKey}
                       currentSortDirection={sortDirection}
@@ -823,6 +832,15 @@ export default function CandidatesPage() {
                         <Badge variant={getExperienceBadgeVariant(candidate.experience)}>
                           {candidate.experience} yrs
                         </Badge>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {candidate.expected_salary ? (
+                          <span className="text-sm">
+                            {CANDIDATE_SALARY_LABELS[candidate.expected_salary] || candidate.expected_salary}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
                       </TableCell>
                       <TableCell className="hidden sm:table-cell">
                         {new Date(candidate.created_at).toLocaleDateString()}
@@ -997,15 +1015,28 @@ export default function CandidatesPage() {
                   <Briefcase className="h-5 w-5" />
                   Job Application
                 </h3>
-                <div>
-                  <p className="text-sm text-muted-foreground">Position Applied For</p>
-                  {candidateToView.job_applied ? (
-                    <Badge variant="outline" className="mt-1">
-                      {candidateToView.job_applied}
-                    </Badge>
-                  ) : (
-                    <p className="text-muted-foreground">General Application</p>
-                  )}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Position Applied For</p>
+                    {candidateToView.job_applied ? (
+                      <Badge variant="outline" className="mt-1">
+                        {candidateToView.job_applied}
+                      </Badge>
+                    ) : (
+                      <p className="text-muted-foreground">General Application</p>
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Expected Salary</p>
+                    {candidateToView.expected_salary ? (
+                      <p className="font-medium flex items-center gap-1">
+                        <DollarSign className="h-3 w-3" />
+                        {CANDIDATE_SALARY_LABELS[candidateToView.expected_salary] || candidateToView.expected_salary}
+                      </p>
+                    ) : (
+                      <p className="text-muted-foreground">—</p>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Applied On</p>
