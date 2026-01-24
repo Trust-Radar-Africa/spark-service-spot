@@ -127,7 +127,7 @@ export default function BlogPostModern() {
         
         {/* Category Badge */}
         <div className="absolute top-24 right-4 lg:right-8 z-10">
-          <span className="inline-block px-4 py-1.5 bg-primary text-primary-foreground text-sm font-medium rounded-full">
+          <span className="inline-block px-4 py-1.5 bg-qx-blue text-white text-sm font-medium rounded-full">
             {post.category}
           </span>
         </div>
@@ -291,10 +291,10 @@ export default function BlogPostModern() {
                 )}
 
                 {/* Newsletter Signup */}
-                <Card className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground border-0">
+                <Card className="bg-qx-blue text-white border-0">
                   <CardHeader>
-                    <CardTitle className="text-xl">Stay Updated</CardTitle>
-                    <CardDescription className="text-primary-foreground/80">
+                    <CardTitle className="text-xl text-white">Stay Updated</CardTitle>
+                    <CardDescription className="text-white/80">
                       Get the latest insights delivered to your inbox weekly.
                     </CardDescription>
                   </CardHeader>
@@ -302,10 +302,10 @@ export default function BlogPostModern() {
                     <Input
                       type="email"
                       placeholder="Enter your email"
-                      className="bg-white/10 border-white/20 text-primary-foreground placeholder:text-primary-foreground/60 focus:ring-white/30"
+                      className="bg-white/10 border-white/20 text-white placeholder:text-white/60 focus:ring-white/30"
                     />
                     <Button 
-                      className="w-full bg-white text-primary hover:bg-white/90"
+                      className="w-full bg-qx-orange text-white hover:bg-qx-orange/90"
                     >
                       Subscribe
                       <ArrowRight className="w-4 h-4 ml-2" />
@@ -381,17 +381,17 @@ export default function BlogPostModern() {
       )}
 
       {/* CTA Section */}
-      <section className="py-16 bg-primary">
+      <section className="py-16 bg-qx-blue">
         <div className="container mx-auto px-4 lg:px-8 text-center">
-          <h3 className="text-2xl md:text-3xl font-bold text-primary-foreground mb-4">
+          <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
             Ready to Transform Your Practice?
           </h3>
-          <p className="text-primary-foreground/80 max-w-xl mx-auto mb-8 text-lg">
+          <p className="text-white/80 max-w-xl mx-auto mb-8 text-lg">
             Discover how our offshore accounting services can help you grow while reducing costs.
           </p>
           <Button
             size="lg"
-            className="bg-white text-primary hover:bg-white/90"
+            className="bg-qx-orange text-white hover:bg-qx-orange/90"
             asChild
           >
             <Link to="/contact">
