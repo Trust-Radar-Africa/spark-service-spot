@@ -81,19 +81,19 @@ export default function ContactModern() {
           <div className="grid md:grid-cols-3 gap-4 max-w-4xl mx-auto -mt-20 relative z-10">
             {/* Schedule Meeting - For Accounting Firms Only */}
             <AnimatedSection delay={0}>
-              <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 text-center hover:shadow-2xl transition-shadow duration-300">
+              <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 text-center hover:shadow-2xl transition-shadow duration-300 h-full flex flex-col">
                 <div className="w-14 h-14 rounded-full bg-gradient-to-br from-qx-orange to-amber-400 flex items-center justify-center mx-auto mb-4 shadow-lg">
                   <Calendar className="w-7 h-7 text-white" />
                 </div>
-                <h3 className="text-job-title text-qx-blue mb-2 leading-tight">Accounting Firms - Schedule a Meeting</h3>
-                <p className="text-body-paragraph text-qx-gray text-sm mb-4">
-                  For employers only. Book a time to discuss your outsourcing needs.
+                <h3 className="text-job-title text-qx-blue mb-2">Schedule a Meeting</h3>
+                <p className="text-body-paragraph text-qx-gray text-sm mb-4 flex-grow">
+                  For accounting firms only
                 </p>
                 <Button 
-                  className="bg-gradient-to-r from-qx-orange to-amber-500 hover:from-qx-orange-dark hover:to-amber-600 text-white rounded-full w-full"
+                  className="bg-gradient-to-r from-qx-orange to-amber-500 hover:from-qx-orange-dark hover:to-amber-600 text-white rounded-full w-full mt-auto"
                   asChild
                 >
-                  <a href="https://calendly.com/YOUR_CALENDLY_LINK" target="_blank" rel="noopener noreferrer">
+                  <a href="#calendly-section">
                     Book Now
                   </a>
                 </Button>
@@ -102,20 +102,20 @@ export default function ContactModern() {
 
             {/* Call Us */}
             <AnimatedSection delay={100}>
-              <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 text-center hover:shadow-2xl transition-shadow duration-300">
+              <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 text-center hover:shadow-2xl transition-shadow duration-300 h-full flex flex-col">
                 <div className="w-14 h-14 rounded-full bg-gradient-to-br from-qx-blue to-qx-blue-dark flex items-center justify-center mx-auto mb-4 shadow-lg">
                   <Phone className="w-7 h-7 text-white" />
                 </div>
                 <h3 className="text-job-title text-qx-blue mb-2">Call Us</h3>
                 <a
                   href="tel:+18885566382"
-                  className="text-job-salary text-xl text-qx-orange hover:underline block mb-4"
+                  className="text-body-paragraph text-qx-orange hover:underline block mb-4 flex-grow"
                 >
                   +1 888 556 6382
                 </a>
                 <Button 
                   variant="outline"
-                  className="border-qx-blue text-qx-blue hover:bg-qx-blue hover:text-white rounded-full w-full"
+                  className="border-qx-blue text-qx-blue hover:bg-qx-blue hover:text-white rounded-full w-full mt-auto"
                   asChild
                 >
                   <a href="tel:+18885566382">Call Now</a>
@@ -125,20 +125,20 @@ export default function ContactModern() {
 
             {/* Email Us */}
             <AnimatedSection delay={200}>
-              <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 text-center hover:shadow-2xl transition-shadow duration-300">
+              <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 text-center hover:shadow-2xl transition-shadow duration-300 h-full flex flex-col">
                 <div className="w-14 h-14 rounded-full bg-gradient-to-br from-qx-blue to-qx-blue-dark flex items-center justify-center mx-auto mb-4 shadow-lg">
                   <Mail className="w-7 h-7 text-white" />
                 </div>
                 <h3 className="text-job-title text-qx-blue mb-2">Email Us</h3>
                 <a
                   href="mailto:info@multiversecpa.com"
-                  className="text-body-paragraph text-qx-orange hover:underline block mb-4"
+                  className="text-body-paragraph text-qx-orange hover:underline block mb-4 flex-grow"
                 >
                   info@multiversecpa.com
                 </a>
                 <Button 
                   variant="outline"
-                  className="border-qx-blue text-qx-blue hover:bg-qx-blue hover:text-white rounded-full w-full"
+                  className="border-qx-blue text-qx-blue hover:bg-qx-blue hover:text-white rounded-full w-full mt-auto"
                   asChild
                 >
                   <a href="mailto:info@multiversecpa.com">Send Email</a>
@@ -146,6 +146,45 @@ export default function ContactModern() {
               </div>
             </AnimatedSection>
           </div>
+        </div>
+      </section>
+
+      {/* Calendly Embed Section */}
+      <section id="calendly-section" className="py-10 md:py-12 bg-white">
+        <div className="container mx-auto px-4 lg:px-8">
+          <AnimatedSection>
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-qx-orange/10 border border-qx-orange/20 mb-3">
+                  <Calendar className="w-3 h-3 text-qx-orange" />
+                  <span className="text-xs text-qx-orange uppercase tracking-wider font-medium">
+                    For Accounting Firms Only
+                  </span>
+                </div>
+                <h2 className="text-section-title text-qx-blue mb-2">
+                  Schedule a Meeting With Us
+                </h2>
+                <p className="text-body-paragraph text-qx-gray max-w-xl mx-auto">
+                  Select a convenient time to discuss your outsourcing needs. This booking is exclusively for accounting firms and employers.
+                </p>
+              </div>
+              
+              {/* Calendly Inline Widget */}
+              <div className="bg-qx-light-gray rounded-2xl p-4 md:p-6 border border-gray-100">
+                <iframe
+                  src="https://calendly.com/YOUR_CALENDLY_LINK?hide_gdpr_banner=1&background_color=f8fafc&text_color=0a2342&primary_color=f26522"
+                  width="100%"
+                  height="650"
+                  frameBorder="0"
+                  title="Schedule a meeting with Multiverse CPA"
+                  className="rounded-xl"
+                ></iframe>
+                <p className="text-xs text-qx-gray text-center mt-4">
+                  Please replace YOUR_CALENDLY_LINK with your actual Calendly scheduling link
+                </p>
+              </div>
+            </div>
+          </AnimatedSection>
         </div>
       </section>
 
