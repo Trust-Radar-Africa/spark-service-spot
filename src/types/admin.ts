@@ -1,3 +1,15 @@
+// Expected salary ranges for candidates (matches form options)
+export const CANDIDATE_SALARY_LABELS: Record<string, string> = {
+  '500-1000': 'USD 500 - 1,000 PM',
+  '1001-1500': 'USD 1,001 - 1,500 PM',
+  '1501-2000': 'USD 1,501 - 2,000 PM',
+  '2001-2500': 'USD 2,001 - 2,500 PM',
+  '2501-3000': 'USD 2,501 - 3,000 PM',
+  '3001-3500': 'USD 3,001 - 3,500 PM',
+  '3501-4000': 'USD 3,501 - 4,000 PM',
+  'above-4001': 'Above USD 4,001 PM',
+};
+
 // Candidate Application Types
 export interface CandidateApplication {
   id: number;
@@ -6,12 +18,13 @@ export interface CandidateApplication {
   email: string;
   nationality: string;
   country: string;
-  location: string;
+  location?: string; // Optional - legacy field
+  expected_salary?: string; // New field matching form
   experience: ExperienceLevel;
   job_applied?: string; // Job title/role they applied for
   job_id?: number; // Reference to job posting
-  cv_url: string;
-  cover_letter_url: string;
+  cv_url?: string;
+  cover_letter_url?: string;
   created_at: string;
   updated_at: string;
 }

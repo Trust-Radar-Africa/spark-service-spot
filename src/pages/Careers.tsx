@@ -349,12 +349,8 @@ export default function Careers() {
                               </h3>
                               <div className="flex flex-wrap gap-2">
                                 <Badge variant="outline" className="gap-1.5 text-xs">
-                                  <Globe className="w-3 h-3" />
-                                  {job.country}
-                                </Badge>
-                                <Badge variant="outline" className="gap-1.5 text-xs">
                                   <MapPin className="w-3 h-3" />
-                                  {job.location}
+                                  {job.country}
                                 </Badge>
                                 <Badge variant="outline" className="gap-1.5 text-xs">
                                   <Clock className="w-3 h-3" />
