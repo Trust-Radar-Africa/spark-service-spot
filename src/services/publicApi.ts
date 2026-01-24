@@ -1,7 +1,8 @@
 /**
  * Public API Service
  * 
- * Fetches data from the Laravel API for public-facing pages (Careers, Blog)
+ * Fetches data from the API for public-facing pages (Careers, Blog)
+ * Supports both Laravel API and JSON Server backends
  * Falls back to local data when API is unavailable or in demo mode
  */
 
@@ -11,8 +12,62 @@ import { BlogPost, authors } from '@/data/blogData';
 
 // Get API configuration
 const getApiConfig = () => {
-  const { apiBaseUrl, isLiveMode } = useApiConfigStore.getState();
-  return { apiBaseUrl, isLiveMode: isLiveMode() };
+  const store = useApiConfigStore.getState();
+  return { 
+    isLiveMode: store.isLiveMode(),
+    isJsonServer: store.isJsonServer(),
+    getApiUrl: store.getApiUrl,
+  };
+};
+
+// Build query params for JSON Server vs Laravel
+const buildQueryParams = (filters: Record<string, string | number | undefined>, isJsonServer: boolean): URLSearchParams => {
+  const params = new URLSearchParams();
+  
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value === undefined || value === '') return;
+    
+    if (isJsonServer) {
+      // JSON Server uses different param names
+      switch (key) {
+        case 'search':
+          params.append('q', String(value)); // Full-text search
+          break;
+        case 'page':
+          params.append('_page', String(value));
+          break;
+        case 'per_page':
+          params.append('_limit', String(value));
+          break;
+        default:
+          params.append(key, String(value));
+      }
+    } else {
+      // Laravel uses standard param names
+      params.append(key, String(value));
+    }
+  });
+  
+  return params;
+};
+
+// Transform JSON Server response to match Laravel API format
+const transformJsonServerResponse = <T>(
+  data: T[], 
+  page: number = 1, 
+  perPage: number = 10,
+  totalHeader?: string | null
+): { data: T[]; meta: { current_page: number; last_page: number; per_page: number; total: number } } => {
+  const total = totalHeader ? parseInt(totalHeader, 10) : data.length;
+  return {
+    data,
+    meta: {
+      current_page: page,
+      last_page: Math.ceil(total / perPage),
+      per_page: perPage,
+      total,
+    },
+  };
 };
 
 // ============================================
@@ -31,6 +86,7 @@ export interface PublicJob {
   benefits?: string;
   salary_range?: string;
   currency?: string;
+  is_active?: boolean;
   created_at: string;
 }
 
@@ -60,22 +116,32 @@ export interface JobFilters {
 }
 
 export async function fetchPublicJobs(filters?: JobFilters): Promise<PublicJobsResponse> {
-  const { apiBaseUrl, isLiveMode } = getApiConfig();
+  const { isLiveMode, isJsonServer, getApiUrl } = getApiConfig();
   
   if (!isLiveMode) {
     throw new Error('Not in live mode');
   }
 
-  const params = new URLSearchParams();
-  if (filters?.search) params.append('search', filters.search);
-  if (filters?.country) params.append('country', filters.country);
-  if (filters?.location) params.append('location', filters.location);
-  if (filters?.work_type) params.append('work_type', filters.work_type);
-  if (filters?.experience) params.append('experience', filters.experience);
-  if (filters?.page) params.append('page', filters.page.toString());
-  if (filters?.per_page) params.append('per_page', filters.per_page.toString());
+  const queryFilters: Record<string, string | number | undefined> = {
+    search: filters?.search,
+    country: filters?.country,
+    location: filters?.location,
+    work_type: filters?.work_type,
+    experience: isJsonServer ? undefined : filters?.experience, // JSON Server uses experience_required
+    experience_required: isJsonServer ? filters?.experience : undefined,
+    page: filters?.page,
+    per_page: filters?.per_page,
+  };
 
-  const response = await fetch(`${apiBaseUrl}/api/jobs?${params.toString()}`, {
+  // For JSON Server, filter only active jobs
+  if (isJsonServer) {
+    (queryFilters as Record<string, unknown>).is_active = true;
+  }
+
+  const params = buildQueryParams(queryFilters, isJsonServer);
+  const url = `${getApiUrl('jobs')}?${params.toString()}`;
+
+  const response = await fetch(url, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -87,17 +153,24 @@ export async function fetchPublicJobs(filters?: JobFilters): Promise<PublicJobsR
     throw new Error('Failed to fetch jobs');
   }
 
+  if (isJsonServer) {
+    const data = await response.json();
+    const total = response.headers.get('X-Total-Count');
+    return transformJsonServerResponse(data, filters?.page || 1, filters?.per_page || 10, total);
+  }
+
   return response.json();
 }
 
 export async function fetchPublicJob(id: number): Promise<{ job: PublicJob }> {
-  const { apiBaseUrl, isLiveMode } = getApiConfig();
+  const { isLiveMode, isJsonServer, getApiUrl } = getApiConfig();
   
   if (!isLiveMode) {
     throw new Error('Not in live mode');
   }
 
-  const response = await fetch(`${apiBaseUrl}/api/jobs/${id}`, {
+  const url = getApiUrl(`jobs/${id}`);
+  const response = await fetch(url, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -107,6 +180,11 @@ export async function fetchPublicJob(id: number): Promise<{ job: PublicJob }> {
 
   if (!response.ok) {
     throw new Error('Failed to fetch job');
+  }
+
+  if (isJsonServer) {
+    const job = await response.json();
+    return { job };
   }
 
   return response.json();
@@ -173,20 +251,29 @@ export interface BlogFilters {
 }
 
 export async function fetchPublicBlogPosts(filters?: BlogFilters): Promise<PublicBlogResponse> {
-  const { apiBaseUrl, isLiveMode } = getApiConfig();
+  const { isLiveMode, isJsonServer, getApiUrl } = getApiConfig();
   
   if (!isLiveMode) {
     throw new Error('Not in live mode');
   }
 
-  const params = new URLSearchParams();
-  if (filters?.search) params.append('search', filters.search);
-  if (filters?.category && filters.category !== 'All') params.append('category', filters.category);
-  if (filters?.author) params.append('author', filters.author);
-  if (filters?.page) params.append('page', filters.page.toString());
-  if (filters?.per_page) params.append('per_page', filters.per_page.toString());
+  const queryFilters: Record<string, string | number | undefined> = {
+    search: filters?.search,
+    category: filters?.category !== 'All' ? filters?.category : undefined,
+    author: filters?.author,
+    page: filters?.page,
+    per_page: filters?.per_page,
+  };
 
-  const response = await fetch(`${apiBaseUrl}/api/blog?${params.toString()}`, {
+  // For JSON Server, filter only published posts
+  if (isJsonServer) {
+    (queryFilters as Record<string, unknown>).is_published = true;
+  }
+
+  const params = buildQueryParams(queryFilters, isJsonServer);
+  const url = `${getApiUrl('blog')}?${params.toString()}`;
+
+  const response = await fetch(url, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -198,17 +285,28 @@ export async function fetchPublicBlogPosts(filters?: BlogFilters): Promise<Publi
     throw new Error('Failed to fetch blog posts');
   }
 
+  if (isJsonServer) {
+    const data = await response.json();
+    const total = response.headers.get('X-Total-Count');
+    return transformJsonServerResponse(data, filters?.page || 1, filters?.per_page || 10, total);
+  }
+
   return response.json();
 }
 
 export async function fetchPublicBlogPost(slug: string): Promise<{ post: PublicBlogPost; related_posts: PublicBlogPost[] }> {
-  const { apiBaseUrl, isLiveMode } = getApiConfig();
+  const { isLiveMode, isJsonServer, getApiUrl } = getApiConfig();
   
   if (!isLiveMode) {
     throw new Error('Not in live mode');
   }
 
-  const response = await fetch(`${apiBaseUrl}/api/blog/${slug}`, {
+  // JSON Server requires querying by slug
+  const url = isJsonServer 
+    ? `${getApiUrl('blog')}?slug=${slug}` 
+    : getApiUrl(`blog/${slug}`);
+
+  const response = await fetch(url, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -220,17 +318,29 @@ export async function fetchPublicBlogPost(slug: string): Promise<{ post: PublicB
     throw new Error('Failed to fetch blog post');
   }
 
+  if (isJsonServer) {
+    const data = await response.json();
+    const post = Array.isArray(data) ? data[0] : data;
+    if (!post) throw new Error('Blog post not found');
+    return { post, related_posts: [] };
+  }
+
   return response.json();
 }
 
 export async function fetchFeaturedBlogPosts(limit: number = 3): Promise<{ posts: PublicBlogPost[] }> {
-  const { apiBaseUrl, isLiveMode } = getApiConfig();
+  const { isLiveMode, isJsonServer, getApiUrl } = getApiConfig();
   
   if (!isLiveMode) {
     throw new Error('Not in live mode');
   }
 
-  const response = await fetch(`${apiBaseUrl}/api/blog/featured?limit=${limit}`, {
+  // JSON Server uses _limit for pagination
+  const url = isJsonServer 
+    ? `${getApiUrl('blog')}?is_published=true&_limit=${limit}&_sort=published_at&_order=desc`
+    : `${getApiUrl('blog/featured')}?limit=${limit}`;
+
+  const response = await fetch(url, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -242,6 +352,11 @@ export async function fetchFeaturedBlogPosts(limit: number = 3): Promise<{ posts
     throw new Error('Failed to fetch featured posts');
   }
 
+  if (isJsonServer) {
+    const posts = await response.json();
+    return { posts };
+  }
+
   return response.json();
 }
 
@@ -249,13 +364,17 @@ export async function fetchBlogCategories(): Promise<{
   categories: Array<{ id: number; name: string; slug: string; description?: string; count: number }>;
   total_posts: number;
 }> {
-  const { apiBaseUrl, isLiveMode } = getApiConfig();
+  const { isLiveMode, isJsonServer, getApiUrl } = getApiConfig();
   
   if (!isLiveMode) {
     throw new Error('Not in live mode');
   }
 
-  const response = await fetch(`${apiBaseUrl}/api/blog/categories`, {
+  const url = isJsonServer 
+    ? getApiUrl('blog-categories')
+    : getApiUrl('blog/categories');
+
+  const response = await fetch(url, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -265,6 +384,14 @@ export async function fetchBlogCategories(): Promise<{
 
   if (!response.ok) {
     throw new Error('Failed to fetch categories');
+  }
+
+  if (isJsonServer) {
+    const categories = await response.json();
+    return { 
+      categories: categories.map((c: { id: number; name: string; slug: string; description?: string }) => ({ ...c, count: 0 })),
+      total_posts: 0 
+    };
   }
 
   return response.json();
@@ -317,24 +444,40 @@ export interface ContactFormData {
 }
 
 export async function submitContactForm(data: ContactFormData): Promise<{ message: string }> {
-  const { apiBaseUrl, isLiveMode } = getApiConfig();
+  const { isLiveMode, isJsonServer, getApiUrl } = getApiConfig();
   
   if (!isLiveMode) {
     throw new Error('Not in live mode');
   }
 
-  const response = await fetch(`${apiBaseUrl}/api/contact`, {
+  const url = getApiUrl('contact-messages');
+  
+  // For JSON Server, add required fields
+  const payload = isJsonServer 
+    ? { 
+        ...data, 
+        is_read: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }
+    : data;
+
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
     },
-    body: JSON.stringify(data),
+    body: JSON.stringify(payload),
   });
 
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.message || 'Failed to submit contact form');
+  }
+
+  if (isJsonServer) {
+    return { message: 'Contact form submitted successfully!' };
   }
 
   return response.json();
@@ -359,12 +502,50 @@ export interface CandidateApplicationData {
 }
 
 export async function submitCandidateApplication(data: CandidateApplicationData): Promise<{ message: string }> {
-  const { apiBaseUrl, isLiveMode } = getApiConfig();
+  const { isLiveMode, isJsonServer, getApiUrl } = getApiConfig();
   
   if (!isLiveMode) {
     throw new Error('Not in live mode');
   }
 
+  // JSON Server doesn't handle file uploads, so we use JSON for it
+  if (isJsonServer) {
+    const url = getApiUrl('candidates');
+    const payload = {
+      first_name: data.first_name,
+      last_name: data.last_name,
+      email: data.email,
+      nationality: data.nationality,
+      country: data.country,
+      location: data.country, // Use country as location for simplicity
+      expected_salary: data.expected_salary,
+      experience: data.experience,
+      job_applied: data.job_title || null,
+      job_id: data.job_id || null,
+      cv_url: `/storage/cvs/cv-${Date.now()}.docx`,
+      cover_letter_url: `/storage/cover-letters/cl-${Date.now()}.docx`,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to submit application');
+    }
+
+    return { message: 'Application submitted successfully!' };
+  }
+
+  // Laravel API uses FormData for file uploads
+  const url = getApiUrl('candidates/apply');
   const formData = new FormData();
   formData.append('first_name', data.first_name);
   formData.append('last_name', data.last_name);
@@ -382,7 +563,7 @@ export async function submitCandidateApplication(data: CandidateApplicationData)
     formData.append('job_id', data.job_id.toString());
   }
 
-  const response = await fetch(`${apiBaseUrl}/api/candidates/apply`, {
+  const response = await fetch(url, {
     method: 'POST',
     body: formData,
   });
@@ -412,24 +593,40 @@ export interface EmployerRequestData {
 }
 
 export async function submitEmployerRequest(data: EmployerRequestData): Promise<{ message: string }> {
-  const { apiBaseUrl, isLiveMode } = getApiConfig();
+  const { isLiveMode, isJsonServer, getApiUrl } = getApiConfig();
   
   if (!isLiveMode) {
     throw new Error('Not in live mode');
   }
 
-  const response = await fetch(`${apiBaseUrl}/api/employer-requests`, {
+  const url = getApiUrl('employer-requests');
+  
+  // For JSON Server, add required fields and map field names
+  const payload = isJsonServer 
+    ? { 
+        ...data, 
+        notes: data.other_qualifications || '',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }
+    : data;
+
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
     },
-    body: JSON.stringify(data),
+    body: JSON.stringify(payload),
   });
 
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.message || 'Failed to submit employer request');
+  }
+
+  if (isJsonServer) {
+    return { message: 'Employer request submitted successfully!' };
   }
 
   return response.json();

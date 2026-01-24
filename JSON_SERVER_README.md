@@ -190,15 +190,47 @@ curl -X DELETE http://localhost:3001/candidates/1
 
 ## Frontend Configuration
 
-To use JSON Server during development, update your API configuration:
+The frontend automatically switches between JSON Server and Laravel API based on environment variables.
 
-```typescript
-// src/stores/apiConfigStore.ts
-const useApiConfigStore = create((set) => ({
-  baseUrl: 'http://localhost:3001', // JSON Server URL
-  isLiveMode: () => true, // Enable API mode
-}));
+### Option 1: Use JSON Server (Development)
+
+Update your `.env` file:
+
+```bash
+# Use JSON Server backend
+VITE_API_BACKEND=json-server
+VITE_JSON_SERVER_URL=http://localhost:3001
+
+# Enable live mode to fetch from API
+VITE_DATA_MODE=live
 ```
+
+### Option 2: Use Laravel API (Production)
+
+```bash
+# Use Laravel backend
+VITE_API_BACKEND=laravel
+VITE_LARAVEL_API_URL=https://api.yoursite.com
+
+# Enable live mode
+VITE_DATA_MODE=live
+```
+
+### Option 3: Demo Mode (No Backend)
+
+```bash
+# Use local Zustand stores
+VITE_DATA_MODE=demo
+```
+
+### Environment Variables Reference
+
+| Variable | Values | Description |
+|----------|--------|-------------|
+| `VITE_API_BACKEND` | `json-server`, `laravel` | Backend type (default: `laravel`) |
+| `VITE_JSON_SERVER_URL` | URL | JSON Server URL (default: `http://localhost:3001`) |
+| `VITE_LARAVEL_API_URL` | URL | Laravel API URL |
+| `VITE_DATA_MODE` | `demo`, `live` | Override mode (auto-detected if not set) |
 
 ## Data Structure
 
