@@ -86,7 +86,7 @@ class ApiService {
 
   // Auth endpoints
   async login(email: string, password: string) {
-    const { isLiveMode, baseUrl } = getApiConfig();
+    const { isLiveMode, isJsonServer, baseUrl } = getApiConfig();
     
     // Demo mode check - use demo credentials without API call
     const demoUser = this.demoUsers[email];
@@ -101,12 +101,35 @@ class ApiService {
 
     // If in demo mode but credentials don't match demo users
     if (!isLiveMode) {
-      throw new Error('Invalid credentials. Use demo@demo.com / demo123');
+      throw new Error('Invalid credentials. Use admin@demo.com / demo123');
     }
 
-    // Real API call (only in live mode)
+    // JSON Server mode - use demo auth with db.json users
+    if (isJsonServer) {
+      // Check against db.json users
+      const response = await fetch(`${baseUrl}/users?email=${email}`);
+      const users = await response.json();
+      const user = users[0];
+      
+      if (user && user.password === password) {
+        const token = `json-server-token-${user.role}-${Date.now()}`;
+        this.setToken(token);
+        return { user, token };
+      }
+      
+      // Fallback to demo users for JSON Server
+      if (demoUser && password === 'demo123') {
+        const demoToken = `demo-token-${demoUser.role}-` + Date.now();
+        this.setToken(demoToken);
+        return { user: demoUser, token: demoToken };
+      }
+      
+      throw new Error('Invalid credentials');
+    }
+
+    // Laravel API call (only for Laravel backend)
     try {
-      // First, get CSRF cookie for Sanctum
+      // First, get CSRF cookie for Sanctum (Laravel only)
       await fetch(`${baseUrl}/sanctum/csrf-cookie`, {
         credentials: 'include',
       });
