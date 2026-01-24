@@ -81,8 +81,10 @@ import { useBulkSelection } from '@/hooks/useBulkSelection';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { useAuditLogger } from '@/stores/auditLogStore';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
-
 import { COUNTRIES, NATIONALITIES } from '@/data/countries';
+import { ApiErrorState } from '@/components/admin/ApiErrorState';
+import { TableLoadingSkeleton, CardsLoadingSkeleton } from '@/components/admin/LoadingState';
+import { NoDataState, NoResultsState } from '@/components/admin/EmptyState';
 
 const experienceLabels: Record<ExperienceLevel, string> = {
   '0-3': '0-3 years',
@@ -105,7 +107,7 @@ const getStoredItemsPerPage = (): ItemsPerPageOption => {
 };
 
 export default function EmployerRequestsPage() {
-  const { requests, isLoading, fetchRequests, deleteRequest } = useEmployerRequestsStore();
+  const { requests, isLoading, error, fetchRequests, deleteRequest } = useEmployerRequestsStore();
   const { toast } = useToast();
   const { sortKey, sortDirection, handleSort, sortData } = useSorting<EmployerRequest>();
   const { canDelete, isViewer } = useAdminPermissions();
@@ -605,6 +607,29 @@ export default function EmployerRequestsPage() {
 
         {/* Requests Table */}
         <div className="bg-card rounded-lg border overflow-hidden">
+          {error ? (
+            <ApiErrorState
+              title="Failed to load employer requests"
+              message={error}
+              onRetry={fetchRequests}
+            />
+          ) : isLoading ? (
+            <div className="p-4">
+              <TableLoadingSkeleton rows={5} columns={6} />
+            </div>
+          ) : requests.length === 0 ? (
+            <NoDataState entityName="employer requests" onRefresh={fetchRequests} />
+          ) : paginatedRequests.length === 0 ? (
+            <NoResultsState onClearFilters={() => {
+              setSearchTerm('');
+              setNationalityFilter('');
+              setCountryFilter('');
+              setLocationFilter('');
+              setPositionFilter('');
+              setExperienceFilter('all');
+              setSalaryFilter('all');
+            }} />
+          ) : (
           <Table>
             <TableHeader>
               <TableRow>
@@ -663,29 +688,7 @@ export default function EmployerRequestsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-            {isLoading ? (
-                Array.from({ length: 5 }).map((_, i) => (
-                  <TableRow key={i}>
-                    <TableCell><div className="h-4 w-4 bg-muted animate-pulse rounded" /></TableCell>
-                    <TableCell><div className="space-y-2"><div className="h-4 w-32 bg-muted animate-pulse rounded" /><div className="h-3 w-24 bg-muted animate-pulse rounded" /></div></TableCell>
-                    <TableCell className="hidden sm:table-cell"><div className="h-4 w-24 bg-muted animate-pulse rounded" /></TableCell>
-                    <TableCell className="hidden md:table-cell"><div className="h-6 w-20 bg-muted animate-pulse rounded-full" /></TableCell>
-                    <TableCell className="hidden lg:table-cell"><div className="h-4 w-24 bg-muted animate-pulse rounded" /></TableCell>
-                    <TableCell className="hidden sm:table-cell"><div className="h-4 w-20 bg-muted animate-pulse rounded" /></TableCell>
-                    <TableCell><div className="flex justify-end gap-1"><div className="h-8 w-8 bg-muted animate-pulse rounded" /><div className="h-8 w-8 bg-muted animate-pulse rounded" /></div></TableCell>
-                  </TableRow>
-                ))
-              ) : paginatedRequests.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8">
-                    <div className="flex flex-col items-center gap-2">
-                      <Building2 className="w-8 h-8 text-muted-foreground" />
-                      <p className="text-muted-foreground">No requests found</p>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                paginatedRequests.map((request) => (
+              {paginatedRequests.map((request) => (
                   <TableRow key={request.id} className={isSelected(request.id) ? 'bg-muted/50' : ''}>
                     <TableCell>
                       <Checkbox
@@ -744,10 +747,10 @@ export default function EmployerRequestsPage() {
                       </div>
                     </TableCell>
                   </TableRow>
-                ))
-              )}
+                ))}
             </TableBody>
           </Table>
+          )}
 
           {/* Pagination */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border-t">

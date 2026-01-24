@@ -67,6 +67,9 @@ import { useBulkSelection } from '@/hooks/useBulkSelection';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { useAuditLogger } from '@/stores/auditLogStore';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
+import { ApiErrorState } from '@/components/admin/ApiErrorState';
+import { TableLoadingSkeleton, CardsLoadingSkeleton } from '@/components/admin/LoadingState';
+import { NoDataState, NoResultsState } from '@/components/admin/EmptyState';
 
 const getStoredItemsPerPage = (): ItemsPerPageOption => {
   if (typeof window !== 'undefined') {
@@ -79,7 +82,7 @@ const getStoredItemsPerPage = (): ItemsPerPageOption => {
 };
 
 export default function BlogManagementPage() {
-  const { posts, addPost, updatePost, deletePost, togglePublish, fetchPosts, isLoading } = useBlogPostsStore();
+  const { posts, addPost, updatePost, deletePost, togglePublish, fetchPosts, isLoading, error } = useBlogPostsStore();
   const { isLiveMode } = useApiConfigStore();
   const { toast } = useToast();
   const { sortKey, sortDirection, handleSort, sortData } = useSorting<BlogPostData>();
@@ -577,6 +580,26 @@ export default function BlogManagementPage() {
         {/* Posts Table */}
         <Card>
           <CardContent className="p-0">
+            {error ? (
+              <ApiErrorState
+                title="Failed to load blog posts"
+                message={error}
+                onRetry={fetchPosts}
+              />
+            ) : isLoading ? (
+              <div className="p-4">
+                <TableLoadingSkeleton rows={5} columns={6} />
+              </div>
+            ) : posts.length === 0 ? (
+              <NoDataState entityName="blog posts" onRefresh={fetchPosts} />
+            ) : paginatedPosts.length === 0 ? (
+              <NoResultsState onClearFilters={() => {
+                setSearchTerm('');
+                setAuthorFilter('');
+                setStatusFilter('');
+                setCategoryFilter('');
+              }} />
+            ) : (
             <Table>
               <TableHeader>
                 <TableRow>
@@ -632,20 +655,7 @@ export default function BlogManagementPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paginatedPosts.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8">
-                      <div className="flex flex-col items-center gap-2">
-                        <FileText className="w-8 h-8 text-muted-foreground" />
-                        <p className="text-muted-foreground">No posts found</p>
-                        <Button variant="outline" size="sm" onClick={handleCreateNew}>
-                          Create your first post
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  paginatedPosts.map((post) => (
+                {paginatedPosts.map((post) => (
                     <TableRow key={post.id} className={isSelected(post.id) ? 'bg-muted/50' : ''}>
                       <TableCell>
                         <Checkbox
@@ -732,10 +742,10 @@ export default function BlogManagementPage() {
                         </div>
                       </TableCell>
                     </TableRow>
-                  ))
-                )}
+                  ))}
               </TableBody>
             </Table>
+            )}
 
             {/* Pagination */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border-t">
