@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
-import logoImg from "@/assets/logo.png";
+import logoImg from "@/assets/multiverse-logo.jpg";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,20 +43,12 @@ export function HeaderModern() {
       <nav className="container mx-auto px-4 lg:px-8">
         <div className="flex min-h-[100px] items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 group">
+          <Link to="/" className="flex items-center group">
             <img 
               src={logoImg} 
-              alt="Multiverse CPA Logo" 
-              className="h-14 w-auto object-contain"
+              alt="Multiverse CPA - Global Outsourced Offshore Accounting Solutions" 
+              className="h-20 w-auto object-contain"
             />
-            <div className="flex flex-col leading-tight">
-              <span className="text-xl font-bold text-qx-blue font-heading tracking-tight">
-                Multiverse
-              </span>
-              <span className="text-xs font-semibold text-qx-orange tracking-widest uppercase">
-                CPA
-              </span>
-            </div>
           </Link>
 
           {/* Desktop Navigation */}
