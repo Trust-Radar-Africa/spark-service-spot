@@ -118,6 +118,7 @@ export default function EmployerRequestsPage() {
   const [nationalityFilter, setNationalityFilter] = useState('');
   const [positionFilter, setPositionFilter] = useState('');
   const [experienceFilter, setExperienceFilter] = useState<string>('all');
+  const [salaryFilter, setSalaryFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPageOption>(getStoredItemsPerPage);
   const [selectedRequest, setSelectedRequest] = useState<EmployerRequest | null>(null);
@@ -126,8 +127,8 @@ export default function EmployerRequestsPage() {
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [filtersExpanded, setFiltersExpanded] = useState(false);
 
-  const hasActiveFilters = !!(searchTerm || countryFilter || locationFilter || nationalityFilter || positionFilter || experienceFilter !== 'all');
-  const activeFilterCount = [countryFilter, locationFilter, nationalityFilter, positionFilter, experienceFilter !== 'all' ? experienceFilter : ''].filter(Boolean).length;
+  const hasActiveFilters = !!(searchTerm || countryFilter || locationFilter || nationalityFilter || positionFilter || experienceFilter !== 'all' || salaryFilter !== 'all');
+  const activeFilterCount = [countryFilter, locationFilter, nationalityFilter, positionFilter, experienceFilter !== 'all' ? experienceFilter : '', salaryFilter !== 'all' ? salaryFilter : ''].filter(Boolean).length;
 
   const handleItemsPerPageChange = (value: ItemsPerPageOption) => {
     setItemsPerPage(value);
@@ -135,22 +136,16 @@ export default function EmployerRequestsPage() {
     localStorage.setItem('admin-employer-requests-items-per-page', String(value));
   };
 
-  // Helper to format experience for CSV export (extract min years as number)
+  // Helper to format experience for CSV export (full label like "7-10 years")
   const formatExperienceForExport = (exp: ExperienceLevel): string => {
-    const mapping: Record<ExperienceLevel, string> = {
-      '0-3': '0',
-      '3-7': '3',
-      '7-10': '7',
-      '10+': '10',
-    };
-    return mapping[exp] || exp;
+    return experienceLabels[exp] || exp;
   };
 
   // Handle CSV export with all details
   const handleExportCSV = () => {
     const exportData = filteredRequests.map(r => ({
       ...r,
-      years_experience_num: formatExperienceForExport(r.years_experience),
+      years_experience_label: formatExperienceForExport(r.years_experience),
       budgeted_salary_label: SALARY_RANGE_LABELS[r.budgeted_salary] || r.budgeted_salary,
     }));
     
@@ -162,7 +157,7 @@ export default function EmployerRequestsPage() {
       { key: 'preferred_location', header: 'Preferred Work Location' },
       { key: 'preferred_nationality', header: 'Preferred Nationality' },
       { key: 'budgeted_salary_label', header: 'Budgeted Salary (USD)' },
-      { key: 'years_experience_num', header: 'Required Years of Experience' },
+      { key: 'years_experience_label', header: 'Required Years of Experience' },
       { key: 'other_qualifications', header: 'Additional Qualifications / Notes' },
       { key: 'created_at', header: 'Request Date' },
     ]);
@@ -203,10 +198,12 @@ export default function EmployerRequestsPage() {
       const matchesPosition = !positionFilter || request.position_title === positionFilter;
       const matchesExperience =
         experienceFilter === 'all' || request.years_experience === experienceFilter;
+      const matchesSalary =
+        salaryFilter === 'all' || request.budgeted_salary === salaryFilter;
 
-      return matchesSearch && matchesCountry && matchesLocation && matchesNationality && matchesPosition && matchesExperience;
+      return matchesSearch && matchesCountry && matchesLocation && matchesNationality && matchesPosition && matchesExperience && matchesSalary;
     });
-  }, [requests, searchTerm, countryFilter, locationFilter, nationalityFilter, positionFilter, experienceFilter]);
+  }, [requests, searchTerm, countryFilter, locationFilter, nationalityFilter, positionFilter, experienceFilter, salaryFilter]);
 
   // Bulk selection
   const {
@@ -235,7 +232,7 @@ export default function EmployerRequestsPage() {
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, countryFilter, locationFilter, nationalityFilter, positionFilter, experienceFilter]);
+  }, [searchTerm, countryFilter, locationFilter, nationalityFilter, positionFilter, experienceFilter, salaryFilter]);
 
   // Generate page numbers for pagination
   const getPageNumbers = () => {
@@ -317,7 +314,7 @@ export default function EmployerRequestsPage() {
   const handleBulkExport = () => {
     const exportData = selectedItems.map(r => ({
       ...r,
-      years_experience_num: formatExperienceForExport(r.years_experience),
+      years_experience_label: formatExperienceForExport(r.years_experience),
       budgeted_salary_label: SALARY_RANGE_LABELS[r.budgeted_salary] || r.budgeted_salary,
     }));
     
@@ -329,7 +326,7 @@ export default function EmployerRequestsPage() {
       { key: 'preferred_location', header: 'Preferred Work Location' },
       { key: 'preferred_nationality', header: 'Preferred Nationality' },
       { key: 'budgeted_salary_label', header: 'Budgeted Salary (USD)' },
-      { key: 'years_experience_num', header: 'Required Years of Experience' },
+      { key: 'years_experience_label', header: 'Required Years of Experience' },
       { key: 'other_qualifications', header: 'Additional Qualifications / Notes' },
       { key: 'created_at', header: 'Request Date' },
     ]);
@@ -536,22 +533,46 @@ export default function EmployerRequestsPage() {
                     </Select>
                   </div>
 
-                  <div className="flex items-end">
-                    <Button
-                      variant="ghost"
-                      onClick={() => {
-                        setSearchTerm('');
-                        setNationalityFilter('');
-                        setCountryFilter('');
-                        setLocationFilter('');
-                        setPositionFilter('');
-                        setExperienceFilter('all');
-                      }}
-                      className="text-muted-foreground w-full"
-                    >
-                      Clear Filters
-                    </Button>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
+                      <DollarSign className="h-3 w-3" />
+                      Salary Budget
+                    </label>
+                    <Select value={salaryFilter} onValueChange={setSalaryFilter}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="All Budgets" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover border shadow-lg z-50">
+                        <SelectItem value="all">All Budgets</SelectItem>
+                        <SelectItem value="500-1000">USD 500 - 1,000 PM</SelectItem>
+                        <SelectItem value="1001-1500">USD 1,001 - 1,500 PM</SelectItem>
+                        <SelectItem value="1501-2000">USD 1,501 - 2,000 PM</SelectItem>
+                        <SelectItem value="2001-2500">USD 2,001 - 2,500 PM</SelectItem>
+                        <SelectItem value="2501-3000">USD 2,501 - 3,000 PM</SelectItem>
+                        <SelectItem value="3001-3500">USD 3,001 - 3,500 PM</SelectItem>
+                        <SelectItem value="3501-4000">USD 3,501 - 4,000 PM</SelectItem>
+                        <SelectItem value="above-4001">USD 4,001+ PM</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
+                </div>
+
+                <div className="mt-4 flex justify-end">
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setSearchTerm('');
+                      setNationalityFilter('');
+                      setCountryFilter('');
+                      setLocationFilter('');
+                      setPositionFilter('');
+                      setExperienceFilter('all');
+                      setSalaryFilter('all');
+                    }}
+                    className="text-muted-foreground"
+                  >
+                    Clear All Filters
+                  </Button>
                 </div>
               </div>
             </CollapsibleContent>
@@ -573,6 +594,7 @@ export default function EmployerRequestsPage() {
                   setLocationFilter('');
                   setPositionFilter('');
                   setExperienceFilter('all');
+                  setSalaryFilter('all');
                 }}
               >
                 Clear filters
