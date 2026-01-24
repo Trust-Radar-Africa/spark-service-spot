@@ -268,17 +268,22 @@ export default function BlogPostModern() {
                     <CardContent className="pt-0">
                       <nav className="space-y-2">
                         {tableOfContents.map((item) => (
-                          <a
+                          <button
                             key={item.id}
-                            href={`#${item.id}`}
-                            className={`block text-sm py-1.5 px-3 rounded-md transition-colors ${
+                            onClick={() => {
+                              const element = document.getElementById(item.id);
+                              if (element) {
+                                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                              }
+                            }}
+                            className={`block w-full text-left text-sm py-1.5 px-3 rounded-md transition-colors ${
                               activeSection === item.id
                                 ? 'bg-primary/10 text-primary font-medium'
                                 : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                             }`}
                           >
                             {item.title}
-                          </a>
+                          </button>
                         ))}
                       </nav>
                     </CardContent>
