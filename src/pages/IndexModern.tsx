@@ -80,14 +80,14 @@ const services = [
     href: "/services#tax",
   },
   {
-    title: "Financial Analysis",
-    description: "In-depth financial analysis to drive informed business decisions.",
+    title: "Consulting Services",
+    description: "Strategic consulting to drive informed business decisions.",
     icon: TrendingUp,
     image: consultingImg,
     href: "/services#analysis",
   },
   {
-    title: "Audit, Review & Compilation",
+    title: "Audit, Review and Compilation Engagements",
     description: "Comprehensive audit, review and compilation of financial statements.",
     icon: BarChart3,
     image: auditImg,
@@ -158,7 +158,7 @@ export default function IndexModern() {
                     Our Range of Services
                   </h4>
                   <ul className="grid grid-cols-2 gap-2.5">
-                    {["Bookkeeping", "Tax Preparation", "Financial Analysis", "Audit & Review"].map((service) => (
+                    {["Bookkeeping", "Tax Preparation", "Consulting Services", "Audit, Review and Compilation Engagements"].map((service) => (
                       <li key={service} className="flex items-center gap-2 text-body-paragraph text-qx-gray text-sm">
                         <CheckCircle2 className="w-4 h-4 text-qx-orange flex-shrink-0" />
                         {service}
@@ -168,7 +168,7 @@ export default function IndexModern() {
                 </div>
 
                 <p className="text-body-paragraph text-qx-gray leading-relaxed">
-                  We act as a <span className="font-semibold text-qx-blue">one-stop shop</span> for your company's financial needs, reducing the need to communicate with multiple accounting outsourcing companies.
+                  We are <span className="font-semibold text-qx-blue">setting the standards in consulting practice</span>, reducing the need to communicate with multiple accounting outsourcing companies.
                 </p>
 
                 <div className="p-4 bg-gradient-to-r from-qx-orange/10 to-amber-50 rounded-xl border border-qx-orange/20">
@@ -334,7 +334,7 @@ export default function IndexModern() {
                   Seeking Potential <span className="text-qx-orange">Candidates</span>?
                 </h3>
                 <p className="text-body-paragraph text-white/70 mb-6">
-                  Let us help you find the perfect accounting professionals for your firm. Send us your requirements and we'll match you with top talent.
+                  Let us help you find the perfect accounting professionals for your firm. Send us your requirements and we will match you with top talent.
                 </p>
                 <Button 
                   className="bg-gradient-to-r from-qx-orange to-amber-500 hover:from-qx-orange-dark hover:to-amber-600 text-white rounded-full px-8 py-6 text-base font-semibold shadow-lg shadow-qx-orange/30 hover:shadow-xl hover:shadow-qx-orange/40 transition-all duration-300 hover:-translate-y-1"

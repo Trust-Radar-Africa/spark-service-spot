@@ -20,7 +20,7 @@ const testimonials = [
     rating: 5,
   },
   {
-    quote: "The quality of work and attention to detail is outstanding. We've reduced our operational costs by 40% while improving turnaround times. Highly recommend their services.",
+    quote: "The quality of work and attention to detail is outstanding. We have reduced our operational costs by 40% while improving turnaround times. Highly recommend their services.",
     author: "James Crawford",
     role: "Director",
     company: "Crawford Accounting Group",
@@ -40,7 +40,7 @@ const testimonials = [
     author: "Michael Zhang",
     role: "Founder",
     company: "Zhang Financial Services",
-    location: "Sydney, Australia",
+    location: "Texas, USA",
     rating: 5,
   },
   {
