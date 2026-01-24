@@ -79,20 +79,23 @@ export default function ContactModern() {
       <section className="py-8 bg-white border-b">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="grid md:grid-cols-3 gap-4 max-w-4xl mx-auto -mt-20 relative z-10">
-            {/* Schedule Meeting */}
+            {/* Schedule Meeting - For Accounting Firms Only */}
             <AnimatedSection delay={0}>
               <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 text-center hover:shadow-2xl transition-shadow duration-300">
                 <div className="w-14 h-14 rounded-full bg-gradient-to-br from-qx-orange to-amber-400 flex items-center justify-center mx-auto mb-4 shadow-lg">
                   <Calendar className="w-7 h-7 text-white" />
                 </div>
-                <h3 className="text-job-title text-qx-blue mb-2">Schedule a Meeting</h3>
+                <h3 className="text-job-title text-qx-blue mb-2 leading-tight">Accounting Firms - Schedule a Meeting</h3>
                 <p className="text-body-paragraph text-qx-gray text-sm mb-4">
-                  Book a time to discuss your outsourcing needs
+                  For employers only. Book a time to discuss your outsourcing needs.
                 </p>
                 <Button 
                   className="bg-gradient-to-r from-qx-orange to-amber-500 hover:from-qx-orange-dark hover:to-amber-600 text-white rounded-full w-full"
+                  asChild
                 >
-                  Book Now
+                  <a href="https://calendly.com/YOUR_CALENDLY_LINK" target="_blank" rel="noopener noreferrer">
+                    Book Now
+                  </a>
                 </Button>
               </div>
             </AnimatedSection>
