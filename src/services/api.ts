@@ -106,25 +106,32 @@ class ApiService {
 
     // JSON Server mode - use demo auth with db.json users
     if (isJsonServer) {
-      // Check against db.json users
-      const response = await fetch(`${baseUrl}/users?email=${email}`);
-      const users = await response.json();
-      const user = users[0];
-      
-      if (user && user.password === password) {
-        const token = `json-server-token-${user.role}-${Date.now()}`;
-        this.setToken(token);
-        return { user, token };
+      try {
+        // Check against db.json users
+        const response = await fetch(`${baseUrl}/users?email=${email}`);
+        if (response.ok) {
+          const users = await response.json();
+          const user = users[0];
+          
+          if (user && user.password === password) {
+            const token = `json-server-token-${user.role}-${Date.now()}`;
+            this.setToken(token);
+            return { user, token };
+          }
+        }
+      } catch {
+        // JSON Server not running - fall back to demo credentials
+        console.warn('JSON Server not available, using demo credentials');
       }
       
-      // Fallback to demo users for JSON Server
+      // Fallback to demo users when JSON Server is not available
       if (demoUser && password === 'demo123') {
         const demoToken = `demo-token-${demoUser.role}-` + Date.now();
         this.setToken(demoToken);
         return { user: demoUser, token: demoToken };
       }
       
-      throw new Error('Invalid credentials');
+      throw new Error('Invalid credentials. Use admin@demo.com / demo123');
     }
 
     // Laravel API call (only for Laravel backend)
