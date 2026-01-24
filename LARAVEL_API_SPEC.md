@@ -484,13 +484,32 @@ Public endpoint for employers to submit recruitment requests.
   "firm_name": "ABC Accounting Firm",
   "email": "hr@company.com",
   "country": "United Arab Emirates",
-  "location": "Dubai",
-  "position_title": "Senior Accountant",
+  "preferred_location": "Dubai",
   "preferred_nationality": "Arab",
+  "budgeted_salary": "4001+",
   "years_experience": "7-10",
-  "other_qualifications": "CPA/CA certified, Big 4 experience preferred"
+  "notes": "CPA/CA certified, Big 4 experience preferred"
 }
 ```
+
+**Field Mapping:**
+| Frontend Field | API Field | Required |
+|----------------|-----------|----------|
+| Firm Name | firm_name | Yes |
+| Email | email | Yes |
+| Country | country | Yes |
+| Preferred Location | preferred_location | Yes |
+| Preferred Nationality | preferred_nationality | Yes |
+| Budgeted Salary | budgeted_salary | Yes |
+| Years Experience | years_experience | Yes |
+| Notes | notes | No |
+
+**Salary Range Values:**
+- `below-1000` = Below $1,000/month
+- `1000-2000` = $1,000 - $2,000/month
+- `2001-3000` = $2,001 - $3,000/month
+- `3001-4000` = $3,001 - $4,000/month
+- `4001+` = Above $4,001/month
 
 **Response (Success):**
 ```json
@@ -504,9 +523,9 @@ List all employer requests with filtering and pagination. Requires authenticatio
 
 **Query Parameters:**
 - `country` (optional): Filter by country
-- `location` (optional): Filter by location
+- `preferred_location` (optional): Filter by preferred location
 - `experience` (optional): Filter by experience level (0-3, 3-7, 7-10, 10+)
-- `search` (optional): Search by firm name, email, or position title
+- `search` (optional): Search by firm name or email
 - `page` (optional): Page number for pagination
 - `per_page` (optional): Items per page
 
@@ -519,11 +538,11 @@ List all employer requests with filtering and pagination. Requires authenticatio
       "firm_name": "ABC Accounting Firm",
       "email": "hr@company.com",
       "country": "United Arab Emirates",
-      "location": "Dubai",
-      "position_title": "Senior Accountant",
+      "preferred_location": "Dubai",
       "preferred_nationality": "Arab",
+      "budgeted_salary": "4001+",
       "years_experience": "7-10",
-      "other_qualifications": "CPA/CA certified, Big 4 experience preferred",
+      "notes": "CPA/CA certified, Big 4 experience preferred",
       "created_at": "2024-01-15T10:30:00Z",
       "updated_at": "2024-01-15T10:30:00Z"
     }
@@ -576,11 +595,11 @@ Schema::create('employer_requests', function (Blueprint $table) {
     $table->string('firm_name');
     $table->string('email');
     $table->string('country');
-    $table->string('location');
-    $table->string('position_title')->nullable();
+    $table->string('preferred_location');
     $table->string('preferred_nationality');
+    $table->enum('budgeted_salary', ['below-1000', '1000-2000', '2001-3000', '3001-4000', '4001+']);
     $table->enum('years_experience', ['0-3', '3-7', '7-10', '10+']);
-    $table->text('other_qualifications')->nullable();
+    $table->text('notes')->nullable();
     $table->timestamps();
 });
 ```
@@ -616,6 +635,7 @@ Schema::create('candidate_applications', function (Blueprint $table) {
     $table->string('nationality');
     $table->string('country');
     $table->string('location');
+    $table->enum('expected_salary', ['below-1000', '1000-2000', '2001-3000', '3001-4000', '4001+']);
     $table->enum('experience', ['0-3', '3-7', '7-10', '10+']);
     $table->string('job_applied')->nullable();
     $table->foreignId('job_id')->nullable()->constrained('job_postings')->nullOnDelete();
@@ -639,16 +659,24 @@ Public endpoint for candidates to submit their application.
 - `nationality`: string, required, max 50 chars
 - `country`: string, required, max 100 chars
 - `location`: string, required, max 100 chars
+- `expected_salary`: string, required (below-1000, 1000-2000, 2001-3000, 3001-4000, 4001+)
 - `experience`: string, required (0-3, 3-7, 7-10, 10+)
-- `cv`: file, required, mime: docx (application/vnd.openxmlformats-officedocument.wordprocessingml.document), max 5MB
-- `cover_letter`: file, required, mime: docx, max 5MB
+- `cv`: file, required, mime: docx (application/vnd.openxmlformats-officedocument.wordprocessingml.document), max 20MB
+- `cover_letter`: file, required, mime: docx, max 20MB
 - `job_title`: string, optional (if applying for a specific job)
 - `job_id`: integer, optional (reference to job posting)
+
+**Salary Expectation Values:**
+- `below-1000` = Below $1,000/month
+- `1000-2000` = $1,000 - $2,000/month
+- `2001-3000` = $2,001 - $3,000/month
+- `3001-4000` = $3,001 - $4,000/month
+- `4001+` = Above $4,001/month
 
 **Response (Success):**
 ```json
 {
-  "message": "Successfully Submitted"
+  "message": "Thank you for your application! You will receive a confirmation email shortly. Please check your spam folder if you don't see it in your inbox."
 }
 ```
 
