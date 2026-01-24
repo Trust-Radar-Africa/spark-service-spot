@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { LayoutModern } from '@/components/layout/LayoutModern';
 import { Button } from '@/components/ui/button';
@@ -41,8 +41,10 @@ import {
   Filter,
   Building2,
   SlidersHorizontal,
+  Loader2,
 } from 'lucide-react';
-import { useJobPostingsStore, getExperienceLabel, WORK_TYPE_LABELS, WORK_TYPE_OPTIONS } from '@/stores/jobPostingsStore';
+import { getExperienceLabel, WORK_TYPE_LABELS, WORK_TYPE_OPTIONS } from '@/stores/jobPostingsStore';
+import { usePublicJobs } from '@/hooks/usePublicJobs';
 import { AnimatedSection } from '@/components/AnimatedSection';
 
 const benefits = [
@@ -55,9 +57,6 @@ const benefits = [
 const JOBS_PER_PAGE = 4;
 
 export default function CareersModern() {
-  const { getActiveJobs } = useJobPostingsStore();
-  const activeJobs = getActiveJobs();
-
   const [searchQuery, setSearchQuery] = useState('');
   const [experienceFilter, setExperienceFilter] = useState<string>('all');
   const [countryFilter, setCountryFilter] = useState<string>('all');
@@ -67,35 +66,24 @@ export default function CareersModern() {
   const [expandedJobs, setExpandedJobs] = useState<Set<number>>(new Set());
   const [filtersExpanded, setFiltersExpanded] = useState(false);
 
-  // Get unique countries for filter
+  // Use the public jobs hook with filters
+  const { jobs: activeJobs, isLoading, error, filters, totalJobs } = usePublicJobs({
+    search: searchQuery,
+    country: countryFilter,
+    location: locationFilter,
+    workType: workTypeFilter,
+    experience: experienceFilter,
+  });
+
+  // Get unique countries for filter (from API or local data)
   const countries = useMemo(() => {
-    const ctrs = new Set(activeJobs.map((job) => job.country));
-    return Array.from(ctrs).sort();
-  }, [activeJobs]);
+    return filters.countries;
+  }, [filters.countries]);
 
-  // Filter jobs
+  // Filter jobs locally if needed (API already filters, but this handles edge cases)
   const filteredJobs = useMemo(() => {
-    return activeJobs.filter((job) => {
-      const matchesSearch =
-        !searchQuery ||
-        job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.country.toLowerCase().includes(searchQuery.toLowerCase());
-
-      const matchesExperience =
-        experienceFilter === 'all' || job.experience_required === experienceFilter;
-
-      const matchesCountry = countryFilter === 'all' || job.country === countryFilter;
-
-      const matchesLocation =
-        !locationFilter || job.location.toLowerCase().includes(locationFilter.toLowerCase());
-
-      const matchesWorkType = workTypeFilter === 'all' || job.work_type === workTypeFilter;
-
-      return matchesSearch && matchesExperience && matchesCountry && matchesLocation && matchesWorkType;
-    });
-  }, [activeJobs, searchQuery, experienceFilter, countryFilter, locationFilter, workTypeFilter]);
+    return activeJobs;
+  }, [activeJobs]);
 
   const hasActiveFilters = searchQuery || experienceFilter !== 'all' || countryFilter !== 'all' || locationFilter || workTypeFilter !== 'all';
 
@@ -148,7 +136,7 @@ export default function CareersModern() {
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 mb-3">
               <Briefcase className="w-3 h-3 text-qx-orange" />
               <span className="text-xs text-white">
-                {activeJobs.length} Open Positions
+                {isLoading ? 'Loading...' : `${totalJobs} Open Positions`}
               </span>
             </div>
             <h1 className="text-2xl md:text-3xl font-heading font-bold text-white mb-3">
@@ -320,11 +308,16 @@ export default function CareersModern() {
                 </Collapsible>
 
                 {/* Results summary */}
-                {hasActiveFilters && (
+                {(hasActiveFilters || error) && (
                   <div className="flex items-center justify-between px-4 py-3 bg-qx-light-gray border-t border-gray-100">
-                    <p className="text-job-meta text-qx-gray">
-                      Showing {filteredJobs.length} of {activeJobs.length} jobs
-                    </p>
+                    <div>
+                      <p className="text-job-meta text-qx-gray">
+                        Showing {filteredJobs.length} of {totalJobs} jobs
+                      </p>
+                      {error && (
+                        <p className="text-xs text-amber-600 mt-1">{error}</p>
+                      )}
+                    </div>
                     <Button variant="ghost" size="sm" onClick={clearFilters} className="text-qx-orange hover:text-qx-orange-dark">
                       Clear filters
                     </Button>
@@ -335,7 +328,15 @@ export default function CareersModern() {
 
             {/* Job Listings */}
             <div className="space-y-4 max-w-4xl mx-auto">
-              {paginatedJobs.length === 0 ? (
+              {isLoading ? (
+                <div className="bg-white rounded-2xl p-10 border border-gray-100 text-center">
+                  <Loader2 className="w-10 h-10 text-qx-orange mx-auto mb-3 animate-spin" />
+                  <h3 className="text-job-title text-qx-blue mb-2">Loading jobs...</h3>
+                  <p className="text-body-paragraph text-qx-gray">
+                    Fetching the latest opportunities for you.
+                  </p>
+                </div>
+              ) : paginatedJobs.length === 0 ? (
                 <div className="bg-white rounded-2xl p-10 border border-gray-100 text-center">
                   <Briefcase className="w-10 h-10 text-qx-gray mx-auto mb-3" />
                   <h3 className="text-job-title text-qx-blue mb-2">No jobs found</h3>

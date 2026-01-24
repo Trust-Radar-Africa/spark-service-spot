@@ -1,10 +1,9 @@
 import { Link } from "react-router-dom";
 import { LayoutModern } from "@/components/layout/LayoutModern";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Calendar, User, Clock } from "lucide-react";
+import { ArrowRight, Calendar, User, Clock, Loader2 } from "lucide-react";
 import { BlogSearch } from "@/components/BlogSearch";
-import { useBlogSearch } from "@/hooks/useBlogSearch";
-import { usePagination } from "@/hooks/usePagination";
+import { usePublicBlog } from "@/hooks/usePublicBlog";
 import {
   Pagination,
   PaginationContent,
@@ -19,29 +18,28 @@ const POSTS_PER_PAGE = 6;
 
 export default function BlogModern() {
   const {
-    setSearchQuery,
-    filteredPosts,
+    posts,
+    featuredPost,
     isLoading,
+    error,
+    categories,
     selectedCategory,
     setSelectedCategory,
-    categories,
-  } = useBlogSearch();
+    searchQuery,
+    setSearchQuery,
+    pagination,
+    setPage,
+  } = usePublicBlog(POSTS_PER_PAGE);
 
-  // Get featured post (first post) and other posts for pagination
-  const featuredPost = filteredPosts[0];
-  const remainingPosts = filteredPosts.slice(1);
+  // Get remaining posts (exclude featured for display)
+  const displayPosts = posts.slice(1);
+  const { currentPage, totalPages, total: totalItems } = pagination;
+  const hasNextPage = currentPage < totalPages;
+  const hasPrevPage = currentPage > 1;
 
-  const {
-    currentPage,
-    totalPages,
-    paginatedItems: displayPosts,
-    goToPage,
-    hasNextPage,
-    hasPrevPage,
-    startIndex,
-    endIndex,
-    totalItems,
-  } = usePagination(remainingPosts, POSTS_PER_PAGE);
+  // Calculate display range
+  const startIndex = displayPosts.length > 0 ? 1 : 0;
+  const endIndex = displayPosts.length;
 
   return (
     <LayoutModern>
@@ -80,7 +78,15 @@ export default function BlogModern() {
       </section>
 
       {/* Featured Post */}
-      {featuredPost && (
+      {isLoading ? (
+        <section className="py-10 md:py-12 bg-white">
+          <div className="container mx-auto px-4 lg:px-8 text-center">
+            <Loader2 className="w-10 h-10 text-qx-orange mx-auto mb-3 animate-spin" />
+            <p className="text-body-paragraph text-qx-gray">Loading articles...</p>
+            {error && <p className="text-xs text-amber-600 mt-2">{error}</p>}
+          </div>
+        </section>
+      ) : featuredPost ? (
         <section className="py-10 md:py-12 bg-white">
           <div className="container mx-auto px-4 lg:px-8">
             <div className="grid lg:grid-cols-2 gap-6 items-center">
@@ -126,18 +132,19 @@ export default function BlogModern() {
             </div>
           </div>
         </section>
-      )}
+      ) : null}
 
       {/* Posts Grid */}
       <section className="py-10 md:py-12 bg-qx-light-gray">
         <div className="container mx-auto px-4 lg:px-8">
           <h3 className="text-xl md:text-2xl font-heading font-bold text-qx-blue mb-2">
-            {filteredPosts.length === 0 ? "No articles found" : "Latest Articles"}
+            {posts.length === 0 && !isLoading ? "No articles found" : "Latest Articles"}
           </h3>
           
           {totalItems > 0 && (
             <p className="text-job-meta text-qx-gray mb-8">
               Showing {startIndex}–{endIndex} of {totalItems} articles
+              {error && <span className="text-amber-600 ml-2">({error})</span>}
             </p>
           )}
 
@@ -190,7 +197,7 @@ export default function BlogModern() {
                 <PaginationContent>
                   <PaginationItem>
                     <PaginationPrevious
-                      onClick={() => hasPrevPage && goToPage(currentPage - 1)}
+                      onClick={() => hasPrevPage && setPage(currentPage - 1)}
                       className={!hasPrevPage ? "pointer-events-none opacity-50" : "cursor-pointer"}
                     />
                   </PaginationItem>
@@ -198,7 +205,7 @@ export default function BlogModern() {
                   {/* First page */}
                   <PaginationItem>
                     <PaginationLink
-                      onClick={() => goToPage(1)}
+                      onClick={() => setPage(1)}
                       isActive={currentPage === 1}
                       className="cursor-pointer"
                     >
@@ -225,7 +232,7 @@ export default function BlogModern() {
                     .map((page) => (
                       <PaginationItem key={page}>
                         <PaginationLink
-                          onClick={() => goToPage(page)}
+                          onClick={() => setPage(page)}
                           isActive={currentPage === page}
                           className="cursor-pointer"
                         >
@@ -245,7 +252,7 @@ export default function BlogModern() {
                   {totalPages > 1 && (
                     <PaginationItem>
                       <PaginationLink
-                        onClick={() => goToPage(totalPages)}
+                        onClick={() => setPage(totalPages)}
                         isActive={currentPage === totalPages}
                         className="cursor-pointer"
                       >
@@ -256,7 +263,7 @@ export default function BlogModern() {
 
                   <PaginationItem>
                     <PaginationNext
-                      onClick={() => hasNextPage && goToPage(currentPage + 1)}
+                      onClick={() => hasNextPage && setPage(currentPage + 1)}
                       className={!hasNextPage ? "pointer-events-none opacity-50" : "cursor-pointer"}
                     />
                   </PaginationItem>
