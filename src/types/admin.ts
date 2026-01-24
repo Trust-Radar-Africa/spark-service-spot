@@ -67,14 +67,27 @@ export interface EmployerRequest {
   firm_name: string;
   email: string;
   country: string;
-  location: string;
+  preferred_location: string;
   position_title?: string;
   preferred_nationality: string;
+  budgeted_salary: string;
   years_experience: ExperienceLevel;
   other_qualifications?: string;
   created_at: string;
   updated_at: string;
 }
+
+// Salary range labels for display
+export const SALARY_RANGE_LABELS: Record<string, string> = {
+  '500-1000': 'USD 500 - 1,000 PM',
+  '1001-1500': 'USD 1,001 - 1,500 PM',
+  '1501-2000': 'USD 1,501 - 2,000 PM',
+  '2001-2500': 'USD 2,001 - 2,500 PM',
+  '2501-3000': 'USD 2,501 - 3,000 PM',
+  '3001-3500': 'USD 3,001 - 3,500 PM',
+  '3501-4000': 'USD 3,501 - 4,000 PM',
+  'above-4001': 'USD 4,001+ PM',
+};
 
 // Auth Types
 export interface AdminUser {
