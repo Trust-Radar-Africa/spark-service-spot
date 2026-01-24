@@ -23,7 +23,6 @@ import bookkeepingImg from "@/assets/bookkeeping-service.jpg";
 import consultingImg from "@/assets/consulting-service.jpg";
 import { HeroCarousel } from "@/components/HeroCarousel";
 import { TestimonialsCarousel } from "@/components/TestimonialsCarousel";
-import { ScrollIndicator } from "@/components/ScrollIndicator";
 import { AnimatedSection } from "@/components/AnimatedSection";
 
 const stats = [
@@ -100,9 +99,6 @@ export default function IndexModern() {
     <LayoutModern>
       {/* Hero Carousel */}
       <HeroCarousel variant="modern" />
-      
-      {/* Scroll Indicator */}
-      <ScrollIndicator variant="modern" />
 
       {/* Welcome to Multiverse CPA Section - Right after carousel */}
       <section className="py-10 md:py-12 bg-gradient-to-b from-white to-qx-light-gray relative overflow-hidden">

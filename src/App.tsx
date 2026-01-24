@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeVersionProvider, useThemeVersion } from "@/contexts/ThemeVersionContext";
 import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
 import { BrandingProvider } from "@/components/BrandingProvider";
+import { ScrollToTop } from "@/components/ScrollToTop";
 
 // Classic theme pages
 import Index from "./pages/Index";
@@ -91,6 +92,7 @@ const App = () => (
             <Toaster />
             <Sonner />
             <BrowserRouter>
+              <ScrollToTop />
               <Routes>
                 {/* Admin Routes */}
                 <Route path="/admin/login" element={<AdminLogin />} />
