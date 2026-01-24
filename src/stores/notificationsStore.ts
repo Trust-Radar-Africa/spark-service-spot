@@ -168,7 +168,7 @@ export const useNotificationsStore = create<NotificationsState>()(
       isLoading: false,
 
       fetchNotifications: async () => {
-        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+        const { isLiveMode, getApiUrl } = useApiConfigStore.getState();
 
         set({ isLoading: true });
 
@@ -181,7 +181,7 @@ export const useNotificationsStore = create<NotificationsState>()(
 
         try {
           const token = localStorage.getItem('admin_token');
-          const response = await fetch(`${apiBaseUrl}/api/admin/notifications`, {
+          const response = await fetch(getApiUrl('/api/admin/notifications'), {
             headers: {
               Authorization: `Bearer ${token}`,
               Accept: 'application/json',
@@ -201,7 +201,7 @@ export const useNotificationsStore = create<NotificationsState>()(
       },
 
       addNotification: async (notification) => {
-        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+        const { isLiveMode, getApiUrl } = useApiConfigStore.getState();
 
         const newNotification: AdminNotification = {
           ...notification,
@@ -219,7 +219,7 @@ export const useNotificationsStore = create<NotificationsState>()(
         if (isLiveMode()) {
           try {
             const token = localStorage.getItem('admin_token');
-            await fetch(`${apiBaseUrl}/api/admin/notifications`, {
+            await fetch(getApiUrl('/api/admin/notifications'), {
               method: 'POST',
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -235,7 +235,7 @@ export const useNotificationsStore = create<NotificationsState>()(
       },
 
       markAsRead: async (id) => {
-        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+        const { isLiveMode, getApiUrl } = useApiConfigStore.getState();
 
         // Update locally first
         set((state) => ({
@@ -248,7 +248,7 @@ export const useNotificationsStore = create<NotificationsState>()(
         if (isLiveMode()) {
           try {
             const token = localStorage.getItem('admin_token');
-            await fetch(`${apiBaseUrl}/api/admin/notifications/${id}/read`, {
+            await fetch(getApiUrl(`/api/admin/notifications/${id}/read`), {
               method: 'PATCH',
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -262,7 +262,7 @@ export const useNotificationsStore = create<NotificationsState>()(
       },
 
       markAllAsRead: async () => {
-        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+        const { isLiveMode, getApiUrl } = useApiConfigStore.getState();
 
         // Update locally first
         set((state) => ({
@@ -273,7 +273,7 @@ export const useNotificationsStore = create<NotificationsState>()(
         if (isLiveMode()) {
           try {
             const token = localStorage.getItem('admin_token');
-            await fetch(`${apiBaseUrl}/api/admin/notifications/mark-all-read`, {
+            await fetch(getApiUrl('/api/admin/notifications/mark-all-read'), {
               method: 'POST',
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -287,7 +287,7 @@ export const useNotificationsStore = create<NotificationsState>()(
       },
 
       removeNotification: async (id) => {
-        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+        const { isLiveMode, getApiUrl } = useApiConfigStore.getState();
 
         // Update locally first
         set((state) => ({
@@ -298,7 +298,7 @@ export const useNotificationsStore = create<NotificationsState>()(
         if (isLiveMode()) {
           try {
             const token = localStorage.getItem('admin_token');
-            await fetch(`${apiBaseUrl}/api/admin/notifications/${id}`, {
+            await fetch(getApiUrl(`/api/admin/notifications/${id}`), {
               method: 'DELETE',
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -312,7 +312,7 @@ export const useNotificationsStore = create<NotificationsState>()(
       },
 
       clearAll: async () => {
-        const { isLiveMode, apiBaseUrl } = useApiConfigStore.getState();
+        const { isLiveMode, getApiUrl } = useApiConfigStore.getState();
 
         // Update locally first
         set({ notifications: [] });
@@ -321,7 +321,7 @@ export const useNotificationsStore = create<NotificationsState>()(
         if (isLiveMode()) {
           try {
             const token = localStorage.getItem('admin_token');
-            await fetch(`${apiBaseUrl}/api/admin/notifications/clear`, {
+            await fetch(getApiUrl('/api/admin/notifications/clear'), {
               method: 'DELETE',
               headers: {
                 Authorization: `Bearer ${token}`,
