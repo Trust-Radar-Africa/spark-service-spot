@@ -131,7 +131,7 @@ export default function EmployersModern() {
                   Submit Your Request
                 </h2>
                 <p className="text-sm text-qx-gray">
-                  Tell us about your ideal candidate and we'll match you with the right professional.
+                  Tell us about your ideal candidate and we will match you with the right professional.
                 </p>
               </div>
             </AnimatedSection>

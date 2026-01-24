@@ -555,7 +555,7 @@ export default function CareersModern() {
               Don't See a Suitable Role?
             </h2>
             <p className="text-white/70 max-w-2xl mx-auto mb-8 text-sm">
-              Send us your resume and we'll keep you in mind for future opportunities.
+              Send us your resume and we will keep you in mind for future opportunities.
             </p>
             <Button
               className="bg-qx-orange hover:bg-qx-orange-dark text-white rounded-full px-8 py-6 text-base"

@@ -532,7 +532,7 @@ export default function Careers() {
               Don't See a Suitable Role?
             </h2>
             <p className="text-primary-foreground/70 max-w-2xl mx-auto mb-8 text-sm">
-              Send us your resume and we'll keep you in mind for future opportunities that match your
+              Send us your resume and we will keep you in mind for future opportunities that match your
               skills and experience.
             </p>
             <Button variant="hero" size="xl" asChild>
