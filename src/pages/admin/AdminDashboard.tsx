@@ -46,6 +46,7 @@ import { useAuditLogStore, AuditLogEntry } from '@/stores/auditLogStore';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
 import { cn } from '@/lib/utils';
 import { DateRange } from 'react-day-picker';
+import { ApiErrorState } from '@/components/admin/ApiErrorState';
 
 const ACTION_LABELS: Record<AuditLogEntry['action'], string> = {
   create: 'Created',
@@ -92,7 +93,7 @@ const datePresets: { value: DatePreset; label: string }[] = [
 ];
 
 export default function AdminDashboard() {
-  const { data, isLoading, fetchDashboard } = useDashboardStore();
+  const { data, isLoading, error, fetchDashboard } = useDashboardStore();
   const { getRecentLogs, fetchLogs } = useAuditLogStore();
   const { isAdmin, isViewer } = useAdminPermissions();
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -273,6 +274,13 @@ export default function AdminDashboard() {
 
   return (
     <AdminLayout>
+      {error ? (
+        <ApiErrorState
+          title="Failed to load dashboard"
+          message={error}
+          onRetry={handleRefresh}
+        />
+      ) : (
       <div className="space-y-6">
         {/* Header with Date Filter */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -696,6 +704,7 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
       </div>
+      )}
     </AdminLayout>
   );
 }
