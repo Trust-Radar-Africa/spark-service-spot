@@ -281,7 +281,16 @@ export default function AdminDashboard() {
           onRetry={handleRefresh}
         />
       ) : (
-      <div className="space-y-6">
+      <div className="space-y-6 relative">
+        {/* Refresh overlay */}
+        {isRefreshing && data && (
+          <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px] z-10 flex items-start justify-center pt-32 animate-fade-in">
+            <div className="flex items-center gap-3 bg-card border rounded-lg px-4 py-3 shadow-lg">
+              <RefreshCw className="h-5 w-5 animate-spin text-primary" />
+              <span className="text-sm font-medium">Refreshing data...</span>
+            </div>
+          </div>
+        )}
         {/* Header with Date Filter */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
