@@ -26,7 +26,7 @@ export default function AdminLogin() {
         title: 'Welcome back!',
         description: 'You have successfully logged in.',
       });
-      navigate('/admin/candidates');
+      navigate('/admin');
     } catch (error) {
       toast({
         title: 'Login failed',
