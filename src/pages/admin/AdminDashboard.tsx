@@ -22,7 +22,9 @@ import {
   TrendingUp,
   History,
   ArrowRight,
+  RefreshCw,
 } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   AreaChart,
   Area,
@@ -94,12 +96,16 @@ const datePresets: { value: DatePreset; label: string }[] = [
 ];
 
 export default function AdminDashboard() {
-  const { jobs, fetchJobs } = useJobPostingsStore();
-  const { posts, fetchPosts } = useBlogPostsStore();
-  const { requests, fetchRequests } = useEmployerRequestsStore();
-  const { candidates, fetchCandidates } = useCandidatesStore();
-  const { getRecentLogs, fetchLogs } = useAuditLogStore();
+  const { jobs, fetchJobs, isLoading: jobsLoading } = useJobPostingsStore();
+  const { posts, fetchPosts, isLoading: postsLoading } = useBlogPostsStore();
+  const { requests, fetchRequests, isLoading: requestsLoading } = useEmployerRequestsStore();
+  const { candidates, fetchCandidates, isLoading: candidatesLoading } = useCandidatesStore();
+  const { getRecentLogs, fetchLogs, isLoading: logsLoading } = useAuditLogStore();
   const { isAdmin, isViewer } = useAdminPermissions();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Combined loading state
+  const isLoading = jobsLoading || postsLoading || requestsLoading || candidatesLoading;
 
   // Fetch all data on mount
   useEffect(() => {
@@ -111,6 +117,19 @@ export default function AdminDashboard() {
       fetchLogs();
     }
   }, [fetchCandidates, fetchJobs, fetchRequests, fetchPosts, fetchLogs, isAdmin]);
+
+  // Manual refresh handler
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await Promise.all([
+      fetchCandidates(),
+      fetchJobs(),
+      fetchRequests(),
+      fetchPosts(),
+      isAdmin ? fetchLogs() : Promise.resolve(),
+    ]);
+    setIsRefreshing(false);
+  };
 
   // Get recent audit logs (only for super admins)
   const recentAuditLogs = useMemo(() => {
@@ -343,6 +362,15 @@ export default function AdminDashboard() {
             </p>
           </div>
           <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              title="Refresh data"
+            >
+              <RefreshCw className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
+            </Button>
             <Select value={datePreset} onValueChange={handlePresetChange}>
               <SelectTrigger className="w-[160px]">
                 <CalendarIcon className="h-4 w-4 mr-2" />
@@ -402,28 +430,46 @@ export default function AdminDashboard() {
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {quickStats.map((stat) => (
-            <Link key={stat.title} to={stat.href}>
-              <Card className="hover:shadow-md transition-shadow cursor-pointer">
+          {isLoading ? (
+            // Loading skeleton for stats cards
+            Array.from({ length: 4 }).map((_, i) => (
+              <Card key={i}>
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground">{stat.title}</p>
-                      <p className="text-2xl font-bold">{stat.value}</p>
-                      <div className="flex items-center gap-1 mt-1">
-                        <Badge variant="secondary" className="text-xs">
-                          {stat.change} {stat.changeLabel}
-                        </Badge>
-                      </div>
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-20" />
+                      <Skeleton className="h-8 w-12" />
+                      <Skeleton className="h-5 w-16" />
                     </div>
-                    <div className={`p-3 rounded-lg ${stat.bgColor}`}>
-                      <stat.icon className={`h-6 w-6 ${stat.color}`} />
-                    </div>
+                    <Skeleton className="h-12 w-12 rounded-lg" />
                   </div>
                 </CardContent>
               </Card>
-            </Link>
-          ))}
+            ))
+          ) : (
+            quickStats.map((stat) => (
+              <Link key={stat.title} to={stat.href}>
+                <Card className="hover:shadow-md transition-shadow cursor-pointer">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-muted-foreground">{stat.title}</p>
+                        <p className="text-2xl font-bold">{stat.value}</p>
+                        <div className="flex items-center gap-1 mt-1">
+                          <Badge variant="secondary" className="text-xs">
+                            {stat.change} {stat.changeLabel}
+                          </Badge>
+                        </div>
+                      </div>
+                      <div className={`p-3 rounded-lg ${stat.bgColor}`}>
+                        <stat.icon className={`h-6 w-6 ${stat.color}`} />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))
+          )}
         </div>
 
         {/* Charts Row 1 - Hidden for viewers (minimal dashboard) */}
@@ -437,39 +483,47 @@ export default function AdminDashboard() {
             </CardHeader>
             <CardContent>
               <div className="h-[250px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={activityData}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                    <XAxis dataKey="date" className="text-xs" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
-                    <YAxis className="text-xs" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: 'hsl(var(--card))',
-                        border: '1px solid hsl(var(--border))',
-                        borderRadius: '8px',
-                      }}
-                    />
-                    <Legend />
-                    <Area
-                      type="monotone"
-                      dataKey="candidates"
-                      stackId="1"
-                      stroke="hsl(var(--primary))"
-                      fill="hsl(var(--primary))"
-                      fillOpacity={0.6}
-                      name="Candidates"
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="employers"
-                      stackId="1"
-                      stroke="hsl(var(--chart-2))"
-                      fill="hsl(var(--chart-2))"
-                      fillOpacity={0.6}
-                      name="Employer Requests"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
+                {isLoading ? (
+                  <div className="flex flex-col gap-4 h-full justify-center">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-32 w-full" />
+                    <Skeleton className="h-4 w-3/4" />
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={activityData}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                      <XAxis dataKey="date" className="text-xs" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                      <YAxis className="text-xs" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: 'hsl(var(--card))',
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px',
+                        }}
+                      />
+                      <Legend />
+                      <Area
+                        type="monotone"
+                        dataKey="candidates"
+                        stackId="1"
+                        stroke="hsl(var(--primary))"
+                        fill="hsl(var(--primary))"
+                        fillOpacity={0.6}
+                        name="Candidates"
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="employers"
+                        stackId="1"
+                        stroke="hsl(var(--chart-2))"
+                        fill="hsl(var(--chart-2))"
+                        fillOpacity={0.6}
+                        name="Employer Requests"
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                )}
               </div>
             </CardContent>
           </Card>
