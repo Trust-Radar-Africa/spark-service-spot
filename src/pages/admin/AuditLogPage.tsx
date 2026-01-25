@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -95,7 +95,7 @@ const MODULE_LABELS: Record<AuditLogEntry['module'], string> = {
 };
 
 export default function AuditLogPage() {
-  const { logs, clearLogs } = useAuditLogStore();
+  const { logs, fetchLogs, isLoading, clearLogs } = useAuditLogStore();
   const { isAdmin } = useAdminPermissions();
   const { toast } = useToast();
   const { sortKey, sortDirection, handleSort, sortData } = useSorting<AuditLogEntry>();
@@ -112,10 +112,12 @@ export default function AuditLogPage() {
   const [selectedLog, setSelectedLog] = useState<AuditLogEntry | null>(null);
   const [clearDialogOpen, setClearDialogOpen] = useState(false);
 
-  // Only super admins can view audit logs
-  if (!isAdmin) {
-    return <Navigate to="/admin" replace />;
-  }
+  // Fetch logs on mount
+  useEffect(() => {
+    if (isAdmin) {
+      fetchLogs();
+    }
+  }, [fetchLogs, isAdmin]);
 
   const hasActiveFilters = !!(searchTerm || userFilter || moduleFilter || actionFilter || startDate || endDate);
   const activeFilterCount = [userFilter, moduleFilter, actionFilter, startDate, endDate].filter(Boolean).length;
@@ -251,6 +253,11 @@ export default function AuditLogPage() {
     }).length,
     deletes: logs.filter((l) => l.action === 'delete').length,
   };
+
+  // Only super admins can view audit logs
+  if (!isAdmin) {
+    return <Navigate to="/admin" replace />;
+  }
 
   return (
     <AdminLayout>
