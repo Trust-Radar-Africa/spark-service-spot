@@ -40,14 +40,10 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
-import { format, subDays, startOfDay, isAfter, isBefore, isWithinInterval, startOfWeek, startOfMonth, startOfQuarter, startOfYear, eachDayOfInterval, eachWeekOfInterval, parseISO } from 'date-fns';
-import { useJobPostingsStore } from '@/stores/jobPostingsStore';
-import { useBlogPostsStore } from '@/stores/blogPostsStore';
-import { useEmployerRequestsStore } from '@/stores/employerRequestsStore';
-import { useCandidatesStore } from '@/stores/candidatesStore';
+import { format, subDays, startOfDay, startOfQuarter, startOfYear, parseISO } from 'date-fns';
+import { useDashboardStore } from '@/stores/dashboardStore';
 import { useAuditLogStore, AuditLogEntry } from '@/stores/auditLogStore';
 import { useAdminPermissions } from '@/hooks/useAdminPermissions';
-import { ExperienceLevel } from '@/types/admin';
 import { cn } from '@/lib/utils';
 import { DateRange } from 'react-day-picker';
 
@@ -96,45 +92,10 @@ const datePresets: { value: DatePreset; label: string }[] = [
 ];
 
 export default function AdminDashboard() {
-  const { jobs, fetchJobs, isLoading: jobsLoading } = useJobPostingsStore();
-  const { posts, fetchPosts, isLoading: postsLoading } = useBlogPostsStore();
-  const { requests, fetchRequests, isLoading: requestsLoading } = useEmployerRequestsStore();
-  const { candidates, fetchCandidates, isLoading: candidatesLoading } = useCandidatesStore();
-  const { getRecentLogs, fetchLogs, isLoading: logsLoading } = useAuditLogStore();
+  const { data, isLoading, fetchDashboard } = useDashboardStore();
+  const { getRecentLogs, fetchLogs } = useAuditLogStore();
   const { isAdmin, isViewer } = useAdminPermissions();
   const [isRefreshing, setIsRefreshing] = useState(false);
-
-  // Combined loading state
-  const isLoading = jobsLoading || postsLoading || requestsLoading || candidatesLoading;
-
-  // Fetch all data on mount
-  useEffect(() => {
-    fetchCandidates();
-    fetchJobs();
-    fetchRequests();
-    fetchPosts();
-    if (isAdmin) {
-      fetchLogs();
-    }
-  }, [fetchCandidates, fetchJobs, fetchRequests, fetchPosts, fetchLogs, isAdmin]);
-
-  // Manual refresh handler
-  const handleRefresh = async () => {
-    setIsRefreshing(true);
-    await Promise.all([
-      fetchCandidates(),
-      fetchJobs(),
-      fetchRequests(),
-      fetchPosts(),
-      isAdmin ? fetchLogs() : Promise.resolve(),
-    ]);
-    setIsRefreshing(false);
-  };
-
-  // Get recent audit logs (only for super admins)
-  const recentAuditLogs = useMemo(() => {
-    return isAdmin ? getRecentLogs(5) : [];
-  }, [isAdmin, getRecentLogs]);
 
   // Date range state
   const [datePreset, setDatePreset] = useState<DatePreset>('30d');
@@ -164,113 +125,90 @@ export default function AdminDashboard() {
     }
   }, [datePreset, customRange]);
 
-  // Filter data within date range
-  const filterByDateRange = <T extends { created_at: string }>(items: T[]) => {
-    if (!dateRange.from || !dateRange.to) return items;
-    return items.filter((item) => {
-      const created = new Date(item.created_at);
-      return isWithinInterval(created, { start: dateRange.from!, end: new Date(dateRange.to!.getTime() + 86400000) });
-    });
-  };
-
-  const filteredCandidates = filterByDateRange(candidates);
-  const filteredRequests = filterByDateRange(requests);
-
-  // Calculate stats for the selected period
-  const stats = useMemo(() => {
-    return {
-      candidates: {
-        total: candidates.length,
-        inPeriod: filteredCandidates.length,
-      },
-      jobs: {
-        total: jobs.length,
-        active: jobs.filter((j) => j.is_active).length,
-      },
-      employers: {
-        total: requests.length,
-        inPeriod: filteredRequests.length,
-      },
-      blog: {
-        total: posts.length,
-        published: posts.filter((p) => p.is_published).length,
-      },
-    };
-  }, [candidates, jobs, requests, posts, filteredCandidates, filteredRequests]);
-
-  // Activity timeline data for selected period
-  const activityData = useMemo(() => {
-    if (!dateRange.from || !dateRange.to) return [];
-    
-    const daysDiff = Math.ceil((dateRange.to.getTime() - dateRange.from.getTime()) / 86400000);
-    
-    // Use weekly grouping for periods > 30 days
-    if (daysDiff > 30) {
-      const weeks = eachWeekOfInterval({ start: dateRange.from, end: dateRange.to });
-      return weeks.map((weekStart, index) => {
-        const weekEnd = weeks[index + 1] || new Date(dateRange.to!.getTime() + 86400000);
-        return {
-          date: format(weekStart, 'MMM d'),
-          candidates: filteredCandidates.filter((c) => {
-            const created = new Date(c.created_at);
-            return created >= weekStart && created < weekEnd;
-          }).length,
-          employers: filteredRequests.filter((r) => {
-            const created = new Date(r.created_at);
-            return created >= weekStart && created < weekEnd;
-          }).length,
-        };
+  // Fetch dashboard data on mount and when date range changes
+  useEffect(() => {
+    if (dateRange.from && dateRange.to) {
+      fetchDashboard({
+        from: format(dateRange.from, 'yyyy-MM-dd'),
+        to: format(dateRange.to, 'yyyy-MM-dd'),
       });
     }
-    
-    // Daily grouping for shorter periods
-    const days = eachDayOfInterval({ start: dateRange.from, end: dateRange.to });
-    return days.map((date) => {
-      const dayStart = startOfDay(date);
-      const dayEnd = new Date(dayStart.getTime() + 86400000);
-      
-      return {
-        date: format(date, daysDiff <= 7 ? 'EEE' : 'MMM d'),
-        candidates: filteredCandidates.filter((c) => {
-          const created = new Date(c.created_at);
-          return created >= dayStart && created < dayEnd;
-        }).length,
-        employers: filteredRequests.filter((r) => {
-          const created = new Date(r.created_at);
-          return created >= dayStart && created < dayEnd;
-        }).length,
-      };
-    });
-  }, [dateRange, filteredCandidates, filteredRequests]);
+    if (isAdmin) {
+      fetchLogs();
+    }
+  }, [fetchDashboard, fetchLogs, isAdmin, dateRange.from, dateRange.to]);
 
-  // Experience distribution (from filtered candidates)
+  // Manual refresh handler
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await Promise.all([
+      fetchDashboard({
+        from: format(dateRange.from!, 'yyyy-MM-dd'),
+        to: format(dateRange.to!, 'yyyy-MM-dd'),
+      }),
+      isAdmin ? fetchLogs() : Promise.resolve(),
+    ]);
+    setIsRefreshing(false);
+  };
+
+  // Get recent audit logs (only for super admins)
+  const recentAuditLogs = useMemo(() => {
+    return isAdmin ? getRecentLogs(5) : [];
+  }, [isAdmin, getRecentLogs]);
+
+  // Transform API data to chart formats
+  const stats = useMemo(() => ({
+    candidates: {
+      total: data?.stats.total_candidates ?? 0,
+      inPeriod: data?.stats.candidates_in_range ?? 0,
+    },
+    jobs: {
+      total: data?.stats.total_jobs ?? 0,
+      active: data?.stats.active_jobs ?? 0,
+    },
+    employers: {
+      total: data?.stats.total_employer_requests ?? 0,
+      inPeriod: data?.stats.employer_requests_in_range ?? 0,
+    },
+    blog: {
+      total: data?.stats.total_blog_posts ?? 0,
+      published: data?.stats.published_blog_posts ?? 0,
+    },
+  }), [data]);
+
+  // Activity timeline from API
+  const activityData = useMemo(() => {
+    if (!data?.charts.candidates_by_date) return [];
+    return data.charts.candidates_by_date.map((item) => ({
+      date: format(new Date(item.date), 'MMM d'),
+      candidates: item.count,
+      employers: 0, // API doesn't provide this separately yet
+    }));
+  }, [data]);
+
+  // Experience distribution from API
   const experienceData = useMemo(() => {
-    const distribution: Record<ExperienceLevel, number> = { '0-3': 0, '3-7': 0, '7-10': 0, '10+': 0 };
-    filteredCandidates.forEach((c) => {
-      distribution[c.experience]++;
-    });
+    if (!data?.charts.candidates_by_experience) return [];
+    const exp = data.charts.candidates_by_experience;
     return [
-      { name: '0-3 years', value: distribution['0-3'] },
-      { name: '3-7 years', value: distribution['3-7'] },
-      { name: '7-10 years', value: distribution['7-10'] },
-      { name: '10+ years', value: distribution['10+'] },
+      { name: '0-3 years', value: exp['0-3'] || 0 },
+      { name: '3-7 years', value: exp['3-7'] || 0 },
+      { name: '7-10 years', value: exp['7-10'] || 0 },
+      { name: '10+ years', value: exp['10+'] || 0 },
     ].filter((d) => d.value > 0);
-  }, [filteredCandidates]);
+  }, [data]);
 
-  // Blog categories
+  // Blog categories from API
   const categoryData = useMemo(() => {
-    const categories: Record<string, number> = {};
-    posts.forEach((p) => {
-      categories[p.category] = (categories[p.category] || 0) + 1;
-    });
-    return Object.entries(categories).map(([name, value]) => ({ name, value }));
-  }, [posts]);
+    if (!data?.charts.blog_by_category) return [];
+    return Object.entries(data.charts.blog_by_category).map(([name, value]) => ({ name, value }));
+  }, [data]);
 
-  // Job status data
+  // Job status data from API
   const jobStatusData = useMemo(() => [
-    { name: 'Active', value: stats.jobs.active, fill: 'hsl(var(--chart-2))' },
-    { name: 'Inactive', value: stats.jobs.total - stats.jobs.active, fill: 'hsl(var(--muted))' },
-  ], [stats.jobs]);
+    { name: 'Active', value: data?.charts.jobs_by_status?.active ?? 0, fill: 'hsl(var(--chart-2))' },
+    { name: 'Inactive', value: data?.charts.jobs_by_status?.inactive ?? 0, fill: 'hsl(var(--muted))' },
+  ], [data]);
 
   // Quick stats cards
   const quickStats = [
@@ -316,32 +254,15 @@ export default function AdminDashboard() {
     },
   ];
 
-  // Recent activity
+  // Recent activity - using audit logs instead since we don't have individual store data
   const recentActivity = useMemo(() => {
-    const activities: { type: string; title: string; date: string; icon: React.ElementType }[] = [];
-    
-    candidates.slice(0, 3).forEach((c) => {
-      activities.push({
-        type: 'candidate',
-        title: `${c.first_name} ${c.last_name} applied`,
-        date: c.created_at,
-        icon: Users,
-      });
-    });
-    
-    requests.slice(0, 2).forEach((r) => {
-      activities.push({
-        type: 'employer',
-        title: `${r.firm_name} submitted a request`,
-        date: r.created_at,
-        icon: Building2,
-      });
-    });
-    
-    return activities
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-      .slice(0, 5);
-  }, [candidates, requests]);
+    return recentAuditLogs.slice(0, 5).map((log) => ({
+      type: log.module,
+      title: `${log.userName} ${ACTION_LABELS[log.action].toLowerCase()} ${log.resourceName}`,
+      date: log.timestamp,
+      icon: log.module === 'candidates' ? Users : log.module === 'jobs' ? Briefcase : log.module === 'employer_requests' ? Building2 : FileText,
+    }));
+  }, [recentAuditLogs]);
 
   const handlePresetChange = (value: string) => {
     setDatePreset(value as DatePreset);
@@ -657,10 +578,14 @@ export default function AdminDashboard() {
                 {recentActivity.map((activity, index) => (
                   <div key={index} className="flex items-start gap-3">
                     <div className={`p-2 rounded-lg ${
-                      activity.type === 'candidate' ? 'bg-primary/10' : 'bg-blue-500/10'
+                      activity.type === 'candidates' ? 'bg-primary/10' : 
+                      activity.type === 'jobs' ? 'bg-green-500/10' :
+                      activity.type === 'employer_requests' ? 'bg-blue-500/10' : 'bg-amber-500/10'
                     }`}>
                       <activity.icon className={`h-4 w-4 ${
-                        activity.type === 'candidate' ? 'text-primary' : 'text-blue-500'
+                        activity.type === 'candidates' ? 'text-primary' : 
+                        activity.type === 'jobs' ? 'text-green-500' :
+                        activity.type === 'employer_requests' ? 'text-blue-500' : 'text-amber-500'
                       }`} />
                     </div>
                     <div className="flex-1 min-w-0">
