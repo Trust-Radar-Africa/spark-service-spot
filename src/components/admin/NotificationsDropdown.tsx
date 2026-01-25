@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
@@ -31,9 +31,14 @@ const colorMap = {
 };
 
 export default function NotificationsDropdown() {
-  const { notifications, markAsRead, markAllAsRead, removeNotification, clearAll, getUnreadCount } =
+  const { notifications, fetchNotifications, markAsRead, markAllAsRead, removeNotification, clearAll, getUnreadCount } =
     useNotificationsStore();
   const [open, setOpen] = useState(false);
+
+  // Fetch notifications on mount
+  useEffect(() => {
+    fetchNotifications();
+  }, [fetchNotifications]);
 
   const unreadCount = getUnreadCount();
 
