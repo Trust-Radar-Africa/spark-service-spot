@@ -33,6 +33,22 @@ interface AuditLogState {
   clearLogs: () => void;
 }
 
+// Normalize audit log entry from API (handles snake_case fields)
+const normalizeLogEntry = (entry: any): AuditLogEntry => ({
+  id: entry.id || '',
+  timestamp: entry.timestamp || entry.created_at || new Date().toISOString(),
+  userId: entry.userId || entry.user_id || '',
+  userName: entry.userName || entry.user_name || 'Unknown',
+  userEmail: entry.userEmail || entry.user_email || '',
+  userRole: entry.userRole || entry.user_role || 'N/A',
+  action: entry.action || 'update',
+  module: entry.module || 'candidates',
+  resourceId: entry.resourceId || entry.resource_id || '',
+  resourceName: entry.resourceName || entry.resource_name || '',
+  changes: entry.changes,
+  metadata: entry.metadata,
+});
+
 export const useAuditLogStore = create<AuditLogState>()(
   persist(
     (set, get) => ({
@@ -56,7 +72,11 @@ export const useAuditLogStore = create<AuditLogState>()(
 
           if (response.ok) {
             const data = await response.json();
-            set({ logs: data.data || data, isLoading: false });
+            const rawLogs = data.data || data;
+            const normalizedLogs = Array.isArray(rawLogs)
+              ? rawLogs.map(normalizeLogEntry)
+              : [];
+            set({ logs: normalizedLogs, isLoading: false });
             return;
           }
           set({ error: 'Failed to fetch audit logs', isLoading: false });

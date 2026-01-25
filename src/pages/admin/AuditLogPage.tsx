@@ -574,12 +574,12 @@ export default function AuditLogPage() {
                         <div className="flex items-center gap-2">
                           <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
                             <span className="text-xs font-medium text-primary">
-                              {log.userName.charAt(0).toUpperCase()}
+                              {(log.userName || 'U').charAt(0).toUpperCase()}
                             </span>
                           </div>
                           <div>
-                            <div className="text-sm font-medium">{log.userName}</div>
-                            <div className="text-xs text-muted-foreground">{log.userRole}</div>
+                            <div className="text-sm font-medium">{log.userName || 'Unknown'}</div>
+                            <div className="text-xs text-muted-foreground">{log.userRole || 'N/A'}</div>
                           </div>
                         </div>
                       </TableCell>
