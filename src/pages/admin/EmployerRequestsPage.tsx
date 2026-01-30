@@ -171,7 +171,8 @@ export default function EmployerRequestsPage() {
 
   useEffect(() => {
     fetchRequests();
-  }, [fetchRequests]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Get unique countries for filter
   const countryOptions: SearchableSelectOption[] = useMemo(() => {

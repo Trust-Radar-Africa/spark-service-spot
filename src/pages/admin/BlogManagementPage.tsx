@@ -93,7 +93,8 @@ export default function BlogManagementPage() {
   // Fetch blog posts from API on mount - force refresh to get fresh data
   useEffect(() => {
     fetchPosts(true); // Force refresh on page load
-  }, [fetchPosts]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
