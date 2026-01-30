@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+laravel/
+LARAVEL_API_SPEC.md
+JSON_SERVER_README.md
