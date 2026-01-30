@@ -1,6 +1,7 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
+import { useApiConfigStore } from '@/stores/apiConfigStore';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -44,8 +45,17 @@ const navigation = [
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const { user, logout } = useAdminAuth();
-  const { branding } = useSettingsStore();
+  const { branding, fetchSettings } = useSettingsStore();
+  const { isLiveMode } = useApiConfigStore();
   const { isAdmin, isEditor, isViewer, userRole } = useAdminPermissions();
+
+  // Fetch branding settings on mount when in live mode
+  useEffect(() => {
+    if (isLiveMode()) {
+      fetchSettings();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount
 
   const getRoleBadgeVariant = () => {
     if (isAdmin) return 'default';
@@ -113,7 +123,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <ThemeToggle />
+          {/* ThemeToggle hidden but still mounted to apply theme */}
+          <div className="hidden">
+            <ThemeToggle />
+          </div>
           <NotificationsDropdown />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -136,6 +149,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 <p className="text-xs text-muted-foreground">{user?.email}</p>
               </div>
               <DropdownMenuSeparator />
+              {/* Audit Log link disabled - uncomment to re-enable
               {isAdmin && (
                 <DropdownMenuItem asChild>
                   <Link to="/admin/audit-log" className="flex items-center cursor-pointer">
@@ -144,6 +158,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   </Link>
                 </DropdownMenuItem>
               )}
+              */}
               <DropdownMenuItem asChild>
                 <Link to="/admin/settings" className="flex items-center cursor-pointer">
                   <Settings className="h-4 w-4 mr-2" />
@@ -162,7 +177,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
       {/* Desktop top bar - aligned with sidebar border */}
       <div className="hidden lg:flex fixed top-0 left-64 right-0 z-30 bg-card border-b h-14 px-6 items-center justify-end gap-2">
-        <ThemeToggle />
+        {/* ThemeToggle hidden but still mounted to apply theme - remove div.hidden wrapper to show */}
         <NotificationsDropdown />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -183,6 +198,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56 bg-popover border shadow-lg z-50">
+            {/* Audit Log link disabled - uncomment to re-enable
             {isAdmin && (
               <DropdownMenuItem asChild>
                 <Link to="/admin/audit-log" className="flex items-center cursor-pointer">
@@ -191,6 +207,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 </Link>
               </DropdownMenuItem>
             )}
+            */}
             <DropdownMenuItem asChild>
               <Link to="/admin/settings" className="flex items-center cursor-pointer">
                 <Settings className="h-4 w-4 mr-2" />
@@ -209,8 +226,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-40 w-64 bg-card border-r transform transition-transform duration-200 ease-in-out lg:translate-x-0',
-          mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+          'fixed inset-y-0 left-0 z-40 w-64 bg-card border-r transform transition-transform duration-200 ease-in-out',
+          // Always visible on desktop (lg and above)
+          'lg:translate-x-0',
+          // On mobile only, controlled by mobileMenuOpen state
+          mobileMenuOpen ? 'max-lg:translate-x-0' : 'max-lg:-translate-x-full'
         )}
       >
         <div className="flex flex-col h-full">

@@ -34,20 +34,37 @@ interface UsePublicBlogResult {
   refetch: () => Promise<void>;
 }
 
+// Helper to extract string value from category (can be string or object)
+function getCategoryName(category: string | { name: string } | null | undefined): string {
+  if (!category) return 'Uncategorized';
+  if (typeof category === 'string') return category;
+  if (typeof category === 'object' && 'name' in category) return category.name;
+  return 'Uncategorized';
+}
+
+// Helper to extract author name (can be string or object)
+function getAuthorName(author: string | { name: string } | null | undefined): string {
+  if (!author) return 'Unknown';
+  if (typeof author === 'string') return author;
+  if (typeof author === 'object' && 'name' in author) return author.name;
+  return 'Unknown';
+}
+
 // Convert admin blog post to public format
-function convertAdminToPublic(post: { 
-  title: string; 
-  slug: string; 
-  excerpt: string; 
-  content: string; 
-  category: string; 
-  author: string; 
-  image_url: string; 
+function convertAdminToPublic(post: {
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  category: string | { name: string };
+  author: string | { name: string };
+  image_url: string;
   published_at: string | null;
   created_at: string;
 }): BlogPost {
-  const authorData = authors[post.author] || {
-    name: post.author,
+  const authorName = getAuthorName(post.author);
+  const authorData = authors[authorName] || {
+    name: authorName,
     role: 'Contributor',
     bio: '',
     avatar: '/placeholder.svg',
@@ -76,7 +93,7 @@ function convertAdminToPublic(post: {
     author: authorData,
     date,
     readTime,
-    category: post.category,
+    category: getCategoryName(post.category),
     slug: post.slug,
   };
 }
@@ -254,33 +271,78 @@ export function usePublicBlogPost(slug: string | undefined): {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Check if local/static data exists for this slug
+  const hasLocalData = useMemo(() => {
+    if (!slug) return false;
+    const adminPost = adminPosts.find(p => p.slug === slug && p.is_published);
+    if (adminPost) return true;
+    return staticPosts.some(p => p.slug === slug);
+  }, [slug, adminPosts]);
+
   useEffect(() => {
     if (!slug) {
       setIsLoading(false);
       return;
     }
 
-    const fetchData = async () => {
-      setIsLoading(true);
+// Update the fetchData function in usePublicBlogPost:
+const fetchData = async () => {
+  setIsLoading(true);
+  setError(null);
+
+  if (isLiveMode()) {
+    try {
+      const response = await fetchPublicBlogPost(slug);
+
+      // Convert the API response to match our frontend format
+      // First, normalize the data to match what convertAdminToPublic expects
+      // Use any cast since API may return extra fields
+      const apiPost = response.post as any;
+      const normalizedPost = {
+        title: apiPost.title,
+        slug: apiPost.slug,
+        excerpt: apiPost.excerpt,
+        content: apiPost.content,
+        category: apiPost.category,
+        author: apiPost.author,
+        image_url: apiPost.image_url || apiPost.featured_image || apiPost.image,
+        published_at: apiPost.published_at,
+        created_at: apiPost.created_at || apiPost.published_at,
+      };
+      
+      const normalizedRelated = response.related_posts.map((p: any) => ({
+        title: p.title,
+        slug: p.slug,
+        excerpt: p.excerpt,
+        content: p.content,
+        category: p.category,
+        author: p.author,
+        image_url: p.image_url || p.featured_image || p.image,
+        published_at: p.published_at,
+        created_at: p.created_at || p.published_at,
+      }));
+      
+      setApiPost(convertAdminToPublic(normalizedPost));
+      setApiRelated(normalizedRelated.map(convertAdminToPublic));
       setError(null);
-
-      if (isLiveMode()) {
-        try {
-          const response = await fetchPublicBlogPost(slug);
-          setApiPost(convertApiBlogToFrontend(response.post));
-          setApiRelated(response.related_posts.map(convertApiBlogToFrontend));
-          setError(null);
-        } catch (err) {
-          console.error('Failed to fetch post from API:', err);
-          setError('Failed to load post.');
-        }
+    } catch (err) {
+      console.error('Failed to fetch post from API:', err);
+      
+      // Only set error if no local fallback is available
+      if (!hasLocalData) {
+        setError('Post not found.');
       }
+      // Clear API data so it falls back to local
+      setApiPost(null);
+      setApiRelated([]);
+    }
+  }
 
-      setIsLoading(false);
-    };
+  setIsLoading(false);
+};
 
     fetchData();
-  }, [slug, isLiveMode]);
+  }, [slug, isLiveMode, hasLocalData]);
 
   // Fallback to local data
   const localPost = useMemo(() => {

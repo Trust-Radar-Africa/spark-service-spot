@@ -16,10 +16,27 @@ interface UseBlogSearchResult {
   categories: string[];
 }
 
+// Helper to extract string value from category (can be string or object)
+function getCategoryName(category: string | { name: string } | null | undefined): string {
+  if (!category) return 'Uncategorized';
+  if (typeof category === 'string') return category;
+  if (typeof category === 'object' && 'name' in category) return category.name;
+  return 'Uncategorized';
+}
+
+// Helper to extract author name (can be string or object)
+function getAuthorName(author: string | { name: string } | null | undefined): string {
+  if (!author) return 'Unknown';
+  if (typeof author === 'string') return author;
+  if (typeof author === 'object' && 'name' in author) return author.name;
+  return 'Unknown';
+}
+
 // Convert admin blog post to public blog post format
 function convertToPublicPost(post: BlogPostData): BlogPost {
-  const authorData = authors[post.author] || {
-    name: post.author,
+  const authorName = getAuthorName(post.author);
+  const authorData = authors[authorName] || {
+    name: authorName,
     role: "Contributor",
     bio: "",
     avatar: "/placeholder.svg",
@@ -50,7 +67,7 @@ function convertToPublicPost(post: BlogPostData): BlogPost {
     author: authorData,
     date,
     readTime,
-    category: post.category,
+    category: getCategoryName(post.category),
     slug: post.slug,
   };
 }

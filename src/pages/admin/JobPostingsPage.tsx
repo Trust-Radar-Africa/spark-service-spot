@@ -563,6 +563,7 @@ export default function JobPostingsPage() {
                       onValueChange={setCountryFilter}
                       placeholder="All Countries"
                       searchPlaceholder="Search country..."
+                      anyOptionLabel="All Countries"
                     />
                   </div>
 

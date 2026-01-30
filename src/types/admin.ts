@@ -1,5 +1,5 @@
-// Expected salary ranges for candidates (matches form options)
-export const CANDIDATE_SALARY_LABELS: Record<string, string> = {
+// Expected salary ranges for filter dropdown options
+export const CANDIDATE_SALARY_FILTER_OPTIONS: Record<string, string> = {
   '500-1000': 'USD 500 - 1,000 PM',
   '1001-1500': 'USD 1,001 - 1,500 PM',
   '1501-2000': 'USD 1,501 - 2,000 PM',
@@ -9,6 +9,30 @@ export const CANDIDATE_SALARY_LABELS: Record<string, string> = {
   '3501-4000': 'USD 3,501 - 4,000 PM',
   'above-4001': 'Above USD 4,001 PM',
 };
+
+// All salary labels including legacy backend formats (for display)
+export const CANDIDATE_SALARY_LABELS: Record<string, string> = {
+  ...CANDIDATE_SALARY_FILTER_OPTIONS,
+  // Legacy backend formats (for display compatibility)
+  '2001-3000': 'USD 2,001 - 3,000 PM',
+  '3001-4000': 'USD 3,001 - 4,000 PM',
+  '4001+': 'Above USD 4,001 PM',
+};
+
+// Map backend salary values to frontend filter values
+// Backend may use different formats (e.g., "4001+" vs "above-4001")
+const SALARY_NORMALIZATION_MAP: Record<string, string> = {
+  '4001+': 'above-4001',
+  'above-4001': 'above-4001',
+  '2001-3000': '2501-3000', // Map wider range to the higher bracket
+  '3001-4000': '3501-4000', // Map wider range to the higher bracket
+};
+
+// Normalize backend salary value to match frontend filter options
+export function normalizeSalaryValue(value: string | undefined): string | undefined {
+  if (!value) return undefined;
+  return SALARY_NORMALIZATION_MAP[value] || value;
+}
 
 // Candidate Application Types
 export interface CandidateApplication {

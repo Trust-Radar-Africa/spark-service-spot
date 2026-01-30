@@ -93,10 +93,11 @@ const nationalityOptions = getNationalityOptions();
 
 interface CandidateApplicationFormProps {
   jobTitle?: string;
+  jobId?: number;
   onSuccess?: () => void;
 }
 
-export default function CandidateApplicationForm({ jobTitle, onSuccess }: CandidateApplicationFormProps) {
+export default function CandidateApplicationForm({ jobTitle, jobId, onSuccess }: CandidateApplicationFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [cvFile, setCvFile] = useState<File | null>(null);
@@ -177,6 +178,7 @@ export default function CandidateApplicationForm({ jobTitle, onSuccess }: Candid
           cv: data.cv,
           cover_letter: data.cover_letter,
           job_title: jobTitle,
+          job_id: jobId,
         });
       } else {
         // Demo mode - simulate API delay

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { CandidateFilters, ExperienceLevel, CandidateApplication, CANDIDATE_SALARY_LABELS } from '@/types/admin';
+import { CandidateFilters, ExperienceLevel, CandidateApplication, CANDIDATE_SALARY_LABELS, CANDIDATE_SALARY_FILTER_OPTIONS, normalizeSalaryValue } from '@/types/admin';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -209,7 +209,7 @@ export default function CandidatesPage() {
       filtered = filtered.filter((c) => c.job_applied === filters.job_applied);
     }
     if (filters.expected_salary) {
-      filtered = filtered.filter((c) => c.expected_salary === filters.expected_salary);
+      filtered = filtered.filter((c) => normalizeSalaryValue(c.expected_salary) === filters.expected_salary);
     }
     if (filters.search) {
       const search = filters.search.toLowerCase();
@@ -620,6 +620,7 @@ export default function CandidatesPage() {
                       onValueChange={(value) => setFilters({ ...filters, job_applied: value })}
                       placeholder="All Jobs"
                       searchPlaceholder="Search job..."
+                      anyOptionLabel="All Jobs"
                     />
                   </div>
 
@@ -634,6 +635,7 @@ export default function CandidatesPage() {
                       onValueChange={(value) => setFilters({ ...filters, nationality: value })}
                       placeholder="All Nationalities"
                       searchPlaceholder="Search nationality..."
+                      anyOptionLabel="All Nationalities"
                     />
                   </div>
 
@@ -648,6 +650,7 @@ export default function CandidatesPage() {
                       onValueChange={(value) => setFilters({ ...filters, country: value })}
                       placeholder="All Countries"
                       searchPlaceholder="Search country..."
+                      anyOptionLabel="All Countries"
                     />
                   </div>
 
@@ -710,7 +713,7 @@ export default function CandidatesPage() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">All Ranges</SelectItem>
-                        {Object.entries(CANDIDATE_SALARY_LABELS).map(([value, label]) => (
+                        {Object.entries(CANDIDATE_SALARY_FILTER_OPTIONS).map(([value, label]) => (
                           <SelectItem key={value} value={value}>
                             {label}
                           </SelectItem>

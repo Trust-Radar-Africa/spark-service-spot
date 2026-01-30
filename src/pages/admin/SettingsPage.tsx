@@ -184,6 +184,7 @@ export default function SettingsPage() {
     adminUsers,
     fetchSettings,
     fetchAdminUsers,
+    createAdminUser,
   } = useSettingsStore();
 
   const { dataMode, isLiveMode } = useApiConfigStore();
@@ -217,17 +218,44 @@ export default function SettingsPage() {
     id: string | null;
     name: string;
   }>({ open: false, type: null, id: null, name: '' });
+  const [userDialog, setUserDialog] = useState({ open: false });
 
   // Form states
   const [socialForm, setSocialForm] = useState({ platform: '', url: '', icon: '' });
   const [categoryForm, setCategoryForm] = useState({ name: '', slug: '', description: '' });
   const [experienceForm, setExperienceForm] = useState({ value: '', label: '' });
+  const [userForm, setUserForm] = useState({ name: '', email: '', password: '', role: 'viewer' as 'super_admin' | 'editor' | 'viewer' });
+  const [isCreatingUser, setIsCreatingUser] = useState(false);
 
   const handleSaveBranding = () => {
     toast({
       title: 'Branding saved',
       description: 'Your branding settings have been updated.',
     });
+  };
+
+  const handleSaveUser = async () => {
+    if (!userForm.name || !userForm.email || !userForm.password) {
+      toast({ title: 'Error', description: 'Name, email, and password are required', variant: 'destructive' });
+      return;
+    }
+
+    if (userForm.password.length < 8) {
+      toast({ title: 'Error', description: 'Password must be at least 8 characters', variant: 'destructive' });
+      return;
+    }
+
+    setIsCreatingUser(true);
+    const result = await createAdminUser(userForm);
+    setIsCreatingUser(false);
+
+    if (result.success) {
+      toast({ title: 'User created', description: `${userForm.name} has been added as ${ROLE_PERMISSIONS[userForm.role].label}` });
+      setUserDialog({ open: false });
+      setUserForm({ name: '', email: '', password: '', role: 'viewer' });
+    } else {
+      toast({ title: 'Error', description: result.error || 'Failed to create user', variant: 'destructive' });
+    }
   };
 
   const handleSaveNotifications = () => {
@@ -391,19 +419,23 @@ export default function SettingsPage() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 h-auto">
+          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 h-auto">
             <TabsTrigger value="branding" className="gap-2">
               <Palette className="h-4 w-4" />
               <span className="hidden sm:inline">Branding</span>
             </TabsTrigger>
+            {/* General tab disabled - uncomment to re-enable
             <TabsTrigger value="general" className="gap-2">
               <Cog className="h-4 w-4" />
               <span className="hidden sm:inline">General</span>
             </TabsTrigger>
+            */}
+            {/* Notifications tab disabled - uncomment to re-enable
             <TabsTrigger value="notifications" className="gap-2">
               <Bell className="h-4 w-4" />
               <span className="hidden sm:inline">Notifications</span>
             </TabsTrigger>
+            */}
             <TabsTrigger value="users" className="gap-2">
               <Users className="h-4 w-4" />
               <span className="hidden sm:inline">Users</span>
@@ -509,10 +541,16 @@ export default function SettingsPage() {
                     />
                   </div>
                 </div>
+                <div className="flex items-center gap-2 pt-4">
+                  <Button onClick={handleSaveBranding}>
+                    <Save className="h-4 w-4 mr-2" />
+                    Save Branding
+                  </Button>
+                </div>
               </CardContent>
             </Card>
 
-            {/* Color Settings */}
+            {/* Color Settings - disabled, uncomment to re-enable
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -598,6 +636,7 @@ export default function SettingsPage() {
                 </div>
               </CardContent>
             </Card>
+            */}
           </TabsContent>
 
           {/* General Tab */}
@@ -947,10 +986,77 @@ export default function SettingsPage() {
                     Manage admin users and their roles
                   </CardDescription>
                 </div>
-                <Button size="sm" disabled>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Invite User
-                </Button>
+                <Dialog open={userDialog.open} onOpenChange={(open) => setUserDialog({ open })}>
+                  <DialogTrigger asChild>
+                    <Button size="sm" disabled={!isAdmin}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add User
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Add Admin User</DialogTitle>
+                      <DialogDescription>
+                        Create a new admin user with specific role permissions
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="user-name">Name</Label>
+                        <Input
+                          id="user-name"
+                          value={userForm.name}
+                          onChange={(e) => setUserForm({ ...userForm, name: e.target.value })}
+                          placeholder="Full name"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="user-email">Email</Label>
+                        <Input
+                          id="user-email"
+                          type="email"
+                          value={userForm.email}
+                          onChange={(e) => setUserForm({ ...userForm, email: e.target.value })}
+                          placeholder="email@example.com"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="user-password">Password</Label>
+                        <Input
+                          id="user-password"
+                          type="password"
+                          value={userForm.password}
+                          onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
+                          placeholder="Minimum 8 characters"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="user-role">Role</Label>
+                        <Select
+                          value={userForm.role}
+                          onValueChange={(value: 'super_admin' | 'editor' | 'viewer') => setUserForm({ ...userForm, role: value })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select role" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="super_admin">Super Admin - Full access</SelectItem>
+                            <SelectItem value="editor">Editor - Manage blog & jobs</SelectItem>
+                            <SelectItem value="viewer">Viewer - Read-only access</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setUserDialog({ open: false })}>
+                        Cancel
+                      </Button>
+                      <Button onClick={handleSaveUser} disabled={isCreatingUser}>
+                        {isCreatingUser ? 'Creating...' : 'Create User'}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </CardHeader>
               <CardContent>
                 <Table>

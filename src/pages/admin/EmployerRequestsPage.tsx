@@ -473,6 +473,7 @@ export default function EmployerRequestsPage() {
                       onValueChange={setNationalityFilter}
                       placeholder="All Nationalities"
                       searchPlaceholder="Search nationality..."
+                      anyOptionLabel="All Nationalities"
                     />
                   </div>
 
@@ -487,6 +488,7 @@ export default function EmployerRequestsPage() {
                       onValueChange={setCountryFilter}
                       placeholder="All Countries"
                       searchPlaceholder="Search country..."
+                      anyOptionLabel="All Countries"
                     />
                   </div>
 
@@ -513,6 +515,7 @@ export default function EmployerRequestsPage() {
                       onValueChange={setPositionFilter}
                       placeholder="All Positions"
                       searchPlaceholder="Search position..."
+                      anyOptionLabel="All Positions"
                     />
                   </div>
 

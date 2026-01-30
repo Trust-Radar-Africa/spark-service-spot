@@ -259,7 +259,7 @@ export default function AdminDashboard() {
   const recentActivity = useMemo(() => {
     return recentAuditLogs.slice(0, 5).map((log) => ({
       type: log.module,
-      title: `${log.userName} ${ACTION_LABELS[log.action].toLowerCase()} ${log.resourceName}`,
+      title: `${log.userName} ${(ACTION_LABELS[log.action] ?? log.action ?? 'performed action on').toLowerCase()} ${log.resourceName}`,
       date: log.timestamp,
       icon: log.module === 'candidates' ? Users : log.module === 'jobs' ? Briefcase : log.module === 'employer_requests' ? Building2 : FileText,
     }));

@@ -37,11 +37,13 @@ const PERMISSION_MAP: Record<AdminRole, Permission[]> = {
 export function useAdminPermissions() {
   const { user, isAuthenticated } = useAdminAuth();
   const { adminUsers } = useSettingsStore();
-  
-  // Get the user's role from the settings store (demo mode)
-  // In production, this would come from the auth context
-  const currentAdminUser = adminUsers.find((u) => u.email === user?.email);
-  const userRole: AdminRole = currentAdminUser?.role || 'viewer';
+
+  // Get the user's role directly from the authenticated user object
+  // Fall back to looking up in adminUsers, then default to super_admin for logged-in users
+  const userRole: AdminRole =
+    user?.role ||
+    adminUsers.find((u) => u.email === user?.email)?.role ||
+    (isAuthenticated ? 'super_admin' : 'viewer');
   
   const hasPermission = (permission: Permission): boolean => {
     if (!isAuthenticated) return false;

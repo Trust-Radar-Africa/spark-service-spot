@@ -25,6 +25,8 @@ interface SearchableSelectProps {
   className?: string;
   disabled?: boolean;
   allowClear?: boolean;
+  showAnyOption?: boolean;
+  anyOptionLabel?: string;
 }
 
 export function SearchableSelect({
@@ -37,6 +39,8 @@ export function SearchableSelect({
   className,
   disabled = false,
   allowClear = true,
+  showAnyOption = true,
+  anyOptionLabel = 'Any',
 }: SearchableSelectProps) {
   const [open, setOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState('');
@@ -96,13 +100,35 @@ export function SearchableSelect({
           />
         </div>
         <ScrollArea className="h-[250px] overflow-auto">
-          {filteredOptions.length === 0 ? (
-            <div className="py-6 text-center text-sm text-muted-foreground">
-              {emptyMessage}
-            </div>
-          ) : (
-            <div className="p-1">
-              {filteredOptions.map((option) => (
+          <div className="p-1">
+            {/* Any/All option at the top */}
+            {showAnyOption && (
+              <button
+                onClick={() => {
+                  onValueChange('');
+                  setOpen(false);
+                  setSearchQuery('');
+                }}
+                className={cn(
+                  'relative flex w-full cursor-pointer select-none items-center rounded-sm py-2 px-3 text-sm outline-none hover:bg-accent hover:text-accent-foreground',
+                  !value && 'bg-accent text-accent-foreground'
+                )}
+              >
+                <Check
+                  className={cn(
+                    'mr-2 h-4 w-4 shrink-0',
+                    !value ? 'opacity-100' : 'opacity-0'
+                  )}
+                />
+                <span className="truncate text-muted-foreground">{anyOptionLabel}</span>
+              </button>
+            )}
+            {filteredOptions.length === 0 ? (
+              <div className="py-6 text-center text-sm text-muted-foreground">
+                {emptyMessage}
+              </div>
+            ) : (
+              filteredOptions.map((option) => (
                 <button
                   key={option.value}
                   onClick={() => handleSelect(option.value)}
@@ -119,9 +145,9 @@ export function SearchableSelect({
                   />
                   <span className="truncate">{option.label}</span>
                 </button>
-              ))}
-            </div>
-          )}
+              ))
+            )}
+          </div>
         </ScrollArea>
       </PopoverContent>
     </Popover>

@@ -1,7 +1,7 @@
 {
   "users": [
     {
-      "id": 1,
+      "id": "1",
       "name": "Demo Admin",
       "email": "admin@demo.com",
       "password": "demo123",
@@ -10,7 +10,7 @@
       "last_login": "2024-01-24T10:30:00Z"
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "Test Editor",
       "email": "editor@demo.com",
       "password": "demo123",
@@ -19,7 +19,7 @@
       "last_login": "2024-01-23T14:20:00Z"
     },
     {
-      "id": 3,
+      "id": "3",
       "name": "Test Viewer",
       "email": "viewer@demo.com",
       "password": "demo123",
@@ -28,10 +28,9 @@
       "last_login": "2024-01-22T09:15:00Z"
     }
   ],
-
   "jobs": [
     {
-      "id": 1,
+      "id": "1",
       "title": "Senior Accountant",
       "description": "We are looking for an experienced Senior Accountant to join our team. The ideal candidate will have a strong background in financial reporting, tax preparation, and audit procedures. You will be responsible for managing a portfolio of clients and ensuring compliance with accounting standards.",
       "country": "United Kingdom",
@@ -47,7 +46,7 @@
       "updated_at": "2024-01-10T09:00:00Z"
     },
     {
-      "id": 2,
+      "id": "2",
       "title": "Tax Manager",
       "description": "Join our dynamic tax team as a Tax Manager. You will oversee tax compliance, planning, and advisory services for our diverse client base. This role offers significant growth opportunities and exposure to complex international tax matters.",
       "country": "United Arab Emirates",
@@ -63,7 +62,7 @@
       "updated_at": "2024-01-08T14:30:00Z"
     },
     {
-      "id": 3,
+      "id": "3",
       "title": "Junior Bookkeeper",
       "description": "Entry-level position for a motivated individual looking to start their career in accounting. You will assist with day-to-day bookkeeping tasks, bank reconciliations, and data entry.",
       "country": "Australia",
@@ -79,7 +78,7 @@
       "updated_at": "2024-01-15T11:00:00Z"
     },
     {
-      "id": 4,
+      "id": "4",
       "title": "Financial Controller",
       "description": "We are seeking a Financial Controller to lead our finance department. This senior role involves overseeing all financial operations, budgeting, forecasting, and strategic financial planning.",
       "country": "United States",
@@ -95,7 +94,7 @@
       "updated_at": "2024-01-05T08:00:00Z"
     },
     {
-      "id": 5,
+      "id": "5",
       "title": "Audit Associate",
       "description": "Join our audit team and gain exposure to diverse industries and clients. You will participate in audit engagements, from planning to completion, working alongside experienced professionals.",
       "country": "Canada",
@@ -111,7 +110,7 @@
       "updated_at": "2024-01-12T10:30:00Z"
     },
     {
-      "id": 6,
+      "id": "6",
       "title": "Payroll Specialist",
       "description": "We need a detail-oriented Payroll Specialist to manage our payroll operations. You will ensure accurate and timely processing of payroll for multiple entities.",
       "country": "United Kingdom",
@@ -127,7 +126,7 @@
       "updated_at": "2024-01-18T09:00:00Z"
     },
     {
-      "id": 7,
+      "id": "7",
       "title": "Management Accountant",
       "description": "We are looking for a Management Accountant to provide financial insights and support business decision-making. This role is crucial for our strategic planning and performance monitoring.",
       "country": "Singapore",
@@ -143,7 +142,7 @@
       "updated_at": "2024-01-20T08:00:00Z"
     },
     {
-      "id": 8,
+      "id": "8",
       "title": "Forensic Accountant",
       "description": "Exciting opportunity for a Forensic Accountant to investigate financial irregularities and fraud. You will work on complex cases involving litigation support and expert witness testimony.",
       "country": "United States",
@@ -159,10 +158,9 @@
       "updated_at": "2024-01-15T10:00:00Z"
     }
   ],
-
   "candidates": [
     {
-      "id": 1,
+      "id": "1",
       "first_name": "John",
       "last_name": "Smith",
       "email": "john.smith@email.com",
@@ -179,7 +177,7 @@
       "updated_at": "2024-01-15T10:30:00Z"
     },
     {
-      "id": 2,
+      "id": "2",
       "first_name": "Sarah",
       "last_name": "Johnson",
       "email": "sarah.johnson@email.com",
@@ -196,7 +194,7 @@
       "updated_at": "2024-01-14T14:20:00Z"
     },
     {
-      "id": 3,
+      "id": "3",
       "first_name": "Mohammed",
       "last_name": "Al-Rahman",
       "email": "mohammed.ar@email.com",
@@ -213,7 +211,7 @@
       "updated_at": "2024-01-13T09:15:00Z"
     },
     {
-      "id": 4,
+      "id": "4",
       "first_name": "Emily",
       "last_name": "Chen",
       "email": "emily.chen@email.com",
@@ -230,7 +228,7 @@
       "updated_at": "2024-01-16T11:45:00Z"
     },
     {
-      "id": 5,
+      "id": "5",
       "first_name": "Michael",
       "last_name": "O'Brien",
       "email": "michael.obrien@email.com",
@@ -247,7 +245,7 @@
       "updated_at": "2024-01-17T08:30:00Z"
     },
     {
-      "id": 6,
+      "id": "6",
       "first_name": "Fatima",
       "last_name": "Hassan",
       "email": "fatima.hassan@email.com",
@@ -264,7 +262,7 @@
       "updated_at": "2024-01-18T15:00:00Z"
     },
     {
-      "id": 7,
+      "id": "7",
       "first_name": "James",
       "last_name": "Wilson",
       "email": "james.wilson@email.com",
@@ -281,7 +279,7 @@
       "updated_at": "2024-01-19T10:00:00Z"
     },
     {
-      "id": 8,
+      "id": "8",
       "first_name": "Priya",
       "last_name": "Sharma",
       "email": "priya.sharma@email.com",
@@ -298,7 +296,7 @@
       "updated_at": "2024-01-20T12:30:00Z"
     },
     {
-      "id": 9,
+      "id": "9",
       "first_name": "David",
       "last_name": "Mueller",
       "email": "david.mueller@email.com",
@@ -315,7 +313,7 @@
       "updated_at": "2024-01-21T09:00:00Z"
     },
     {
-      "id": 10,
+      "id": "10",
       "first_name": "Lisa",
       "last_name": "Anderson",
       "email": "lisa.anderson@email.com",
@@ -332,10 +330,9 @@
       "updated_at": "2024-01-22T14:15:00Z"
     }
   ],
-
   "employer-requests": [
     {
-      "id": 1,
+      "id": "1",
       "firm_name": "ABC Accounting Firm",
       "email": "hr@abcaccounting.com",
       "country": "United Arab Emirates",
@@ -348,7 +345,7 @@
       "updated_at": "2024-01-15T10:30:00Z"
     },
     {
-      "id": 2,
+      "id": "2",
       "firm_name": "Global Finance Partners",
       "email": "recruitment@gfp.com",
       "country": "United Kingdom",
@@ -361,7 +358,7 @@
       "updated_at": "2024-01-14T14:00:00Z"
     },
     {
-      "id": 3,
+      "id": "3",
       "firm_name": "TaxPro Solutions",
       "email": "careers@taxpro.com.au",
       "country": "Australia",
@@ -374,7 +371,7 @@
       "updated_at": "2024-01-13T09:00:00Z"
     },
     {
-      "id": 4,
+      "id": "4",
       "firm_name": "Northern CPA Group",
       "email": "jobs@northerncpa.ca",
       "country": "Canada",
@@ -387,7 +384,7 @@
       "updated_at": "2024-01-16T11:00:00Z"
     },
     {
-      "id": 5,
+      "id": "5",
       "firm_name": "Singapore Audit Associates",
       "email": "hr@sga.sg",
       "country": "Singapore",
@@ -400,7 +397,7 @@
       "updated_at": "2024-01-17T08:30:00Z"
     },
     {
-      "id": 6,
+      "id": "6",
       "firm_name": "Smith & Associates",
       "email": "recruiting@smithassoc.com",
       "country": "United States",
@@ -413,10 +410,9 @@
       "updated_at": "2024-01-18T15:30:00Z"
     }
   ],
-
   "blog": [
     {
-      "id": 1,
+      "id": "1",
       "title": "The Future of Offshore Accounting in 2024",
       "slug": "future-offshore-accounting-2024",
       "excerpt": "Discover how technological advancements and changing regulations are reshaping the offshore accounting landscape in 2024 and beyond.",
@@ -431,7 +427,7 @@
       "updated_at": "2024-01-10T09:00:00Z"
     },
     {
-      "id": 2,
+      "id": "2",
       "title": "Best Practices for Remote Bookkeeping Teams",
       "slug": "best-practices-remote-bookkeeping",
       "excerpt": "Learn the proven strategies for managing successful remote bookkeeping operations and maintaining quality standards across distributed teams.",
@@ -446,7 +442,7 @@
       "updated_at": "2024-01-08T14:00:00Z"
     },
     {
-      "id": 3,
+      "id": "3",
       "title": "Understanding UAE Corporate Tax: A Complete Guide",
       "slug": "uae-corporate-tax-guide",
       "excerpt": "Everything you need to know about the new UAE corporate tax regime, including rates, exemptions, and compliance requirements.",
@@ -461,7 +457,7 @@
       "updated_at": "2024-01-05T10:00:00Z"
     },
     {
-      "id": 4,
+      "id": "4",
       "title": "Data Security in Offshore Accounting",
       "slug": "data-security-offshore-accounting",
       "excerpt": "How to protect sensitive financial data when working with offshore accounting teams, including best practices and essential security measures.",
@@ -476,7 +472,7 @@
       "updated_at": "2024-01-03T11:00:00Z"
     },
     {
-      "id": 5,
+      "id": "5",
       "title": "Choosing the Right Accounting Software for Your Firm",
       "slug": "choosing-accounting-software",
       "excerpt": "A comprehensive comparison of popular accounting software options to help you make the right choice for your firm's needs.",
@@ -491,7 +487,7 @@
       "updated_at": "2024-01-01T09:00:00Z"
     },
     {
-      "id": 6,
+      "id": "6",
       "title": "Draft: AI in Accounting - The Next Frontier",
       "slug": "ai-accounting-next-frontier",
       "excerpt": "Exploring how artificial intelligence is transforming the accounting profession and what it means for practitioners.",
@@ -506,10 +502,9 @@
       "updated_at": "2024-01-22T10:00:00Z"
     }
   ],
-
   "contact-messages": [
     {
-      "id": 1,
+      "id": "1",
       "name": "Robert Thompson",
       "email": "robert.t@company.com",
       "company": "Thompson Industries",
@@ -520,7 +515,7 @@
       "updated_at": "2024-01-20T15:00:00Z"
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "Jennifer Lee",
       "email": "jlee@startupxyz.com",
       "company": "StartupXYZ",
@@ -531,7 +526,7 @@
       "updated_at": "2024-01-22T14:30:00Z"
     },
     {
-      "id": 3,
+      "id": "3",
       "name": "Ahmed Hassan",
       "email": "ahmed@hassangroup.ae",
       "company": "Hassan Group",
@@ -542,7 +537,6 @@
       "updated_at": "2024-01-23T08:15:00Z"
     }
   ],
-
   "notifications": [
     {
       "id": "notif_001",
@@ -595,7 +589,6 @@
       "link": "/admin/candidates"
     }
   ],
-
   "audit-logs": [
     {
       "id": "log_001",
@@ -688,18 +681,40 @@
         }
       ],
       "metadata": {}
+    },
+    {
+      "id": "7ce0cf73-0d26-4103-b3ea-d222f611bf6f",
+      "userId": "1",
+      "userName": "Demo Admin",
+      "userEmail": "admin@demo.com",
+      "userRole": "super_admin",
+      "action": "unpublish",
+      "module": "blog",
+      "resourceId": "5",
+      "resourceName": "Choosing the Right Accounting Software for Your Firm",
+      "timestamp": "2026-01-24T23:54:26.266Z"
     }
   ],
-
   "settings": {
     "branding": {
+      "logoUrl": null,
+      "companyName": "Global Outsourced Accounting",
+      "tagline": "Global Outsourced Offshore Accounting Solutions",
+      "primaryColor": "220 60% 20%",
+      "accentColor": "38 92% 50%",
       "logo_url": "/storage/branding/logo.png",
       "company_name": "Global Outsourced Accounting",
-      "tagline": "Global Outsourced Offshore Accounting Solutions",
       "primary_color": "222 47% 11%",
       "accent_color": "45 93% 47%"
     },
     "general": {
+      "themeMode": "light",
+      "itemsPerPage": 10,
+      "dateFormat": "MM/DD/YYYY",
+      "timeFormat": "12h",
+      "currencyFormat": "USD",
+      "autoArchiveDays": 90,
+      "autoArchiveEnabled": false,
       "theme_mode": "light",
       "items_per_page": 10,
       "date_format": "MM/DD/YYYY",
@@ -709,18 +724,109 @@
       "auto_archive_enabled": false
     },
     "notifications": {
+      "emailNewCandidates": true,
+      "emailNewEmployerRequests": true,
+      "emailDigestFrequency": "daily",
+      "candidateThreshold": 10,
+      "employerThreshold": 5,
+      "thresholdAlertEnabled": true,
       "email_new_candidates": true,
       "email_new_employer_requests": true,
       "email_digest_frequency": "daily",
       "candidate_threshold": 10,
       "employer_threshold": 5,
       "threshold_alert_enabled": true
-    }
+    },
+    "socialLinks": [
+      {
+        "id": "1",
+        "platform": "LinkedIn",
+        "url": "https://www.linkedin.com/company/multiversecpa",
+        "icon": "linkedin",
+        "enabled": true
+      },
+      {
+        "id": "2",
+        "platform": "Twitter",
+        "url": "https://x.com/CPAMULTIVERSE",
+        "icon": "twitter",
+        "enabled": true
+      },
+      {
+        "id": "3",
+        "platform": "Facebook",
+        "url": "https://facebook.com/goa",
+        "icon": "facebook",
+        "enabled": false
+      }
+    ],
+    "blogCategories": [
+      {
+        "id": "1",
+        "name": "Industry News",
+        "slug": "industry-news",
+        "description": "Latest accounting industry updates",
+        "isDefault": true
+      },
+      {
+        "id": "2",
+        "name": "Tips & Tricks",
+        "slug": "tips-tricks",
+        "description": "Helpful tips for professionals",
+        "isDefault": true
+      },
+      {
+        "id": "3",
+        "name": "Compliance",
+        "slug": "compliance",
+        "description": "Regulatory and compliance updates",
+        "isDefault": true
+      },
+      {
+        "id": "4",
+        "name": "Career Advice",
+        "slug": "career-advice",
+        "description": "Career development tips",
+        "isDefault": true
+      },
+      {
+        "id": "5",
+        "name": "Technology",
+        "slug": "technology",
+        "description": "Tech in accounting",
+        "isDefault": true
+      }
+    ],
+    "experienceLevels": [
+      {
+        "id": "1",
+        "value": "0-3",
+        "label": "0-3 years",
+        "isDefault": true
+      },
+      {
+        "id": "2",
+        "value": "3-7",
+        "label": "3-7 years",
+        "isDefault": true
+      },
+      {
+        "id": "3",
+        "value": "7-10",
+        "label": "7-10 years",
+        "isDefault": true
+      },
+      {
+        "id": "4",
+        "value": "10+",
+        "label": "10+ years",
+        "isDefault": true
+      }
+    ]
   },
-
   "social-links": [
     {
-      "id": 1,
+      "id": "1",
       "platform": "LinkedIn",
       "url": "https://linkedin.com/company/goa",
       "icon": "linkedin",
@@ -728,7 +834,7 @@
       "order": 1
     },
     {
-      "id": 2,
+      "id": "2",
       "platform": "Twitter",
       "url": "https://twitter.com/goa_accounting",
       "icon": "twitter",
@@ -736,7 +842,7 @@
       "order": 2
     },
     {
-      "id": 3,
+      "id": "3",
       "platform": "Facebook",
       "url": "https://facebook.com/goaaccounting",
       "icon": "facebook",
@@ -744,88 +850,164 @@
       "order": 3
     }
   ],
-
   "blog-categories": [
     {
-      "id": 1,
+      "id": "1",
       "name": "Industry Insights",
       "slug": "industry-insights",
       "description": "Latest trends and news from the accounting industry",
       "is_default": true
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "Best Practices",
       "slug": "best-practices",
       "description": "Tips and strategies for accounting professionals",
       "is_default": true
     },
     {
-      "id": 3,
+      "id": "3",
       "name": "Tax Advisory",
       "slug": "tax-advisory",
       "description": "Tax guidance and regulatory updates",
       "is_default": false
     },
     {
-      "id": 4,
+      "id": "4",
       "name": "Technical",
       "slug": "technical",
       "description": "Software and technology guides",
       "is_default": false
     }
   ],
-
   "experience-levels": [
     {
-      "id": 1,
+      "id": "1",
       "value": "0-3",
       "label": "0-3 years",
       "is_default": true
     },
     {
-      "id": 2,
+      "id": "2",
       "value": "3-7",
       "label": "3-7 years",
       "is_default": true
     },
     {
-      "id": 3,
+      "id": "3",
       "value": "7-10",
       "label": "7-10 years",
       "is_default": true
     },
     {
-      "id": 4,
+      "id": "4",
       "value": "10+",
       "label": "10+ years",
       "is_default": true
     }
   ],
-
   "nationalities": [
-    { "id": 1, "value": "American", "label": "American" },
-    { "id": 2, "value": "Australian", "label": "Australian" },
-    { "id": 3, "value": "British", "label": "British" },
-    { "id": 4, "value": "Canadian", "label": "Canadian" },
-    { "id": 5, "value": "Chinese", "label": "Chinese" },
-    { "id": 6, "value": "Emirati", "label": "Emirati" },
-    { "id": 7, "value": "Filipino", "label": "Filipino" },
-    { "id": 8, "value": "French", "label": "French" },
-    { "id": 9, "value": "German", "label": "German" },
-    { "id": 10, "value": "Indian", "label": "Indian" },
-    { "id": 11, "value": "Irish", "label": "Irish" },
-    { "id": 12, "value": "Italian", "label": "Italian" },
-    { "id": 13, "value": "Japanese", "label": "Japanese" },
-    { "id": 14, "value": "Korean", "label": "Korean" },
-    { "id": 15, "value": "Malaysian", "label": "Malaysian" },
-    { "id": 16, "value": "Nigerian", "label": "Nigerian" },
-    { "id": 17, "value": "Pakistani", "label": "Pakistani" },
-    { "id": 18, "value": "Singaporean", "label": "Singaporean" },
-    { "id": 19, "value": "South African", "label": "South African" },
-    { "id": 20, "value": "Spanish", "label": "Spanish" }
+    {
+      "id": "1",
+      "value": "American",
+      "label": "American"
+    },
+    {
+      "id": "2",
+      "value": "Australian",
+      "label": "Australian"
+    },
+    {
+      "id": "3",
+      "value": "British",
+      "label": "British"
+    },
+    {
+      "id": "4",
+      "value": "Canadian",
+      "label": "Canadian"
+    },
+    {
+      "id": "5",
+      "value": "Chinese",
+      "label": "Chinese"
+    },
+    {
+      "id": "6",
+      "value": "Emirati",
+      "label": "Emirati"
+    },
+    {
+      "id": "7",
+      "value": "Filipino",
+      "label": "Filipino"
+    },
+    {
+      "id": "8",
+      "value": "French",
+      "label": "French"
+    },
+    {
+      "id": "9",
+      "value": "German",
+      "label": "German"
+    },
+    {
+      "id": "10",
+      "value": "Indian",
+      "label": "Indian"
+    },
+    {
+      "id": "11",
+      "value": "Irish",
+      "label": "Irish"
+    },
+    {
+      "id": "12",
+      "value": "Italian",
+      "label": "Italian"
+    },
+    {
+      "id": "13",
+      "value": "Japanese",
+      "label": "Japanese"
+    },
+    {
+      "id": "14",
+      "value": "Korean",
+      "label": "Korean"
+    },
+    {
+      "id": "15",
+      "value": "Malaysian",
+      "label": "Malaysian"
+    },
+    {
+      "id": "16",
+      "value": "Nigerian",
+      "label": "Nigerian"
+    },
+    {
+      "id": "17",
+      "value": "Pakistani",
+      "label": "Pakistani"
+    },
+    {
+      "id": "18",
+      "value": "Singaporean",
+      "label": "Singaporean"
+    },
+    {
+      "id": "19",
+      "value": "South African",
+      "label": "South African"
+    },
+    {
+      "id": "20",
+      "value": "Spanish",
+      "label": "Spanish"
+    }
   ],
-
   "dashboard": {
     "stats": {
       "total_candidates": 156,
@@ -849,13 +1031,34 @@
         "10+": 17
       },
       "candidates_by_date": [
-        { "date": "2024-01-18", "count": 5 },
-        { "date": "2024-01-19", "count": 8 },
-        { "date": "2024-01-20", "count": 3 },
-        { "date": "2024-01-21", "count": 6 },
-        { "date": "2024-01-22", "count": 4 },
-        { "date": "2024-01-23", "count": 7 },
-        { "date": "2024-01-24", "count": 9 }
+        {
+          "date": "2024-01-18",
+          "count": 5
+        },
+        {
+          "date": "2024-01-19",
+          "count": 8
+        },
+        {
+          "date": "2024-01-20",
+          "count": 3
+        },
+        {
+          "date": "2024-01-21",
+          "count": 6
+        },
+        {
+          "date": "2024-01-22",
+          "count": 4
+        },
+        {
+          "date": "2024-01-23",
+          "count": 7
+        },
+        {
+          "date": "2024-01-24",
+          "count": 9
+        }
       ],
       "jobs_by_status": {
         "active": 18,

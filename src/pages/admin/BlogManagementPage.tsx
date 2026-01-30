@@ -90,9 +90,9 @@ export default function BlogManagementPage() {
   const { user } = useAdminAuth();
   const { logAction } = useAuditLogger();
 
-  // Fetch blog posts from API on mount when in live mode
+  // Fetch blog posts from API on mount - force refresh to get fresh data
   useEffect(() => {
-    fetchPosts();
+    fetchPosts(true); // Force refresh on page load
   }, [fetchPosts]);
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -139,15 +139,19 @@ export default function BlogManagementPage() {
   };
 
   // Get unique categories for filter
-  const categoryOptions: SearchableSelectOption[] = useMemo(() => {
-    const uniqueCategories = [...new Set(posts.map((p) => p.category))].sort();
-    return uniqueCategories.map((c) => ({ value: c, label: c }));
-  }, [posts]);
+const categoryOptions: SearchableSelectOption[] = useMemo(() => {
+  const uniqueCategories = [...new Set(posts.map((p) => 
+    typeof p.category === 'object' ? p.category.name : p.category
+  ))].filter(Boolean).sort();
+  return uniqueCategories.map((c) => ({ value: c as string, label: c as string }));
+}, [posts]);
 
   // Get unique authors for filter
   const authorOptions: SearchableSelectOption[] = useMemo(() => {
-    const uniqueAuthors = [...new Set(posts.map((p) => p.author))].sort();
-    return uniqueAuthors.map((a) => ({ value: a, label: a }));
+    const uniqueAuthors = [...new Set(posts.map((p) =>
+      typeof p.author === 'object' ? (p.author as any).name : p.author
+    ))].filter(Boolean).sort();
+    return uniqueAuthors.map((a) => ({ value: a as string, label: a as string }));
   }, [posts]);
 
   // Status options
@@ -159,19 +163,28 @@ export default function BlogManagementPage() {
   // Filter and sort posts
   const filteredPosts = useMemo(() => {
     return posts.filter((post) => {
+      // Helper to get string value from category/author (can be string or object)
+      const getCategoryName = (cat: any): string =>
+        typeof cat === 'object' && cat?.name ? cat.name : String(cat || '');
+      const getAuthorName = (auth: any): string =>
+        typeof auth === 'object' && auth?.name ? auth.name : String(auth || '');
+
+      const categoryName = getCategoryName(post.category);
+      const authorName = getAuthorName(post.author);
+
       const matchesSearch =
         searchTerm === '' ||
         post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         post.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        post.author.toLowerCase().includes(searchTerm.toLowerCase());
+        authorName.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesStatus =
         !statusFilter ||
         (statusFilter === 'published' && post.is_published) ||
         (statusFilter === 'draft' && !post.is_published);
 
-      const matchesCategory = !categoryFilter || post.category === categoryFilter;
-      const matchesAuthor = !authorFilter || post.author === authorFilter;
+      const matchesCategory = !categoryFilter || categoryName === categoryFilter;
+      const matchesAuthor = !authorFilter || authorName === authorFilter;
 
       return matchesSearch && matchesStatus && matchesCategory && matchesAuthor;
     });
@@ -505,6 +518,7 @@ export default function BlogManagementPage() {
                       onValueChange={setAuthorFilter}
                       placeholder="All Authors"
                       searchPlaceholder="Search author..."
+                      anyOptionLabel="All Authors"
                     />
                   </div>
 
@@ -519,6 +533,7 @@ export default function BlogManagementPage() {
                       onValueChange={setStatusFilter}
                       placeholder="All Status"
                       searchPlaceholder="Search status..."
+                      anyOptionLabel="All Status"
                     />
                   </div>
 
@@ -533,6 +548,7 @@ export default function BlogManagementPage() {
                       onValueChange={setCategoryFilter}
                       placeholder="All Categories"
                       searchPlaceholder="Search category..."
+                      anyOptionLabel="All Categories"
                     />
                   </div>
 
@@ -675,13 +691,13 @@ export default function BlogManagementPage() {
                       <TableCell>
                         <Badge variant="outline" className="flex items-center gap-1 w-fit">
                           <Tag className="w-3 h-3" />
-                          {post.category}
+                          {typeof post.category === 'object' ? (post.category as any).name : post.category}
                         </Badge>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1 text-sm">
                           <User className="w-3 h-3 text-muted-foreground" />
-                          {post.author}
+                          {typeof post.author === 'object' ? (post.author as any).name : post.author}
                         </div>
                       </TableCell>
                       <TableCell>

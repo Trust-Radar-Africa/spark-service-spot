@@ -325,7 +325,25 @@ export async function fetchPublicBlogPost(slug: string): Promise<{ post: PublicB
     return { post, related_posts: [] };
   }
 
-  return response.json();
+  // Laravel API response handling
+  const data = await response.json();
+
+  // Handle different response structures:
+  // 1. { post: {...}, related_posts: [...] } - expected format
+  // 2. { data: { post: {...}, related_posts: [...] } } - Laravel resource wrapper
+  // 3. { data: {...} } - Laravel resource with post directly in data
+  if (data.post) {
+    return { post: data.post, related_posts: data.related_posts || [] };
+  }
+  if (data.data?.post) {
+    return { post: data.data.post, related_posts: data.data.related_posts || [] };
+  }
+  if (data.data) {
+    // Post is directly in data (common Laravel resource pattern)
+    return { post: data.data, related_posts: data.related_posts || [] };
+  }
+
+  throw new Error('Unexpected API response format');
 }
 
 export async function fetchFeaturedBlogPosts(limit: number = 3): Promise<{ posts: PublicBlogPost[] }> {
@@ -397,16 +415,37 @@ export async function fetchBlogCategories(): Promise<{
   return response.json();
 }
 
+// Helper to extract string value from category (can be string or object)
+function getCategoryName(category: string | { name: string } | null | undefined): string {
+  if (!category) return 'Uncategorized';
+  if (typeof category === 'string') return category;
+  if (typeof category === 'object' && 'name' in category) return category.name;
+  return 'Uncategorized';
+}
+
+// Helper to extract author name (can be string or object)
+function getAuthorName(author: string | { name: string } | null | undefined): string {
+  if (!author) return 'Unknown';
+  if (typeof author === 'string') return author;
+  if (typeof author === 'object' && 'name' in author) return author.name;
+  return 'Unknown';
+}
+
 // Convert API blog post to frontend format
 export function convertApiBlogToFrontend(post: PublicBlogPost): BlogPost {
-  const authorData = authors[post.author] || {
-    name: post.author,
+  if (!post) {
+    throw new Error('Cannot convert undefined blog post');
+  }
+
+  const authorName = getAuthorName(post.author);
+  const authorData = authors[authorName] || {
+    name: authorName,
     role: 'Contributor',
     bio: '',
     avatar: '/placeholder.svg',
   };
 
-  const readTime = post.reading_time 
+  const readTime = post.reading_time
     ? `${post.reading_time} min read`
     : `${Math.max(1, Math.ceil(post.content.split(/\s+/).length / 200))} min read`;
 
@@ -426,7 +465,7 @@ export function convertApiBlogToFrontend(post: PublicBlogPost): BlogPost {
     author: authorData,
     date,
     readTime,
-    category: post.category,
+    category: getCategoryName(post.category),
     slug: post.slug,
   };
 }

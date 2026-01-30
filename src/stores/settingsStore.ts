@@ -130,6 +130,7 @@ interface SettingsState {
   // Admin Users (for display, managed by backend)
   adminUsers: AdminUser[];
   setAdminUsers: (users: AdminUser[]) => void;
+  createAdminUser: (userData: { name: string; email: string; password: string; role: AdminRole }) => Promise<{ success: boolean; user?: AdminUser; error?: string }>;
 
   // API functions
   fetchSettings: () => Promise<void>;
@@ -178,61 +179,82 @@ export const useSettingsStore = create<SettingsState>()(
 
       // Social Links - start empty, fetch from API
       socialLinks: [],
-      addSocialLink: (link) =>
+      addSocialLink: (link) => {
         set((state) => ({
           socialLinks: [...state.socialLinks, { ...link, id: crypto.randomUUID() }],
-        })),
-      updateSocialLink: (id, link) =>
+        }));
+        get().saveSettingsToApi();
+      },
+      updateSocialLink: (id, link) => {
         set((state) => ({
           socialLinks: state.socialLinks.map((l) =>
             l.id === id ? { ...l, ...link } : l
           ),
-        })),
-      deleteSocialLink: (id) =>
+        }));
+        get().saveSettingsToApi();
+      },
+      deleteSocialLink: (id) => {
         set((state) => ({
           socialLinks: state.socialLinks.filter((l) => l.id !== id),
-        })),
-      reorderSocialLinks: (links) => set({ socialLinks: links }),
+        }));
+        get().saveSettingsToApi();
+      },
+      reorderSocialLinks: (links) => {
+        set({ socialLinks: links });
+        get().saveSettingsToApi();
+      },
 
       // Blog Categories - start empty, fetch from API
       blogCategories: [],
-      addBlogCategory: (category) =>
+      addBlogCategory: (category) => {
         set((state) => ({
           blogCategories: [
             ...state.blogCategories,
             { ...category, id: crypto.randomUUID() },
           ],
-        })),
-      updateBlogCategory: (id, category) =>
+        }));
+        get().saveSettingsToApi();
+      },
+      updateBlogCategory: (id, category) => {
         set((state) => ({
           blogCategories: state.blogCategories.map((c) =>
             c.id === id ? { ...c, ...category } : c
           ),
-        })),
-      deleteBlogCategory: (id) =>
+        }));
+        get().saveSettingsToApi();
+      },
+      deleteBlogCategory: (id) => {
         set((state) => ({
           blogCategories: state.blogCategories.filter((c) => c.id !== id),
-        })),
+        }));
+        get().saveSettingsToApi();
+      },
 
       // Experience Levels - start empty, fetch from API
       experienceLevels: [],
-      addExperienceLevel: (level) =>
+      addExperienceLevel: (level) => {
         set((state) => ({
           experienceLevels: [
             ...state.experienceLevels,
             { ...level, id: crypto.randomUUID() },
           ],
-        })),
-      updateExperienceLevel: (id, level) =>
+        }));
+        get().saveSettingsToApi();
+      },
+      updateExperienceLevel: (id, level) => {
         set((state) => ({
           experienceLevels: state.experienceLevels.map((l) =>
             l.id === id ? { ...l, ...level } : l
           ),
-        })),
-      deleteExperienceLevel: (id) =>
+        }));
+        get().saveSettingsToApi();
+      },
+      deleteExperienceLevel: (id) => {
         set((state) => ({
           experienceLevels: state.experienceLevels.filter((l) => l.id !== id),
-        })),
+        }));
+        get().saveSettingsToApi();
+      },
 
       // Notification Preferences - defaults
       notifications: {
@@ -254,6 +276,39 @@ export const useSettingsStore = create<SettingsState>()(
       adminUsers: [],
       setAdminUsers: (users) => set({ adminUsers: users }),
 
+      // Create admin user
+      createAdminUser: async (userData: { name: string; email: string; password: string; role: AdminRole }) => {
+        const { getApiUrl } = useApiConfigStore.getState();
+
+        try {
+          const token = localStorage.getItem('admin_token');
+          const response = await fetch(getApiUrl('/api/admin/users'), {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(userData),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            const newUser = data.data || data;
+            set((state) => ({
+              adminUsers: [...state.adminUsers, newUser],
+            }));
+            return { success: true, user: newUser };
+          } else {
+            const errorData = await response.json();
+            return { success: false, error: errorData.message || 'Failed to create user' };
+          }
+        } catch (error) {
+          console.error('Failed to create admin user:', error);
+          return { success: false, error: 'Failed to connect to server' };
+        }
+      },
+
       // API functions
       fetchSettings: async () => {
         const { getApiUrl } = useApiConfigStore.getState();
@@ -273,24 +328,66 @@ export const useSettingsStore = create<SettingsState>()(
             const data = await response.json();
             const settings = data.data || data;
 
-            // Update store with fetched settings
+            // Update store with fetched settings - map snake_case to camelCase
             if (settings.branding) {
-              set((state) => ({ branding: { ...state.branding, ...settings.branding } }));
+              const branding: Partial<BrandingSettings> = {};
+              if (settings.branding.company_name) branding.companyName = settings.branding.company_name;
+              if (settings.branding.tagline) branding.tagline = settings.branding.tagline;
+              if (settings.branding.primary_color) branding.primaryColor = settings.branding.primary_color;
+              if (settings.branding.accent_color) branding.accentColor = settings.branding.accent_color;
+              if (settings.branding.logo_url) branding.logoUrl = settings.branding.logo_url;
+              if (settings.branding.logo_path) branding.logoUrl = '/storage/' + settings.branding.logo_path;
+              set((state) => ({ branding: { ...state.branding, ...branding } }));
             }
             if (settings.general) {
-              set((state) => ({ general: { ...state.general, ...settings.general } }));
+              const general: Partial<GeneralSettings> = {};
+              if (settings.general.theme_mode) general.themeMode = settings.general.theme_mode;
+              if (settings.general.items_per_page) general.itemsPerPage = parseInt(settings.general.items_per_page);
+              if (settings.general.date_format) general.dateFormat = settings.general.date_format;
+              if (settings.general.time_format) general.timeFormat = settings.general.time_format;
+              if (settings.general.currency_format) general.currencyFormat = settings.general.currency_format;
+              if (settings.general.auto_archive_days) general.autoArchiveDays = parseInt(settings.general.auto_archive_days);
+              if (settings.general.auto_archive_enabled !== undefined) general.autoArchiveEnabled = settings.general.auto_archive_enabled === 'true' || settings.general.auto_archive_enabled === true;
+              set((state) => ({ general: { ...state.general, ...general } }));
             }
             if (settings.notifications) {
-              set((state) => ({ notifications: { ...state.notifications, ...settings.notifications } }));
+              const notifications: Partial<NotificationPreferences> = {};
+              if (settings.notifications.email_new_candidates !== undefined) notifications.emailNewCandidates = settings.notifications.email_new_candidates === 'true' || settings.notifications.email_new_candidates === true;
+              if (settings.notifications.email_new_employer_requests !== undefined) notifications.emailNewEmployerRequests = settings.notifications.email_new_employer_requests === 'true' || settings.notifications.email_new_employer_requests === true;
+              if (settings.notifications.email_digest_frequency) notifications.emailDigestFrequency = settings.notifications.email_digest_frequency;
+              if (settings.notifications.candidate_threshold) notifications.candidateThreshold = parseInt(settings.notifications.candidate_threshold);
+              if (settings.notifications.employer_threshold) notifications.employerThreshold = parseInt(settings.notifications.employer_threshold);
+              if (settings.notifications.threshold_alert_enabled !== undefined) notifications.thresholdAlertEnabled = settings.notifications.threshold_alert_enabled === 'true' || settings.notifications.threshold_alert_enabled === true;
+              set((state) => ({ notifications: { ...state.notifications, ...notifications } }));
             }
-            if (settings.socialLinks) {
-              set({ socialLinks: settings.socialLinks });
+            if (settings.social_links) {
+              const socialLinks = settings.social_links.map((link: any) => ({
+                id: String(link.id),
+                platform: link.platform,
+                url: link.url,
+                icon: link.icon,
+                enabled: link.is_enabled,
+              }));
+              set({ socialLinks });
             }
-            if (settings.blogCategories) {
-              set({ blogCategories: settings.blogCategories });
+            if (settings.blog_categories) {
+              const blogCategories = settings.blog_categories.map((cat: any) => ({
+                id: String(cat.id),
+                name: cat.name,
+                slug: cat.slug,
+                description: cat.description,
+                isDefault: cat.is_default,
+              }));
+              set({ blogCategories });
             }
-            if (settings.experienceLevels) {
-              set({ experienceLevels: settings.experienceLevels });
+            if (settings.experience_levels) {
+              const experienceLevels = settings.experience_levels.map((level: any) => ({
+                id: String(level.id),
+                value: level.value,
+                label: level.label,
+                isDefault: level.is_default,
+              }));
+              set({ experienceLevels });
             }
             set({ isLoading: false });
             return;

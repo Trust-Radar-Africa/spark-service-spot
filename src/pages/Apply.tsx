@@ -57,7 +57,7 @@ export default function Apply() {
         <div className="container mx-auto px-4 lg:px-8">
           <div className="max-w-2xl mx-auto">
             <div className="bg-card rounded-2xl p-6 sm:p-8 border border-border shadow-card">
-              <CandidateApplicationForm jobTitle={jobTitle} />
+              <CandidateApplicationForm jobTitle={jobTitle} jobId={jobId} />
             </div>
           </div>
         </div>
