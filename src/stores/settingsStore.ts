@@ -1,6 +1,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { useApiConfigStore } from './apiConfigStore';
+import { normalizeHsl } from '@/utils/color';
+
+
 
 // Types
 export interface SocialLink {
@@ -154,11 +157,20 @@ export const useSettingsStore = create<SettingsState>()(
         accentColor: '38 92% 50%',
       },
       setBranding: async (branding) => {
+        const normalized = {
+          ...branding,
+          primaryColor: normalizeHsl(branding.primaryColor),
+          accentColor: normalizeHsl(branding.accentColor),
+          secondaryColor: normalizeHsl((branding as any).secondaryColor),
+        };
+
         set((state) => ({
-          branding: { ...state.branding, ...branding },
+          branding: { ...state.branding, ...normalized },
         }));
+
         await get().saveSettingsToApi();
       },
+
 
       // General Settings - defaults
       general: {
@@ -333,8 +345,13 @@ export const useSettingsStore = create<SettingsState>()(
               const branding: Partial<BrandingSettings> = {};
               if (settings.branding.company_name) branding.companyName = settings.branding.company_name;
               if (settings.branding.tagline) branding.tagline = settings.branding.tagline;
-              if (settings.branding.primary_color) branding.primaryColor = settings.branding.primary_color;
-              if (settings.branding.accent_color) branding.accentColor = settings.branding.accent_color;
+              
+              if (settings.branding.primary_color)
+                branding.primaryColor = normalizeHsl(settings.branding.primary_color);
+
+              if (settings.branding.accent_color)
+                branding.accentColor = normalizeHsl(settings.branding.accent_color);
+
               if (settings.branding.logo_url) branding.logoUrl = settings.branding.logo_url;
               if (settings.branding.logo_path) branding.logoUrl = '/storage/' + settings.branding.logo_path;
               set((state) => ({ branding: { ...state.branding, ...branding } }));

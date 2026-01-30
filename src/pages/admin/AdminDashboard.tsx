@@ -126,18 +126,20 @@ export default function AdminDashboard() {
     }
   }, [datePreset, customRange]);
 
+  // Format date range for stable dependency comparison
+  const fromDate = dateRange.from ? format(dateRange.from, 'yyyy-MM-dd') : null;
+  const toDate = dateRange.to ? format(dateRange.to, 'yyyy-MM-dd') : null;
+
   // Fetch dashboard data on mount and when date range changes
   useEffect(() => {
-    if (dateRange.from && dateRange.to) {
-      fetchDashboard({
-        from: format(dateRange.from, 'yyyy-MM-dd'),
-        to: format(dateRange.to, 'yyyy-MM-dd'),
-      });
+    if (fromDate && toDate) {
+      fetchDashboard({ from: fromDate, to: toDate });
     }
     if (isAdmin) {
       fetchLogs();
     }
-  }, [fetchDashboard, fetchLogs, isAdmin, dateRange.from, dateRange.to]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fromDate, toDate, isAdmin]);
 
   // Manual refresh handler
   const handleRefresh = async () => {

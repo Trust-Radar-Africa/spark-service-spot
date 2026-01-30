@@ -118,7 +118,8 @@ export default function AuditLogPage() {
     if (isAdmin) {
       fetchLogs();
     }
-  }, [fetchLogs, isAdmin]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAdmin]);
 
   const hasActiveFilters = !!(searchTerm || userFilter || moduleFilter || actionFilter || startDate || endDate);
   const activeFilterCount = [userFilter, moduleFilter, actionFilter, startDate, endDate].filter(Boolean).length;

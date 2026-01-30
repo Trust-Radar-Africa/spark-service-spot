@@ -197,7 +197,8 @@ export default function SettingsPage() {
       fetchSettings();
       fetchAdminUsers();
     }
-  }, [isLiveMode, fetchSettings, fetchAdminUsers]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Dialog states
   const [socialLinkDialog, setSocialLinkDialog] = useState<{
@@ -550,7 +551,7 @@ export default function SettingsPage() {
               </CardContent>
             </Card>
 
-            {/* Color Settings - disabled, uncomment to re-enable
+            {/* Color Settings - disabled, uncomment to re-enable */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -636,7 +637,7 @@ export default function SettingsPage() {
                 </div>
               </CardContent>
             </Card>
-            */}
+           
           </TabsContent>
 
           {/* General Tab */}
